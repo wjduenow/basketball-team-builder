@@ -30,9 +30,16 @@
             <div class="divider"></div>
             <p>Please select the Gym Slot you want to start a session for.</p>
 
+            <h4>Today:</h4>
+            {% for gym_slot in gym_slots_today %}
+                <button class="btn btn-flat pink waves-effect waves-light white-text"><a href="start_gym_slot_session/{{gym_slot.id}}">{{gym_slot.name}}</a></button>
+            {% endfor %}
 
-            {% for gym_slot in gym_slots %}
-                <button class="btn btn-flat pink waves-effect waves-light white-text"><a href="start_gym_slot_session?gymslot={{gym_slot.id}}">{{gym_slot.name}}</a></button>
+            <div class="divider"></div>
+
+            <h4>Other Days:</h4>
+            {% for gym_slot in gym_slots_other %}
+                <button class="btn btn-flat pink waves-effect waves-light white-text"><a href="start_gym_slot_session/{{gym_slot.id}}">{{gym_slot.name}}</a></button>
             {% endfor %}
             
 <!--
@@ -45,51 +52,7 @@
 -->
 
         </div>
-        <div class="col l3">
-            <div id="aside">
-                <h3>Aside</h3>
-                <div class="divider"></div>
-                <div class="card">
-                    <div class="card-image">
-                        <img src="//placehold.it/800x450/FF9800/EE00BB">
-                        <span class="card-title">Card Title</span>
-                    </div>
-                    <div class="card-content">
-                        <p>I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively.</p>
-                    </div>
-                    <div class="card-action">
-                        <a href="#">This is a link</a>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-image">
-                        <img src="//placehold.it/800x450/FF9800/EE00BB">
-                        <span class="card-title">Card Title</span>
-                    </div>
-                    <div class="card-content">
-                        <p>I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively.</p>
-                    </div>
-                    <div class="card-action">
-                        <a href="#">This is a link</a>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-image">
-                        <img src="//placehold.it/800x450/FF9800/EE00BB">
-                        <span class="card-title">Card Title 2</span>
-                    </div>
-                    <div class="card-content">
-                        <p>I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively.</p>
-                    </div>
-                    <div class="card-action">
-                        <a href="#">This is a link</a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+       
 
     </div>
 </div>
@@ -128,12 +91,12 @@
     </div>
 </div>
 
-    ...
+
     <!--Import jQuery before materialize.js-->
     {% block footer %}
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
         <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
     {% endblock %}
-    ...
+
   </body>
 </html>

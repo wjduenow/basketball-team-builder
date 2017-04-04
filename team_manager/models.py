@@ -60,6 +60,12 @@ class GymSlot(models.Model):
     end_date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
+    day_of_week = models.CharField(max_length=200, 
+                                   blank=True, null=True, 
+                                   choices=[('Monday', 'Monday'), ('Tuesday', 'Tuesday'), 
+                                         ('Wednesday', 'Wednesday'), ('Thursday', 'Thursday'), 
+                                         ('Friday', 'Friday'), ('Saturday', 'Saturday'), 
+                                         ('Sunday', 'Sunday')])
     black_out_dates = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
