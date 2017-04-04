@@ -15,9 +15,10 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from polls.views import index
+from team_manager.views import index
 
 urlpatterns = [
-    url(r'^$', index),
+    url(r'^$', include('team_manager.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^dashboard/', include('team_manager.urls')),
 ]
