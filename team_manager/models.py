@@ -39,16 +39,20 @@ class Player(models.Model):
         player_stats = PlayerStats.objects.filter(player = self).latest('created_at')
         if player_stats:
             return player_stats
-        return None
+        else:
+            player_stats = PlayerStats.create(player = self).scoring
+            player_stats.save
+            return player_stats
 
 class PlayerStats(models.Model):
-    player = models.ForeignKey(Player, blank=True, null=True)
-    scoring = models.IntegerField()
-    passing = models.IntegerField()
-    rebounding = models.IntegerField()
-    defend_large = models.IntegerField()
-    defend_fast = models.IntegerField()
-    movement = models.IntegerField()
+    player = models.ForeignKey(Player, blank=True, null=True, db_index=True)
+    scoring = models.IntegerField(default=2)
+    outside_shooting = models.IntegerField(default=2)
+    passing = models.IntegerField(default=2)
+    rebounding = models.IntegerField(default=2)
+    defend_large = models.IntegerField(default=2)
+    defend_fast = models.IntegerField(default=2)
+    movement = models.IntegerField(default=2)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class GymSlot(models.Model):
@@ -76,10 +80,11 @@ class GymSlot(models.Model):
 
 class GymSession(models.Model):
     gym_slot = models.ForeignKey(GymSlot, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200)
+    players = models.ManyToManyField(Player)
+    name = models.CharField(max_length=200, blank=True, null=True)
     status = models.CharField(max_length=200, blank=True, null=True)
     start_time = models.DateTimeField(auto_now_add=True)
-    end_time = models.DateTimeField()
+    end_time = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -107,10 +112,6 @@ class Team(models.Model):
     score = models.IntegerField()
     won = models.NullBooleanField()
 
-class GymSessionPlayer(models.Model):
-    gym_session = models.ForeignKey(GymSession, on_delete=models.CASCADE)
-    player = models.ForeignKey(Player, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
 class TeamPlayer(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
