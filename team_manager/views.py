@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.template import RequestContext
 from django.template import loader
 from django.template.context_processors import csrf
 from datetime import datetime
 
-from .models import Player, Group, GymSlot, GymSession, Game, Team, TeamPlayer
+from .models import Player, Group, GymSlot, GymSession, Game, Team, TeamPlayer, PlayerStats
 
 
 
@@ -61,12 +62,44 @@ def gym_slot_session_create(request, gym_slot_id=None):
 def players(request):
     template = loader.get_template('team_manager/players.html')
     players = Player.objects.all().order_by('last_name')
+    player_ids = [int(p.id) for p in players]
+    stats = PlayerStats.objects.raw("SELECT * FROM team_manager_playerstats s WHERE s.id in (SELECT MAX(id) as id FROM team_manager_playerstats GROUP BY player_id);")
+    stats_dict = {}
 
+    for stat in stats:
+        stats_dict[stat.player_id] = stat
+
+    #for player in players:
+    #    player.stats = player.current_stats
     for player in players:
-        player.stats = player.current_stats
+        if player.id in stats_dict:
+            player.stats = stats_dict[int(player.id)]
 
-    context = ({'players': players})
+    context = ({'players': players, 'player_ids': player_ids})
     return HttpResponse(template.render(context, request))
 
-# Create your views here.
+def update_player_stats(request):
+
+    #players = Player.objects.all()#.order_by('last_name')
+
+    for key in request.POST:
+        print(key)
+        value = request.POST[key]
+        print(value)
+
+    print("############")
+
+    print(request.POST["player_ids"])
+
+    for id in request.POST["player_ids"].split():
+        print id
+
+    #for player in players:
+    #    print(player.id)
+        #print(request.POST["stats[" + str(player.id) + "]scoring"])
+
+
+    return redirect(players)
+
+
 

@@ -45,15 +45,11 @@
 
         </div>
         <div class="col l3">
-            <div id="aside">
-                <h3>Past Sessions</h3>
-                <div class="divider"></div>
-                <div class="card">
-                    <div class="card-image">
-                        <img src="//placehold.it/800x450/FF9800/EE00BB">
-                        <span class="card-title">Past Sessions</span>
-                    </div>
-                    <div class="card-action">
+            <div class="card pink darken-1">
+                <div class="card-content white-text">
+                    <span class="card-title">Past Sessions</span>
+                </div>
+                <div class="card-action">
                         {% for session in sessions %}
                             <a href="#">{{session.start_time|date:"SHORT_DATE_FORMAT"}}<br/></a>
                         {% endfor %}
