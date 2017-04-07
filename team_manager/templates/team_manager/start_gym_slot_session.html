@@ -23,16 +23,28 @@
 <!-- main content -->
 <div class="container">
     <div class="row">
-        <div class="col l9">
+        <div class="col l12">
             <h3>Gym Slot: {{gym_slot.name}} </h3>
+
+             <form action="" method="post">
+             {% csrf_token %}
 
             <div class="divider"></div>
             <p>Please select which players are present.</p>
 
 
             {% for player in players %}
-                {{player}}<br/>
+                <p>
+                    <input type="checkbox" id="players_group[]-{{player.id}}" name="players_group[]" value="{{player.id}}" />
+                    <label for="players_group[]-{{player.id}}">{{player}}</label>
+                </p>
             {% endfor %}
+
+            <button class="btn waves-effect pink waves-light" type="submit" name="action">Make Team
+                <i class="material-icons right"></i>
+            </button>
+            </form>
+
             
 <!--
             <div class="row">
@@ -44,6 +56,32 @@
 -->
 
         </div>
+
+        <div class="row">
+        <div class="col s12 m6">
+          <div class="card blue-grey darken-1">
+            <div class="card-content white-text">
+              <span class="card-title">Proposed Teams</span>
+              {% for team,players in teams.items  %}
+                <b>Team A ({{team}})</b><br />
+                <ul>
+
+                    {% for player in players %} 
+                       <li>{{player.first_name}} {{player.last_name}} - {{player.position}}<li>
+                    {% endfor %}
+
+                </ul>
+              {% endfor %}
+
+            </div>
+            <div class="card-action">
+              <a href="#">This is a link</a>
+              <a href="#">This is a link</a>
+            </div>
+          </div>
+        </div>
+      </div>
+<!--
         <div class="col l3">
             <div class="card pink darken-1">
                 <div class="card-content white-text">
@@ -57,7 +95,7 @@
                 </div>
 
             </div>
-
+-->
         </div>
 
     </div>
@@ -97,12 +135,12 @@
     </div>
 </div>
 
-    ...
+
     <!--Import jQuery before materialize.js-->
     {% block footer %}
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
         <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
     {% endblock %}
-    ...
+
   </body>
 </html>

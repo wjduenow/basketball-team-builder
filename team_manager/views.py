@@ -21,11 +21,17 @@ def index(request):
 def start_gym_slot_session(request, gym_slot_id=None):
     template = loader.get_template('team_manager/start_gym_slot_session.html')
 
+    players_group = request.POST.getlist('players_group[]')
+    if players_group:
+        teams = Team.make_team(players_group)
+        print(teams)
+    
+
     gym_slot = GymSlot.objects.get(id = gym_slot_id)
     players = gym_slot.players.all().order_by('last_name')
     sessions = GymSession.objects.filter(gym_slot = gym_slot).all()
 
-    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot, 'sessions': sessions})
+    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot, 'sessions': sessions, 'teams': teams})
     return HttpResponse(template.render(context, request))
 
 def gym_slot_session(request, gym_session_id=None):
@@ -62,7 +68,7 @@ def gym_slot_session_create(request, gym_slot_id=None):
 def players(request):
     template = loader.get_template('team_manager/players.html')
     players = Player.objects.all().order_by('last_name')
-    player_ids = [int(p.id) for p in players]
+    player_ids = ','.join([str(p.id) for p in players])
     stats = PlayerStats.objects.raw("SELECT * FROM team_manager_playerstats s WHERE s.id in (SELECT MAX(id) as id FROM team_manager_playerstats GROUP BY player_id);")
     stats_dict = {}
 
@@ -75,31 +81,35 @@ def players(request):
         if player.id in stats_dict:
             player.stats = stats_dict[int(player.id)]
 
+    ids = range(1, 14)
+    print ids
+    teams = Team.make_team(ids)
+
+    for k,v in teams.items():
+            print(k)
+            for player in v:
+                print("   %s (%s) - %s" % (player['first_name'], player['id'], player['player_score']))
+
     context = ({'players': players, 'player_ids': player_ids})
     return HttpResponse(template.render(context, request))
 
 def update_player_stats(request):
+    ids = request.POST["player_ids"]
+    for id in ids.split(","):
+        scoring = request.POST["scoring[" + str(id) + "]"]
+        outside_shooting = request.POST["outside_shooting[" + str(id) + "]"]
+        passing = request.POST["passing[" + str(id) + "]"]
+        rebounding = request.POST["rebounding[" + str(id) + "]"]
+        defend_large = request.POST["defend_large[" + str(id) + "]"]
+        defend_fast = request.POST["defend_fast[" + str(id) + "]"]
+        movement = request.POST["movement[" + str(id) + "]"]
 
-    #players = Player.objects.all()#.order_by('last_name')
-
-    for key in request.POST:
-        print(key)
-        value = request.POST[key]
-        print(value)
-
-    print("############")
-
-    print(request.POST["player_ids"])
-
-    for id in request.POST["player_ids"].split():
-        print id
-
-    #for player in players:
-    #    print(player.id)
-        #print(request.POST["stats[" + str(player.id) + "]scoring"])
-
+        PlayerStats.objects.create(player = Player.objects.get(id = id), scoring = scoring,
+                                   outside_shooting = outside_shooting, passing = passing, rebounding = rebounding, 
+                                   defend_large = defend_large, defend_fast = defend_fast, movement = movement)
 
     return redirect(players)
+
 
 
 

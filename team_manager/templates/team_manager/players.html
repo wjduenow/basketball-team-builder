@@ -35,7 +35,7 @@
             {% csrf_token %}
 
 
-            <table id="example" class="striped" cellspacing="0" width="100%">
+            <table id="example" class="striped responsive-table scroll" cellspacing="0" width="100%">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -55,14 +55,16 @@
 
                     {% for player in players %}
                     <tr>
-                        <td>{{player}}<input type="hidden" name="player[{{ player.id }}]" value="{{ player.id }}"></td>
+                        <td>{{player}} ({{player.id}})<input type="hidden" name="player[{{ player.id }}]" value="{{ player.id }}"></td>
                         <td>
-                            <select id="scoring" name="scoring[{{ player.id }}]">
+                            <select id="scoring" class="flow-text" name="scoring[{{ player.id }}]">
                                 <option value="1" {% if player.stats.scoring == 1 %}selected{% endif %}>1</option>
                                 <option value="2" {% if player.stats.scoring == 2 %}selected{% endif %}>2</option>
                                 <option value="3" {% if player.stats.scoring == 3 %}selected{% endif %}>3</option>
-                                <option value="4" {% if player.stats.scoring == 4 %}selected{% endif %}>4</option>
-                                <option value="5" {% if player.stats.scoring == 5 %}selected{% endif %}>5</option>
+                                <!-- 
+                                <option value="4" {% if player.stats.defend_fast == 4 %}selected{% endif %}>4</option>
+                                <option value="5" {% if player.stats.defend_fast == 5 %}selected{% endif %}>5</option>
+                                -->
                             </select>
                         </td>
                         <td>
@@ -70,8 +72,10 @@
                                 <option value="1" {% if player.stats.outside_shooting == 1 %}selected{% endif %}>1</option>
                                 <option value="2" {% if player.stats.outside_shooting == 2 %}selected{% endif %}>2</option>
                                 <option value="3" {% if player.stats.outside_shooting == 3 %}selected{% endif %}>3</option>
-                                <option value="4" {% if player.stats.outside_shooting == 4 %}selected{% endif %}>4</option>
-                                <option value="5" {% if player.stats.outside_shooting == 5 %}selected{% endif %}>5</option>
+                                <!-- 
+                                <option value="4" {% if player.stats.defend_fast == 4 %}selected{% endif %}>4</option>
+                                <option value="5" {% if player.stats.defend_fast == 5 %}selected{% endif %}>5</option>
+                                -->
                             </select>
                         </td>
                         <td>
@@ -79,8 +83,10 @@
                                 <option value="1" {% if player.stats.passing == 1 %}selected{% endif %}>1</option>
                                 <option value="2" {% if player.stats.passing == 2 %}selected{% endif %}>2</option>
                                 <option value="3" {% if player.stats.passing == 3 %}selected{% endif %}>3</option>
-                                <option value="4" {% if player.stats.passing == 4 %}selected{% endif %}>4</option>
-                                <option value="5" {% if player.stats.passing == 5 %}selected{% endif %}>5</option>
+                                <!-- 
+                                <option value="4" {% if player.stats.defend_fast == 4 %}selected{% endif %}>4</option>
+                                <option value="5" {% if player.stats.defend_fast == 5 %}selected{% endif %}>5</option>
+                                -->
                             </select>
                         </td>
                         <td>
@@ -88,8 +94,10 @@
                                 <option value="1" {% if player.stats.rebounding == 1 %}selected{% endif %}>1</option>
                                 <option value="2" {% if player.stats.rebounding == 2 %}selected{% endif %}>2</option>
                                 <option value="3" {% if player.stats.rebounding == 3 %}selected{% endif %}>3</option>
-                                <option value="4" {% if player.stats.rebounding == 4 %}selected{% endif %}>4</option>
-                                <option value="5" {% if player.stats.rebounding == 5 %}selected{% endif %}>5</option>
+                                <!-- 
+                                <option value="4" {% if player.stats.defend_fast == 4 %}selected{% endif %}>4</option>
+                                <option value="5" {% if player.stats.defend_fast == 5 %}selected{% endif %}>5</option>
+                                -->
                             </select>
                         </td>
                         <td>
@@ -97,8 +105,10 @@
                                 <option value="1" {% if player.stats.defend_large == 1 %}selected{% endif %}>1</option>
                                 <option value="2" {% if player.stats.defend_large == 2 %}selected{% endif %}>2</option>
                                 <option value="3" {% if player.stats.defend_large == 3 %}selected{% endif %}>3</option>
-                                <option value="4" {% if player.stats.defend_large == 4 %}selected{% endif %}>4</option>
-                                <option value="5" {% if player.stats.defend_large == 5 %}selected{% endif %}>5</option>
+                                <!-- 
+                                <option value="4" {% if player.stats.defend_fast == 4 %}selected{% endif %}>4</option>
+                                <option value="5" {% if player.stats.defend_fast == 5 %}selected{% endif %}>5</option>
+                                -->
                             </select>
                         </td>
                         <td>
@@ -106,8 +116,10 @@
                                 <option value="1" {% if player.stats.defend_fast == 1 %}selected{% endif %}>1</option>
                                 <option value="2" {% if player.stats.defend_fast == 2 %}selected{% endif %}>2</option>
                                 <option value="3" {% if player.stats.defend_fast == 3 %}selected{% endif %}>3</option>
+                                <!-- 
                                 <option value="4" {% if player.stats.defend_fast == 4 %}selected{% endif %}>4</option>
                                 <option value="5" {% if player.stats.defend_fast == 5 %}selected{% endif %}>5</option>
+                                -->
                             </select>
                         </td>
                         <td>
@@ -115,17 +127,18 @@
                                 <option value="1" {% if player.stats.movement == 1 %}selected{% endif %}>1</option>
                                 <option value="2" {% if player.stats.movement == 2 %}selected{% endif %}>2</option>
                                 <option value="3" {% if player.stats.movement == 3 %}selected{% endif %}>3</option>
-                                <option value="4" {% if player.stats.movement == 4 %}selected{% endif %}>4</option>
-                                <option value="5" {% if player.stats.movement == 5 %}selected{% endif %}>5</option>
+                                <!-- 
+                                <option value="4" {% if player.stats.defend_fast == 4 %}selected{% endif %}>4</option>
+                                <option value="5" {% if player.stats.defend_fast == 5 %}selected{% endif %}>5</option>
+                                -->
                             </select>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-
-            <button class="btn waves-effect waves-light" type="submit" name="action">Update Stats
-                <i class="material-icons right">send</i>
+            <br />
+            <button class="btn waves-effect pink waves-light" type="submit" name="action">Update Stats
             </button>
             </form>
             
