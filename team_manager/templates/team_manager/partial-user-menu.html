@@ -5,6 +5,8 @@
 
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
   </head>
 
 <style>
@@ -18,7 +20,6 @@
 </style>   
 
   <body>
-
 
 
 
@@ -36,15 +37,15 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="/">Home</a></li>
+            <li><a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
             {% if user.is_superuser %}
-                <li><a href="/players">Players</a></li>
-                <li><a href="/admin">Admin</a></li>
+                <li><a href="/players"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Players</a></li>
+                <li><a href="/admin"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Admin</a></li>
             {% endif %}
             {% if user.is_authenticated %}
-              <li><a href="/logout">Logout</a></li>
+              <li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Logout</a></li>
             {% else %}
-              <li><a href="/login">Login</a></li>
+              <li><a href="/login"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Login</a></li>
             {% endif %}
           </ul>
         </div><!--/.nav-collapse -->

@@ -38,10 +38,11 @@ def login(request):
 #Logs a user out, redirects to login page
 def logout(request):
     auth_logout(request)
-    template = loader.get_template('team_manager/login.html')
-    context = {}
+    #template = loader.get_template('team_manager/login.html')
+    #context = {}
     messages.success(request, 'You have successfully logged out.')
-    return HttpResponse(template.render(context, request))
+    return HttpResponseRedirect("/")
+    #return HttpResponse(template.render(context, request))
     
 
 

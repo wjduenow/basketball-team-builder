@@ -25,7 +25,8 @@
 
             <h4>Other Days:</h4>
             {% for gym_slot in gym_slots_other %}
-                <button class="btn btn-flat pink waves-effect waves-light white-text"><a href="start_gym_slot_session/{{gym_slot.id}}">{{gym_slot.name}}</a></button>
+                <button class="btn btn-flat pink waves-effect waves-light white-text"><a href="start_gym_slot_session/{{gym_slot.id}}">
+                <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> {{gym_slot.name}}</a></button>
             {% endfor %}
             
 <!--
