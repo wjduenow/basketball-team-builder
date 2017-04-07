@@ -56,7 +56,7 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 def start_gym_slot_session(request, gym_slot_id=None):
-    template = loader.get_template('team_manager/start_gym_slot_sessionbs.html')
+    template = loader.get_template('team_manager/start_gym_slot_session.html')
 
     players_group = request.POST.getlist('players_group[]')
     teams = ""
