@@ -1,14 +1,48 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.template import loader
 from django.template.context_processors import csrf
+from django.contrib import messages
 from datetime import datetime, timedelta
+from django.contrib.auth.models import User
 
 from .models import Player, Group, GymSlot, GymSession, Game, Team, TeamPlayer, PlayerStats
 
+
+#Form to login  
+def login(request):
+    if request.method == 'POST':
+        identifier = request.POST['identifier']
+        password = request.POST['password']
+        users = User.objects.filter(email = identifier)
+        if len(users) == 1:
+            username = users[0].username
+        else:
+            username = identifier
+        user = authenticate(username=username, password=password)
+        if user is not None and user.is_active:
+            auth_login(request, user)
+            messages.success(request, 'Welcome ' + str(username) + ', you are now logged in!')
+            return HttpResponseRedirect("/")
+    else:
+        template = loader.get_template('team_manager/login.html')
+        context = {}
+        return HttpResponse(template.render(context, request))
+    messages.error(request, 'Email or password are invalid!')
+    return HttpResponseRedirect("team_manager//login/")
+
+#Logs a user out, redirects to login page
+def logout(request):
+    auth_logout(request)
+    template = loader.get_template('team_manager/login.html')
+    context = {}
+    messages.success(request, 'You have successfully logged out.')
+    return HttpResponse(template.render(context, request))
+    
 
 
 def index(request):

@@ -1,0 +1,143 @@
+<script>
+$('#cluster-select').click(function(e){
+  e.preventDefault();
+  var link = $(this);
+  link.toggleClass('on');
+  $('#cluster-select-options').fadeToggle();
+});
+$('#settings-toggle').click(function(e){
+  e.preventDefault();
+  $('#settings').fadeToggle();
+});
+function csrfSafeMethod(method) {
+// these HTTP methods do not require CSRF protection
+return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+function getCookie(name) {
+  var cookieValue = null;
+  if (document.cookie && document.cookie != '') {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = jQuery.trim(cookies[i]);
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) == (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+console.log(csrftoken)
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+var utils = {
+  capitalizeFirstLetter: function(str){
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  },
+  capitalizeEachWord: function(str) {
+    return str.replace(/\w\S*/g, function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  },  
+  humanTime: function(microseconds) {
+    if(microseconds == 0){
+      return '0.00 sec'
+    }else if((microseconds / 1000000) < 1){
+      return d3.format('.02f')(microseconds / 1000000) + ' sec'
+    }
+    var ms = Math.floor(microseconds / 1000000);
+    var hours = Math.floor(ms / 3600);
+    hours = hours == 0 ? '' : hours;
+    var minutes = Math.floor((ms % 3600) / 60); 
+    minutes = minutes == 0 ? '' : minutes;
+    var seconds = Math.floor((ms % 360) % 60);
+    seconds = seconds == 0 ? '' : seconds;
+    var stamp = '';
+    if(hours != ''){
+      stamp += hours + " hr ";
+    }
+    if(minutes != ''){
+      stamp += minutes + " min ";
+    }
+    if(seconds != ''){
+      stamp += seconds + " sec";
+    }
+    stamp = stamp == '' ? '<1 sec' : stamp;
+    return stamp;
+  },
+  formatData: function(val, factor){
+    var mod = 1;
+    if(factor == 'GB'){
+      mod = 1000000000
+    }else if(factor == 'MB'){
+      mod = 1000000;
+    }else if(factor == 'KB'){
+      mod = 1000;
+    }
+    if((val == 0)||(val == null)){return 0}
+    var k = val * mod;
+    //console.log(k)
+    if(k < 1000){
+      return d3.format('.02f')(k) + ' B'; 
+    }else{
+      var tmp = d3.format('.5s')(k);
+      var unit_letter = tmp.slice(-1)
+      if(isNaN(parseInt(unit_letter)) == false){
+        return d3.format('.4s')(val * 1000) + 'B';
+      }else{    
+        var splits = tmp.split('.');
+        var deci = splits[1].slice(0, -1)
+        var display_val = tmp.slice(0, -1) + ' ' + unit_letter.toUpperCase() + 'B';
+        if(deci.length > 2){
+          var mod = deci.length == 4 ? 10000 : 1000 ;
+          var two_points = d3.format('.02f')(parseFloat(deci / mod)).split('.')
+          display_val = splits[0] + '.' + two_points[1] + ' ' + unit_letter.toUpperCase() + 'B';
+        }
+        return display_val;
+      }
+    }
+  },
+  equalHeight: function(group) {
+    var tallest = 0;
+    group.each(function() {
+      var thisHeight = $(this).height();
+      if(thisHeight > tallest) {
+        tallest = thisHeight;
+      }
+    });
+    group.height(tallest);
+  },
+  processURLParams: function(){
+    var pageURL = decodeURIComponent(window.location.search.substring(1));
+    var URLVariables = pageURL.split('&');
+    var params = {names : [], full_string: pageURL}
+    for (var i = 0, l = URLVariables.length; i<l; i++) {
+      var pair = URLVariables[i].split('=');
+      if(pair[0] != ''){
+        params.names.push(pair[0]);
+        params[pair[0]] = pair[1];
+      }
+    }
+    return params;
+  },
+  setURLParams: function(params){
+
+    if (history.pushState) {
+      var newurl = window.location.protocol + "//" + 
+          window.location.host + window.location.pathname;
+      if(params != ''){ 
+        newurl += '?' + params;
+      }
+      window.history.pushState({path:newurl},'',newurl);
+    }
+  }    
+}
+</script>
