@@ -1,80 +1,76 @@
 {% load staticfiles %}
 <html>
-  <head>
-    <!--Import materialize.css-->
-    <link type="text/css" rel="stylesheet" href="{% static 'materialize/bin/materialize.css' %}"  media="screen,projection"/>
-  </head>
-  <body>
 
 
 {% include 'team_manager/partial-user-menu.html' %}
 
 
-<!-- main content -->
-<div class="container">
-    <div class="row">
-        <div class="col l12">
-            <h3>Gym Slot: {{gym_slot.name}} </h3>
-            <div class="divider"></div>
-        </div>
+    <!-- main content -->
+    <div class="container theme-showcase" role="main">
+
+    <div class="page-header">
+        <h1>Gym Slot: {{gym_slot.name}}</h1>
     </div>
 
-    <div class="row">
-        <div class="col s12 m6">
-
-             <form action="" method="post">
-             {% csrf_token %}
-
-            
-            <p>Please select which players are present.</p>
-
-            {% for player in players %}
-                <p>
-                    <input type="checkbox" id="players_group[]-{{player.id}}" name="players_group[]" value="{{player.id}}" {% if player.id in players_group %}checked{% endif %}/>
-                    <label for="players_group[]-{{player.id}}">{{player}}</label>
-                </p>
+<div class="container">
+  <div class="row">
+    <form action="" method="post">
+    {% csrf_token %}
+        <div class="col-sm-5 col-sm-offset-1">
+          <div class="list-group" id="list1">
+          <a href="#" class="list-group-item active">Select Players<input title="toggle all" type="checkbox" class="all pull-right"></a>
+          {% for player in players %}
+              <a href="#" class="list-group-item">{{player}}<input type="checkbox" class="pull-right" id="players_group[]-{{player.id}}" name="players_group[]" value="{{player.id}}" {% if player.id in players_group %}checked{% endif %}/></a>
             {% endfor %}
+          </div><!-- end list -->
+
+
+
 
             <button class="btn waves-effect pink waves-light" type="submit" name="action">Make Team
                 <i class="material-icons right"></i>
             </button>
-            </form>
 
-            
-<!--
-            <div class="row">
-                <div class="col s2"><i class="medium mdi-action-label-outline"></i></div>
-                <div class="col s2"><i class="medium mdi-action-loyalty"></i></div>
-                <div class="col s2"><i class="medium mdi-action-query-builder"></i></div>
-                <div class="col s2"><i class="medium mdi-action-settings-applications"></i></div>
-            </div>
--->
+        </div><!-- end col -->
+    </form>
 
-        </div>
+
+
+
+
 
     {% if teams %} 
-        <div class="row">
-        <div class="col s12 m6">
-          <div class="card blue-grey darken-1">
-            <div class="card-content">
-              <span class="card-title">Proposed Teams</span><br />
+
+        <div class="col-sm-5 col-sm-offset-1">
+          <div class="list-group" id="list2">
               {% for team,players in teams.items  %}
-                <ul class="collection">
 
-                    {% for player in players %} 
-                       <li class="collection-item">{{player.first_name}} {{player.last_name}} - {{player.position}}<li>
-                    {% endfor %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                         {% if team == 'team_a' %}
+                            <h3 class="panel-title">Team A ({{team_score.team_a}})</h3>
+                         {% else %}
+                            <h3 class="panel-title">Team B ({{team_score.team_b}})</h3>
+                         {% endif %}
+                    </div>
+                    <div class="panel-body">
+                        {% for player in players %} 
+                            <a  class="list-group-item">{{player.first_name}} {{player.last_name}} - {{player.position}}</a>
+                        {% endfor %}
+                    </div>
+                </div>
 
-                </ul>
               {% endfor %}
 
-            </div>
+
           </div>
         </div>
 
     {% endif %}
-      </div>
-    
+
+</div>
+
+
 <!--
         <div class="col l3">
             <div class="card pink darken-1">
@@ -129,16 +125,77 @@
     </div>
 </div>
 
+    <!-- Latest compiled and minified JavaScript -->
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script>
 
-    <!--Import jQuery before materialize.js-->
-    {% block footer %}
-        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
-    {% endblock %}
+$('.add').click(function(){
+    $('.all').prop("checked",false);
+    var items = $("#list1 input:checked:not('.all')");
+    var n = items.length;
+    if (n > 0) {
+      items.each(function(idx,item){
+        var choice = $(item);
+        choice.prop("checked",false);
+        choice.parent().appendTo("#list2");
+      });
+    }
+    else {
+        alert("Choose an item from list 1");
+    }
+});
 
-    <script type="text/javascript">
-         $(".button-collapse").sideNav();
-    </script>
+$('.remove').click(function(){
+    $('.all').prop("checked",false);
+    var items = $("#list2 input:checked:not('.all')");
+    items.each(function(idx,item){
+      var choice = $(item);
+      choice.prop("checked",false);
+      choice.parent().appendTo("#list1");
+    });
+});
+
+/* toggle all checkboxes in group */
+$('.all').click(function(e){
+    e.stopPropagation();
+    var $this = $(this);
+    if($this.is(":checked")) {
+        $this.parents('.list-group').find("[type=checkbox]").prop("checked",true);
+    }
+    else {
+        $this.parents('.list-group').find("[type=checkbox]").prop("checked",false);
+        $this.prop("checked",false);
+    }
+});
+
+$('[type=checkbox]').click(function(e){
+  e.stopPropagation();
+});
+
+/* toggle checkbox when list group item is clicked */
+$('.list-group a').click(function(e){
+  
+    e.stopPropagation();
+  
+    var $this = $(this).find("[type=checkbox]");
+    if($this.is(":checked")) {
+        $this.prop("checked",false);
+    }
+    else {
+        $this.prop("checked",true);
+    }
+  
+    if ($this.hasClass("all")) {
+        $this.trigger('click');
+    }
+});
+
+
+</script>
+
 
   </body>
 </html>

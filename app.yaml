@@ -8,6 +8,10 @@ handlers:
   static_dir: lib/materialize/static/
 - url: .*
   script: bbtb_site.wsgi.application
+- url: /admin/media
+  static_dir: lib/django/contrib/admin/media
+- url: /static/admin
+  static_dir: lib/django/contrib/admin/static
 
 # Only pure Python libraries can be vendored
 # Python libraries that use C extensions can

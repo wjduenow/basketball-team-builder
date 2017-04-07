@@ -5,6 +5,9 @@ from datetime import datetime
 from operator import itemgetter
 from collections import defaultdict
 
+from django.core.signals import request_finished
+from django.dispatch import receiver
+
 # Create your models here.
 
 
@@ -25,7 +28,7 @@ class Player(models.Model):
     nick_name = models.CharField(max_length=200, blank=True, null=True)
     referred_by = models.ForeignKey('self', blank=True, null=True)
     status = models.CharField(max_length=200, blank=True, null=True, choices=[('Active', 'Active'), ('Inactive', 'Inactive')])
-    size = models.CharField(max_length=200, blank=True, null=True, choices=[('Small', 'Small'), ('Medium', 'Medium'), ('Large', 'Large')])
+    size = models.IntegerField(blank=True, null=True, choices=[('1', 'Small'), ('2', 'Medium'), ('4', 'Large')])
     position = models.CharField(max_length=200, blank=True, null=True, choices=[('Guard', 'Guard'), ('Forward', 'Forward')])
     ball_handler = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -55,7 +58,11 @@ class PlayerStats(models.Model):
     defend_large = models.IntegerField(default=2)
     defend_fast = models.IntegerField(default=2)
     movement = models.IntegerField(default=2)
+    awareness = models.IntegerField(default=2)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def player_score(self):
+        return mean([self.scoring, self.outside_shooting, self.passing, self.rebounding, self.defend_large, self.defend_fast, self.movement, self.awareness])
 
 class GymSlot(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
@@ -141,9 +148,10 @@ class Team(models.Model):
                 player['defend_large'] = stats_dict[int(player['id'])].defend_large
                 player['defend_fast'] = stats_dict[int(player['id'])].defend_fast
                 player['movement'] = stats_dict[int(player['id'])].movement
+                player['awareness'] = stats_dict[int(player['id'])].awareness
                 player['player_score'] = mean([player['scoring'], player['outside_shooting'], 
                                                player['passing'], player['rebounding'], player['defend_large'], 
-                                               player['defend_fast'], player['movement']])
+                                               player['defend_fast'], player['movement'], player['awareness']])
             else:
                 print("DID NOT FIND STATS FOR %s" % (player['id']))
                 player['player_score'] = 2.1
@@ -161,8 +169,8 @@ class Team(models.Model):
 
         #Sort by Scoring and Assign to B and then A
         sl = sorted(sl, key=itemgetter('scoring', 'player_score'), reverse=True)
-        team_a.append(sl.pop(0))
         team_b.append(sl.pop(0))
+        team_a.append(sl.pop(0))
 
         if group_size < 6:
             return teams
@@ -170,7 +178,7 @@ class Team(models.Model):
         ### Scoring Existing Teams for OutSide Shooting and Assign Best Shooter to Worst Team
         sl = sorted(sl, key=itemgetter('outside_shooting'), reverse=True)
 
-        sorted_team = sort_team_on_metric(teams, 'outside_shooting')
+        sorted_team = Team.sort_team_on_metric(teams, 'outside_shooting')
         if sorted_team['team_a'] < sorted_team['team_a']:
             team_a.append(sl.pop(0))
             team_b.append(sl.pop(0))
@@ -184,8 +192,8 @@ class Team(models.Model):
         ### Scoring Existing Teams for player_score and Assign Best Movement to Worst Team
         sl = sorted(sl, key=itemgetter('movement'), reverse=True)
 
-        sorted_team = sort_team_on_metric(teams, 'player_score')
-        if sorted_team['team_a'] < sorted_team['team_a']:
+        sorted_team = Team.sort_team_on_metric(teams, 'player_score')
+        if sorted_team['team_a'] < sorted_team['team_b']:
             team_a.append(sl.pop(0))
             team_b.append(sl.pop(0))
         else:
@@ -195,18 +203,36 @@ class Team(models.Model):
         if group_size < 10:
             return teams
 
-        ### Scoring Existing Teams for player_score and Assign Best player_score to Worst Team
+        ### Scoring Existing Teams for player_score and Assign Best big player_score to Worst Team
         sl = sorted(sl, key=itemgetter('player_score'), reverse=True)
 
-        sorted_team = sort_team_on_metric(teams, 'player_score')
-        if sorted_team['team_a'] < sorted_team['team_a']:
+        sorted_team = sort_team_on_metric_size(teams, 'player_score')
+        if sorted_team['team_a'] < sorted_team['team_b']:
             team_a.append(sl.pop(0))
             team_b.append(sl.pop(0))
         else:
             team_b.append(sl.pop(0))
             team_a.append(sl.pop(0))
 
+        ### Calculate Team Scores
+        sorted_team = Team.sort_team_on_metric(teams, 'player_score')
+        team_score = {'team_a': sorted_team['team_a'], 'team_b': sorted_team['team_b']}
+        if abs(sorted_team['team_a'] - sorted_team['team_b']) > 2:
+            print("Model Error: The Teams are Mismatched")
+
         return teams
+
+    @classmethod
+    def sort_team_on_metric(cls, teams, metric):
+        sorted_team = {}
+        for team,players in teams.items():
+            outside_shooting = 0
+            for player in teams[team]:
+                outside_shooting += player[metric]
+
+            sorted_team[team] = int(outside_shooting)
+
+        return sorted_team
 
 
 class TeamPlayer(models.Model):
@@ -218,12 +244,14 @@ class TeamPlayer(models.Model):
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
 
-def sort_team_on_metric(teams, metric):
+def sort_team_on_metric_size(teams, metric):
     sorted_team = {}
     for team,players in teams.items():
         outside_shooting = 0
         for player in teams[team]:
-            outside_shooting += player[metric]
+            outside_shooting += player[metric] * (player['size'])
+            print(player['first_name'])
+            print(player[metric] * (player['size']))
 
         sorted_team[team] = int(outside_shooting)
 

@@ -1,13 +1,56 @@
 {% load staticfiles %}
 <html>
-  <head>
-    <!--Import materialize.css-->
-    <link type="text/css" rel="stylesheet" href="{% static 'materialize/bin/materialize.css' %}"  media="screen,projection"/>
-  </head>
-  <body>
+
+
 
 
 {% include 'team_manager/partial-user-menu.html' %}
+
+
+<style>
+
+table {
+        width: 100%;
+    }
+
+thead, tbody, tr, td, th { display: block; }
+
+tr:after {
+    content: ' ';
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+
+
+
+
+
+tbody {
+    height: 400px;
+    overflow-y: auto;
+}
+
+thead {
+    /* fallback */
+}
+
+
+tbody td, thead th {
+    width: 9%;
+    float: left;
+}
+
+.td-name {
+    width: 19%;
+    float: left;
+}
+
+.table-condensed{
+  font-size: 10px;
+}
+
+</style>
 
 
 <!-- main content -->
@@ -15,7 +58,7 @@
     <div class="row">
 
 
-        <div class="col l12">
+        <div class="col">
             <br />
             <h3>Players</h3>
 
@@ -24,18 +67,20 @@
             <input type="hidden" name="player_ids" value="{{player_ids}}">
             {% csrf_token %}
 
-
-            <table id="example" class="dataTable" cellspacing="0" width="100%">
+            <div class="table-responsive">
+            <table id="example" class="table table-striped table-bordered table-condensed">
                 <thead>
                     <tr>
-                        <th>Name</th>
+                        <th class="td-name">Name</th>
+                        <th>Player Score</th>
                         <th>Scoring</th>
                         <th>Shooting</th>
-                        <th>Passing</th>
-                        <th>Rebounding</th>
-                        <th>D Large</th>
-                        <th>D Fast</th>
-                        <th>Movement</th>
+                        <th>Pass</th>
+                        <th>Reb</th>
+                        <th>D.Large</th>
+                        <th>D.Fast</th>
+                        <th>Move</th>
+                        <th>Aware</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -45,7 +90,8 @@
 
                     {% for player in players %}
                     <tr>
-                        <td>{{player}} ({{player.id}})<input type="hidden" name="player[{{ player.id }}]" value="{{ player.id }}"></td>
+                        <td class="td-name">{{player}} ({{player.id}})<input type="hidden" name="player[{{ player.id }}]" value="{{ player.id }}"></td>
+                        <td>({{player.player_score}})</td>
                         <td>
                             <select id="scoring" name="scoring[{{ player.id }}]">
                                 <option value="1" {% if player.stats.scoring == 1 %}selected{% endif %}>1</option>
@@ -123,10 +169,22 @@
                                 -->
                             </select>
                         </td>
+                        <td>
+                            <select id="awareness" name="awareness[{{ player.id }}]">
+                                <option value="1" {% if player.stats.awareness == 1 %}selected{% endif %}>1</option>
+                                <option value="2" {% if player.stats.awareness == 2 %}selected{% endif %}>2</option>
+                                <option value="3" {% if player.stats.awareness == 3 %}selected{% endif %}>3</option>
+                                <!-- 
+                                <option value="4" {% if player.stats.awareness == 4 %}selected{% endif %}>4</option>
+                                <option value="5" {% if player.stats.awareness == 5 %}selected{% endif %}>5</option>
+                                -->
+                            </select>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
             <br />
             <button class="btn waves-effect pink waves-light" type="submit" name="action">Update Stats
             </button>
@@ -182,11 +240,12 @@
 </div>
 
 
-    <!--Import jQuery before materialize.js-->
-    {% block footer %}
-        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
-    {% endblock %}
+
+    <!-- Latest compiled and minified JavaScript -->
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
     <script>
         $(document).ready(function() {

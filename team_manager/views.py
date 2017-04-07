@@ -56,19 +56,22 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 def start_gym_slot_session(request, gym_slot_id=None):
-    template = loader.get_template('team_manager/start_gym_slot_session.html')
+    template = loader.get_template('team_manager/start_gym_slot_sessionbs.html')
 
     players_group = request.POST.getlist('players_group[]')
     teams = ""
+    team_score = ""
     if players_group:
         teams = Team.make_team(players_group)
+        sorted_team = Team.sort_team_on_metric(teams, 'player_score')
+        team_score = {'team_a': sorted_team['team_a'], 'team_b': sorted_team['team_b']}
 
     players_group = map(int, players_group)
     gym_slot = GymSlot.objects.get(id = gym_slot_id)
     players = gym_slot.players.all().order_by('last_name')
     sessions = GymSession.objects.filter(gym_slot = gym_slot).all()
 
-    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot, 'sessions': sessions, 'teams': teams, 'players_group': players_group})
+    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot, 'sessions': sessions, 'teams': teams, 'players_group': players_group, 'team_score': team_score})
     return HttpResponse(template.render(context, request))
 
 def gym_slot_session(request, gym_session_id=None):
@@ -114,19 +117,10 @@ def players(request):
         stats_dict[stat.player_id] = stat
 
     #for player in players:
-    #    player.stats = player.current_stats
     for player in players:
         if player.id in stats_dict:
             player.stats = stats_dict[int(player.id)]
-
-    ids = range(1, 14)
-    print ids
-    teams = Team.make_team(ids)
-
-    for k,v in teams.items():
-            print(k)
-            for player in v:
-                print("   %s (%s) - %s" % (player['first_name'], player['id'], player['player_score']))
+            player.player_score = round(player.stats.player_score(), 2)
 
     context = ({'players': players, 'player_ids': player_ids})
     return HttpResponse(template.render(context, request))
@@ -142,13 +136,15 @@ def update_player_stats(request):
         defend_large = request.POST["defend_large[" + str(id) + "]"]
         defend_fast = request.POST["defend_fast[" + str(id) + "]"]
         movement = request.POST["movement[" + str(id) + "]"]
+        awareness = request.POST["awareness[" + str(id) + "]"]
 
         PlayerStats.objects.create(player = Player.objects.get(id = id), scoring = scoring,
                                    outside_shooting = outside_shooting, passing = passing, rebounding = rebounding, 
-                                   defend_large = defend_large, defend_fast = defend_fast, movement = movement)
+                                   defend_large = defend_large, defend_fast = defend_fast, movement = movement, awareness = awareness)
 
     return redirect(players)
 
 
-
+def mean(numbers):
+    return float(sum(numbers)) / max(len(numbers), 1)
 
