@@ -35,16 +35,16 @@
             {% csrf_token %}
 
 
-            <table id="example" class="striped responsive-table scroll" cellspacing="0" width="100%">
+            <table id="example" class="dataTable" cellspacing="0" width="100%">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Scoring</th>
-                        <th>Outside Shooting</th>
+                        <th>Shooting</th>
                         <th>Passing</th>
                         <th>Rebounding</th>
-                        <th>Defend Large</th>
-                        <th>Defend Fast</th>
+                        <th>D Large</th>
+                        <th>D Fast</th>
                         <th>Movement</th>
                     </tr>
                 </thead>
@@ -57,7 +57,7 @@
                     <tr>
                         <td>{{player}} ({{player.id}})<input type="hidden" name="player[{{ player.id }}]" value="{{ player.id }}"></td>
                         <td>
-                            <select id="scoring" class="flow-text" name="scoring[{{ player.id }}]">
+                            <select id="scoring" name="scoring[{{ player.id }}]">
                                 <option value="1" {% if player.stats.scoring == 1 %}selected{% endif %}>1</option>
                                 <option value="2" {% if player.stats.scoring == 2 %}selected{% endif %}>2</option>
                                 <option value="3" {% if player.stats.scoring == 3 %}selected{% endif %}>3</option>
