@@ -14,14 +14,13 @@
 
 from django.conf.urls import include, url
 from django.contrib import admin
-
+from . import views
 from team_manager.views import index
 
 urlpatterns = [
     url(r'', include('team_manager.urls')),
     url(r'^login/$', views.login),
     url(r'^logout/$', views.logout),
-    url(r'^register/$', views.register),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^dashboard/', include('team_manager.urls')),
 ]
