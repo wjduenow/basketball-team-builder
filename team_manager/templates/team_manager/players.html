@@ -73,8 +73,8 @@ thead {
 
                     {% for player in players %}
                     <tr>
-                        <td class="td-name">{{player}} ({{player.id}})<input type="hidden" name="player[{{ player.id }}]" value="{{ player.id }}"></td>
-                        <td>({{player.player_score}})</td>
+                        <td class="td-name">{{player}}<input type="hidden" name="player[{{ player.id }}]" value="{{ player.id }}"></td>
+                        <td>{{player.player_score}}</td>
                         <td>
                             <select id="scoring" name="scoring[{{ player.id }}]">
                                 <option value="1" {% if player.stats.scoring == 1 %}selected{% endif %}>1</option>
@@ -169,19 +169,12 @@ thead {
             </table>
             </div>
             <br />
-            <button class="" type="submit" name="action">Update Stats <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> 
+            <button class="btn btn-primary" type="submit" name="action">Update Stats <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> 
             </button>
             </form>
             
 
-<!--
-            <div class="row">
-                <div class="col s2"><i class="medium mdi-action-label-outline"></i></div>
-                <div class="col s2"><i class="medium mdi-action-loyalty"></i></div>
-                <div class="col s2"><i class="medium mdi-action-query-builder"></i></div>
-                <div class="col s2"><i class="medium mdi-action-settings-applications"></i></div>
-            </div>
--->
+
 
         </div>
        
@@ -190,38 +183,7 @@ thead {
 </div>
 
 
-<!--login modal-->
-<div id="modalLogin" class="modal">
-    <div class="modal-content">
-        <h2 class="center-align">Login</h2>
-        <div class="center-align">
-            <div class="divider"></div>
-            <form class="col s12">
-                <div class="row center-align">
-                    <div class="input-field col m10 offset-m1 blue-text">
-                        <i class="mdi-action-account-circle prefix"></i>
-                        <input id="icon_prefix" type="text" class="validate">
-                        <label for="icon_prefix">Username</label>
-                    </div>
-                    <div class="input-field col m10 offset-m1 blue-text ">
-                        <i class="mdi-action-lock-open prefix"></i>
-                        <input id="icon_password" type="password" class="validate">
-                        <label for="icon_password">Password</label>
-                    </div>
-                    <div class="input-field col m10 offset-m1 blue-text">
-                        <input type="checkbox" class="blue-text" id="filled-in-box" checked="checked">
-                        <label for="filled-in-box">Remember me next time</label>
-                    </div>
-                </div>
-            </form>
-            <div class="divider"></div>
-            <p>
-                <a href="#" class="btn btn-flat white modal-close">Cancel</a> &nbsp;
-                <a href="#" class="waves-effect waves-blue blue btn btn-flat modal-action modal-close">Login</a>
-            </p>
-        </div>
-    </div>
-</div>
+
 
 
 
@@ -232,16 +194,6 @@ thead {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
     
-
-    <script>
-        $(document).ready(function() {
-            $('select').material_select();
-        });
-     </script>
-
-    <script type="text/javascript">
-         $(".button-collapse").sideNav();
-    </script>
 
   </body>
 </html>
