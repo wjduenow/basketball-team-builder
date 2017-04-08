@@ -61,7 +61,7 @@ span.badge.pull-right {
     {% csrf_token %}
         <div class="col-sm-5 col-sm-offset-1" id="general-content" >
           <div class="list-group" id="list1">
-          <a href="#" class="list-group-item active" id="general">Select Players <i><span class="badge counter"></span></i> <input title="toggle all" type="checkbox" class="all pull-right"></a>
+          <a href="#" class="list-group-item active" id="general">Select Players <i><span class="badge badge-pill badge-primary counter"></span></i> <input title="toggle all" type="checkbox" class="all pull-right"></a>
           {% for player in players %}
               <a href="#!" class="list-group-item">{{player}}<input type="checkbox" class="pull-right" id="players_group[]-{{player.id}}" name="players_group[]" value="{{player.id}}" {% if player.id in players_group %}checked{% endif %}/></a>
             {% endfor %}
