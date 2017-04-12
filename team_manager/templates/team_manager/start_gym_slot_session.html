@@ -11,7 +11,7 @@
 
 span.badge.pull-right {
     margin-left: 10px;
-    width: 100px;
+
 }
 
 </style>
@@ -35,9 +35,15 @@ span.badge.pull-right {
                 <div class="panel panel-default">
                     <div class="panel-heading">
                          {% if team == 'team_a' %}
-                            <h3 class="panel-title">Team A <span class="badge badge-pill badge-primary pull-right">Score: {{team_score.team_a}}</span></h3>
+                            <h3 class="panel-title">Team A 
+                                <span class="badge badge-pill badge-primary pull-right">Score: {{team_score.team_a}}</span>
+                                <span class="badge badge-pill badge-primary pull-right">Size: {{team_size.team_a}}</span>
+                            </h3>
                          {% else %}
-                            <h3 class="panel-title">Team B <span class="badge badge-pill badge-primary pull-right">Score: {{team_score.team_b}}</span></h3>
+                            <h3 class="panel-title">Team B 
+                                <span class="badge badge-pill badge-primary pull-right">Score: {{team_score.team_b}}</span>
+                                <span class="badge badge-pill badge-primary pull-right">Size: {{team_size.team_b}}</span>
+                            </h3>
                          {% endif %}
                     </div>
                     <div class="panel-body">
@@ -67,17 +73,116 @@ span.badge.pull-right {
             {% endfor %}
           </div><!-- end list -->
 
-            <button class="btn btn-primary" type="submit" name="action">Make Teams
-                <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-            </button>
+
+                <button class="btn btn-primary" type="submit" name="action">Make Teams
+                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"> Advanced 
+                    <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                </button>
+
+            
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Adjust Model Weights</h4>
+      </div>
+      <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-5">
+                        Scoring:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="scoring" value="{% firstof model_weights.scoring 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                        Outside Shooting:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="outside_shooting" value="{% firstof model_weights.outside_shooting 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                        Passing:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="passing" value="{% firstof model_weights.passing 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                        Rebounding:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="rebounding" value="{% firstof model_weights.rebounding 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                        Defend Large:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="defend_large" value="{% firstof model_weights.defend_large 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                        Defend Fast:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="defend_fast" value="{% firstof model_weights.defend_fast 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                        Movement:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="movement" value="{% firstof model_weights.movement 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                        Awareness:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="awareness" value="{% firstof model_weights.awareness 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                        Size:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="size" value="{% firstof model_weights.size 1 %}">
+                    </div>
+                </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button class="btn btn-primary" type="submit" name="action">Make Teams
+            <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
         </div><!-- end col -->
     </form>
 
 
-
-
 </div>
+
+
+
 
 
 <!--

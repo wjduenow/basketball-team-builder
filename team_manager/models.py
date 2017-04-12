@@ -28,7 +28,7 @@ class Player(models.Model):
     nick_name = models.CharField(max_length=200, blank=True, null=True)
     referred_by = models.ForeignKey('self', blank=True, null=True)
     status = models.CharField(max_length=200, blank=True, null=True, choices=[('Active', 'Active'), ('Inactive', 'Inactive')])
-    size = models.IntegerField(blank=True, null=True, choices=[('1', 'Small'), ('2', 'Medium'), ('4', 'Large')])
+    size = models.IntegerField(blank=True, null=True, choices=[('1', 'Small'), ('2', 'Medium'), ('3', 'Large')])
     position = models.CharField(max_length=200, blank=True, null=True, choices=[('Guard', 'Guard'), ('Forward', 'Forward')])
     ball_handler = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -122,7 +122,7 @@ class Team(models.Model):
     won = models.NullBooleanField()
     
     @classmethod
-    def make_team(cls, player_ids):
+    def make_team(cls, player_ids, model_weights = {}):
         team_a = []
         team_b = []
         stats_dict = {}
@@ -141,6 +141,7 @@ class Team(models.Model):
         ### Append Stats to Players
         for player in players:
             if player['id'] in stats_dict:
+                player['size'] = player['size']
                 player['scoring'] = stats_dict[int(player['id'])].scoring
                 player['outside_shooting'] = stats_dict[int(player['id'])].outside_shooting
                 player['passing'] = stats_dict[int(player['id'])].passing
@@ -149,26 +150,31 @@ class Team(models.Model):
                 player['defend_fast'] = stats_dict[int(player['id'])].defend_fast
                 player['movement'] = stats_dict[int(player['id'])].movement
                 player['awareness'] = stats_dict[int(player['id'])].awareness
+
+                ## Add in Weights
+                for k,v in model_weights.items():
+                    if v.isnumeric():
+                        player[k] = float(player[k]) * float(v)
+
                 player['player_score'] = mean([player['scoring'], player['outside_shooting'], 
                                                player['passing'], player['rebounding'], player['defend_large'], 
-                                               player['defend_fast'], player['movement'], player['awareness']])
+                                               player['defend_fast'], player['movement'], player['awareness'], player['size']])
             else:
                 print("DID NOT FIND STATS FOR %s" % (player['id']))
-                player['player_score'] = 2.1
+                player['player_score'] = 2
 
-      
 
-        ### Sort by Ball Handler and Assign Best Ball Handlers to Teams A and B
-        sl = sorted(players, key=itemgetter('ball_handler', 'player_score'), reverse=True)
+        #Sort by Scoring and Assign to B and then A
+        sl = sorted(players, key=itemgetter('scoring', 'player_score'), reverse=True)
         team_a.append(sl.pop(0))
         team_b.append(sl.pop(0))
+        
 
         if group_size < 4:
             return teams
- 
 
-        #Sort by Scoring and Assign to B and then A
-        sl = sorted(sl, key=itemgetter('scoring', 'player_score'), reverse=True)
+        ### Sort by Ball Handler and Assign Best Ball Handlers to Teams A and B
+        sl = sorted(sl, key=itemgetter('ball_handler', 'player_score'), reverse=True)        
         team_b.append(sl.pop(0))
         team_a.append(sl.pop(0))
 
@@ -190,9 +196,9 @@ class Team(models.Model):
             return teams
 
         ### Scoring Existing Teams for player_score and Assign Best Movement to Worst Team
-        sl = sorted(sl, key=itemgetter('movement'), reverse=True)
+        sl = sorted(sl, key=itemgetter('player_score'), reverse=True)
 
-        sorted_team = Team.sort_team_on_metric(teams, 'player_score')
+        sorted_team = sort_team_on_metric_size(teams, 'player_score')
         if sorted_team['team_a'] < sorted_team['team_b']:
             team_a.append(sl.pop(0))
             team_b.append(sl.pop(0))
@@ -250,8 +256,6 @@ def sort_team_on_metric_size(teams, metric):
         outside_shooting = 0
         for player in teams[team]:
             outside_shooting += player[metric] * (player['size'])
-            print(player['first_name'])
-            print(player[metric] * (player['size']))
 
         sorted_team[team] = int(outside_shooting)
 
