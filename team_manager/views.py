@@ -43,14 +43,9 @@ def login(request):
 #Logs a user out, redirects to login page
 def logout(request):
     auth_logout(request)
-    #template = loader.get_template('team_manager/login.html')
-    #context = {}
     messages.success(request, 'You have successfully logged out.')
     return HttpResponseRedirect("/")
-    #return HttpResponse(template.render(context, request))
     
-
-
 def index(request):
     #return HttpResponse("Hello, world. You're at the team manager index.")
     template = loader.get_template('team_manager/index.html')
@@ -60,6 +55,25 @@ def index(request):
     gym_slots_today = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).filter(day_of_week = today).all()
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
     context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other})
+    return HttpResponse(template.render(context, request))
+
+def view_gym_slot(request, gym_slot_id=None):
+    template = loader.get_template('team_manager/gym_slot.html')
+    gym_slot = GymSlot.objects.get(id = gym_slot_id)
+
+    today = datetime.now().date()
+
+    context = ({'gym_slot': gym_slot, 'today': today})
+    return HttpResponse(template.render(context, request))
+
+def view_gym_session(request, gym_session_id=None):
+    template = loader.get_template('team_manager/start_gym_slot_session.html')
+    gym_session = GymSession.objects.get(id = gym_session_id)
+
+    available_players = Player.objects.exclude(pk__in=gym_session.players.values_list('id', flat=True)).filter(pk__in=gym_session.gym_slot.players.values_list('id', flat=True))
+    print available_players.count()
+
+    context = ({'gym_session': gym_session, 'available_players': available_players})
     return HttpResponse(template.render(context, request))
 
 def view_game(request, game_id=None):
@@ -191,7 +205,7 @@ def new_game(request, gym_slot_id=None, teams=None):
     return HttpResponse(template.render(context, request))
 
 def start_gym_slot_session(request, gym_slot_id=None):
-    template = loader.get_template('team_manager/start_gym_slot_session.html')
+    template = loader.get_template('team_manager/start_gym_slot_session2.html')
 
     players_group = request.POST.getlist('players_group[]')
     teams = ""

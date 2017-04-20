@@ -7,47 +7,48 @@
 
 
 <!-- main content -->
-<div class="container">
-    <div class="row">
-        <div class="col l9">
-            <br />
-            <h3>Gym Slot</h3>
 
-            <p>Select the slot you want to start a session for:</p>
+<div class="container theme-showcase" role="main">
+
+  <div class="page-header col-sm-10">
+      <h1>Gym Slot: {{gym_slot.name}}</h1>
+      <p>Select the slot you want to start a session for:</p>
+  </div>
 
 
 
-<div class="list-group">
-  <a href="#" class="list-group-item active">
-    Today
-  </a>
-    {% if gym_slots_today %}
-      {% for gym_slot in gym_slots_today %}
-         <a href="start_gym_slot_session/{{gym_slot.id}}" class="list-group-item list-group-item-action"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> {{gym_slot.name}}</a>
+  <div class="col-sm-10">
+    <div class="list-group">
+      <a href="#" class="list-group-item active">
+        Today
+      </a>
+        {% if gym_slots_today %}
+          {% for gym_slot in gym_slots_today %}
+             <a href="gym_slot/{{gym_slot.id}}" class="list-group-item list-group-item-action"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> {{gym_slot.name}}</a>
+           {% endfor %}
+        {% else %}
+            <a href="" class="list-group-item list-group-item-action">No Gym Slots Scheduled Today</a>
+        {% endif %}
+    </div>
+  </div>
+
+
+  <div class="col-sm-10">
+    <div class="list-group">
+      <a href="#" class="list-group-item active">
+        Other Days
+      </a>
+      {% for gym_slot in gym_slots_other %}
+         <a href="gym_slot/{{gym_slot.id}}" class="list-group-item list-group-item-action"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> {{gym_slot.name}}</a>
        {% endfor %}
-    {% else %}
-        <a href="" class="list-group-item list-group-item-action">No Gym Slots Scheduled Today</a>
-    {% endif %}
-</div>
-
-
-<div class="list-group">
-  <a href="#" class="list-group-item active">
-    Other Days
-  </a>
-  {% for gym_slot in gym_slots_other %}
-     <a href="start_gym_slot_session/{{gym_slot.id}}" class="list-group-item list-group-item-action"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> {{gym_slot.name}}</a>
-   {% endfor %}
-</div>
+    </div>
+  </div>
 
             
 
 
-        </div>
-       
-
-    </div>
 </div>
+       
 
 
 

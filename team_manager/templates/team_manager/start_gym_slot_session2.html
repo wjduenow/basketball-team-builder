@@ -1,0 +1,410 @@
+{% load staticfiles %}
+<html>
+
+
+{% include 'team_manager/partial-user-menu.html' %}
+
+<script>
+
+
+function change_team(player) {
+    var team = player.closest('div.panel-body');
+    if (team.attr('id') == 'team_a') {
+        //var team_name = 'team_b[]'
+        //var inpu = player.closest("button.btn")
+        //( "input" ).find(".player_checkbox").val();
+        //alert(inpu.attr('class'));
+        //var btn = player.closest("button.btn")
+        //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
+        $( "#team_b" ).append(player);
+    } else {
+        $( "#team_a" ).append(player);
+    }
+
+    var btn = player.closest("button.btn")
+    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down')
+
+}
+
+</script>
+
+<style>
+.panel-heading {
+  background-color: #337ab7;
+}
+
+span.badge.pull-right {
+    margin-left: 10px;
+
+}
+
+.btn-circle {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  padding: 3px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+
+</style>
+
+
+    <!-- main content -->
+    <div class="container theme-showcase" role="main">
+
+    <div class="page-header">
+        <h1>Gym Slot: {{gym_slot.name}}</h1>
+    </div>
+
+<div class="container">
+
+    {% if teams %} 
+    <form action="/new_game/{{gym_slot.id}}" method="POST">
+    {% csrf_token %}
+
+        <div class="col-sm-5 col-sm-offset-1">
+          <div class="list-group" id="list2">
+              {% for team,players in teams.items  %}
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                         {% if team == 'team_a' %}
+                            <h3 class="panel-title">Team A 
+                                <span class="badge badge-pill badge-primary pull-right">Score: {{team_score.team_a}}</span>
+                                <span class="badge badge-pill badge-primary pull-right">Size: {{team_size.team_a}}</span>
+                            </h3>
+                         {% else %}
+                            <h3 class="panel-title">Team B 
+                                <span class="badge badge-pill badge-primary pull-right">Score: {{team_score.team_b}}</span>
+                                <span class="badge badge-pill badge-primary pull-right">Size: {{team_size.team_b}}</span>
+                            </h3>
+                         {% endif %}
+                    </div>
+                    <div class="panel-body" id="{{team}}">
+                        {% for player in players %} 
+                            <div id="player_{{player.id}}" class="list-group-item player">{{player.first_name}} {{player.last_name}} - {{player.position}}
+                            
+
+                             <button type="button" class="btn btn-default btn-circle btn-xs pull-right" aria-label="Left Align">
+                                {% if team == 'team_a' %}
+                                    <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                {% endif %}
+                            </button>
+
+                            <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
+
+
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                </div>
+
+              {% endfor %}
+
+
+          </div>
+          <input type="hidden" name="teams" value="{{ teams_json }}">
+          <button class="btn btn-success btn-sm" type="submit" name="action">
+                    New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
+          </button>
+
+
+        </form>
+
+
+
+        </div>
+
+    {% endif %}
+
+
+  <div class="row">
+    <form action="" method="post">
+    {% csrf_token %}
+        <div class="col-sm-5 col-sm-offset-1" id="general-content" >
+          <div class="list-group" id="list1">
+          <a href="#" class="list-group-item active" id="general">Select Players <i><span class="badge badge-pill badge-primary counter"></span></i> <input title="toggle all" type="checkbox" class="all pull-right"></a>
+          {% for player in players %}
+              <a href="#!" class="list-group-item">{{player}}<input type="checkbox" class="pull-right" id="players_group[]-{{player.id}}" name="players_group[]" value="{{player.id}}" {% if player.id in players_group %}checked{% endif %}/></a>
+            {% endfor %}
+          </div><!-- end list -->
+
+
+                <button class="btn btn-primary" type="submit" name="action">Make Teams
+                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"> Advanced 
+                    <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                </button>
+
+            
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Adjust Model Weights</h4>
+      </div>
+      <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-6">
+                        Scoring:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="scoring" value="{% firstof model_weights.scoring 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        Outside Shooting:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="outside_shooting" value="{% firstof model_weights.outside_shooting 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        Passing:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="passing" value="{% firstof model_weights.passing 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        Rebounding:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="rebounding" value="{% firstof model_weights.rebounding 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        Defend Large:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="defend_large" value="{% firstof model_weights.defend_large 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        Defend Fast:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="defend_fast" value="{% firstof model_weights.defend_fast 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        Movement:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="movement" value="{% firstof model_weights.movement 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        Awareness:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="awareness" value="{% firstof model_weights.awareness 1 %}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        Size:
+                    </div>
+                    <div class="col-xs-3">
+                        <input size="3" type="text" name="size" value="{% firstof model_weights.size 1 %}">
+                    </div>
+                </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button class="btn btn-primary" type="submit" name="action">Make Teams
+            <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+        </div><!-- end col -->
+    </form>
+
+
+</div>
+
+
+
+
+
+<!--
+        <div class="col l3">
+            <div class="card pink darken-1">
+                <div class="card-content white-text">
+                    <span class="card-title">Past Sessions</span>
+                </div>
+                <div class="card-action">
+                        {% for session in sessions %}
+                            <a href="#">{{session.start_time|date:"SHORT_DATE_FORMAT"}}<br/></a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+-->
+        </div>
+
+    </div>
+</div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script>
+
+$('.add').click(function(){
+    $('.all').prop("checked",false);
+    var items = $("#list1 input:checked:not('.all')");
+    var n = items.length;
+    if (n > 0) {
+      items.each(function(idx,item){
+        var choice = $(item);
+        choice.prop("checked",false);
+        choice.parent().appendTo("#list2");
+      });
+    }
+    else {
+        alert("Choose an item from list 1");
+    }
+});
+
+$('.remove').click(function(){
+    $('.all').prop("checked",false);
+    var items = $("#list2 input:checked:not('.all')");
+    items.each(function(idx,item){
+      var choice = $(item);
+      choice.prop("checked",false);
+      choice.parent().appendTo("#list1");
+    });
+});
+
+/* toggle all checkboxes in group */
+$('.all').click(function(e){
+    e.stopPropagation();
+    var $this = $(this);
+    if($this.is(":checked")) {
+        $this.parents('.list-group').find("[type=checkbox]").prop("checked",true);
+    }
+    else {
+        $this.parents('.list-group').find("[type=checkbox]").prop("checked",false);
+        $this.prop("checked",false);
+    }
+});
+
+$('[type=checkbox]').click(function(e){
+  e.stopPropagation();
+});
+
+/* toggle checkbox when list group item is clicked */
+$('.list-group a').click(function(e){
+  
+    e.stopPropagation();
+  
+    var $this = $(this).find("[type=checkbox]");
+    if($this.is(":checked")) {
+        $this.prop("checked",false);
+    }
+    else {
+        $this.prop("checked",true);
+    }
+  
+    if ($this.hasClass("all")) {
+        $this.trigger('click');
+    }
+});
+
+</script>
+
+<script type='text/javascript'>//<![CDATA[
+$(window).load(function(){
+$(function() {
+    $('#general i .counter').text(' ');
+    
+    var generallen = $("#general-content input[name='players_group[]']:checked").length;
+    if(generallen>0){$("#general i .counter").text(generallen + ' selected');}else{$("#general i .counter").text('0 selected');}
+})
+
+function updateCounter() {
+    var len = $("#general-content input[name='players_group[]']:checked").length;
+    if(len>0){$("#general i .counter").text(len + ' selected');}else{$("#general i .counter").text('0 selected');}
+}
+
+$("#general-content input:checkbox").on("change", function() {
+    updateCounter();
+});
+
+$("#general-content a").click(function(){
+      updateCounter();
+});
+
+$(function() {
+    $('.select_all').change(function() {
+        var checkthis = $(this);
+        var checkboxes = $(this).parent().next('ul').find("input[name='players_group[]']");
+
+        if(checkthis.is(':checked')) {
+            checkboxes.attr('checked', true);
+        } else {
+            checkboxes.attr('checked', false);
+        }
+        updateCounter();
+    });
+    
+})
+
+});//]]> 
+
+</script>
+
+<script>
+$( "button.btn-circle" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.list-group-item');
+
+
+    var btn = player.next('button.btn');
+    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
+
+  //change_team(player);
+    var team = player.closest('div.panel-body');
+    if (team.attr('id') == 'team_a') {
+        //var team_name = 'team_b[]'
+        //var inpu = player.closest("button.btn")
+        //( "input" ).find(".player_checkbox").val();
+        //alert(inpu.attr('class'));
+        //var btn = player.closest("button.btn")
+        //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
+        $( "#team_b" ).append(player);
+    } else {
+        $( "#team_a" ).append(player);
+    }
+
+
+});
+</script>
+
+
+  </body>
+</html>

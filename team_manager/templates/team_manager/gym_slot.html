@@ -1,0 +1,115 @@
+{% load staticfiles %}
+<html>
+
+
+{% include 'team_manager/partial-user-menu.html' %}
+
+<script>
+
+
+function change_team(player) {
+    var team = player.closest('div.panel-body');
+    if (team.attr('id') == 'team_a') {
+        //var team_name = 'team_b[]'
+        //var inpu = player.closest("button.btn")
+        //( "input" ).find(".player_checkbox").val();
+        //alert(inpu.attr('class'));
+        //var btn = player.closest("button.btn")
+        //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
+        $( "#team_b" ).append(player);
+    } else {
+        $( "#team_a" ).append(player);
+    }
+
+    var btn = player.closest("button.btn")
+    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down')
+
+}
+
+</script>
+
+<style>
+.panel-heading {
+  background-color: #337ab7;
+}
+
+span.badge.pull-right {
+    margin-left: 10px;
+
+}
+
+.btn-circle {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  padding: 3px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+
+</style>
+
+
+    <!-- main content -->
+    <div class="container theme-showcase" role="main">
+
+    <div class="page-header col-sm-10">
+        <h1>Gym Slot: {{gym_slot.name}}</h1>
+    </div>
+
+
+    
+
+<div class="container">
+
+
+  <div class="row">
+        <div class="col-sm-5" id="general-content" >
+          <div class="list-group" id="list1">
+                  
+          <a href="#" class="list-group-item active " id="general">Past Sessions</a>
+          {% for session in gym_slot.gymsession_set.all %}
+              <a href="/gym_session/{{session.id}}" class="list-group-item text-center{%if session.start_time.date == today %} list-group-item-warning{%endif%}">{{session.start_time|date:"SHORT_DATE_FORMAT"}}</a>
+          {% endfor %}
+          <a href="/start_gym_slot_session/{{gym_slot.id}}" class="list-group-item text-center ">
+              <button class="btn btn-success btn-sm" type="submit" name="action">
+                        Start New Session <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 
+              </button>
+          </a>
+
+          </div><!-- end list -->
+        </div>
+
+
+
+        <div class="col-sm-5" id="general-content" >
+          <div class="list-group" id="list1">
+          <a href="#" class="list-group-item active" id="general">Players</a>
+          {% for player in gym_slot.players.all %}
+              <a href="#!" class="list-group-item">{{player}}</a>
+            {% endfor %}
+          </div><!-- end list -->
+
+        </div><!-- end col -->
+    </div>
+
+
+
+</div>
+
+
+
+    </div>
+</div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+
+
+  </body>
+</html>
