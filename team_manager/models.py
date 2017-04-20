@@ -28,7 +28,7 @@ class Player(models.Model):
     nick_name = models.CharField(max_length=200, blank=True, null=True)
     referred_by = models.ForeignKey('self', blank=True, null=True)
     status = models.CharField(max_length=200, blank=True, null=True, choices=[('Active', 'Active'), ('Inactive', 'Inactive')])
-    size = models.IntegerField(blank=True, null=True, choices=[('1', 'Small'), ('2', 'Medium'), ('3', 'Large')])
+    size = models.IntegerField(blank=True, null=True, choices=[(1, 'Small'), (2, 'Medium'), (3, 'Large')])
     position = models.CharField(max_length=200, blank=True, null=True, choices=[('Guard', 'Guard'), ('Forward', 'Forward')])
     ball_handler = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -61,8 +61,9 @@ class PlayerStats(models.Model):
     awareness = models.IntegerField(default=2)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
     def player_score(self):
-        return mean([self.scoring, self.outside_shooting, self.passing, self.rebounding, self.defend_large, self.defend_fast, self.movement, self.awareness])
+        return mean([self.scoring, self.outside_shooting, self.passing, self.rebounding, self.defend_large, self.defend_fast, self.movement, self.awareness, self.player.size])
 
 class GymSlot(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
@@ -107,9 +108,12 @@ class Game(models.Model):
     name = models.CharField(max_length=200)
     status = models.CharField(max_length=200, blank=True, null=True)
     start_time = models.DateTimeField(auto_now_add=True)
-    end_time = models.DateTimeField()
+    end_time = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
     def end_game(self):
         self.end_time = datetime.now()
@@ -118,8 +122,9 @@ class Game(models.Model):
 class Team(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
-    score = models.IntegerField()
-    won = models.NullBooleanField()
+    players = models.ManyToManyField(Player)
+    score = models.IntegerField(null=True)
+    won = models.NullBooleanField(null=True)
     
     @classmethod
     def make_team(cls, player_ids, model_weights = {}):
@@ -150,15 +155,13 @@ class Team(models.Model):
                 player['defend_fast'] = stats_dict[int(player['id'])].defend_fast
                 player['movement'] = stats_dict[int(player['id'])].movement
                 player['awareness'] = stats_dict[int(player['id'])].awareness
+                player['player_score'] = stats_dict[int(player['id'])].player_score
 
                 ## Add in Weights
                 for k,v in model_weights.items():
                     if v.isnumeric():
                         player[k] = float(player[k]) * float(v)
 
-                player['player_score'] = mean([player['scoring'], player['outside_shooting'], 
-                                               player['passing'], player['rebounding'], player['defend_large'], 
-                                               player['defend_fast'], player['movement'], player['awareness'], player['size']])
             else:
                 print("DID NOT FIND STATS FOR %s" % (player['id']))
                 player['player_score'] = 2
@@ -223,8 +226,8 @@ class Team(models.Model):
         ### Calculate Team Scores
         sorted_team = Team.sort_team_on_metric(teams, 'player_score')
         team_score = {'team_a': sorted_team['team_a'], 'team_b': sorted_team['team_b']}
-        if abs(sorted_team['team_a'] - sorted_team['team_b']) > 2:
-            print("Model Error: The Teams are Mismatched")
+        #if abs(sorted_team['team_a'] - sorted_team['team_b']) > 2:
+        #    print("Model Error: The Teams are Mismatched")
 
         return teams
 
@@ -239,13 +242,6 @@ class Team(models.Model):
             sorted_team[team] = int(outside_shooting)
 
         return sorted_team
-
-
-class TeamPlayer(models.Model):
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    player = models.ForeignKey(Player, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
 
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)

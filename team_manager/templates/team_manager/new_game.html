@@ -1,0 +1,151 @@
+{% load staticfiles %}
+<html>
+
+
+{% include 'team_manager/partial-user-menu.html' %}
+
+
+<style>
+.panel-heading {
+  background-color: #337ab7;
+}
+
+span.badge.pull-right {
+    margin-left: 10px;
+
+}
+
+.btn-circle {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  padding: 3px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+
+</style>
+
+
+ <!-- main content -->
+    <div class="container theme-showcase" role="main">
+
+    <div class="page-header">
+        <h1>Gym Slot: {{gym_slot.name}}</h1>
+    </div>
+
+<div class="container">
+
+    {% if teams %} 
+    <form action="/start_game/{{gym_slot.id}}" method="POST">
+    {% csrf_token %}
+
+        <div class="col-sm-7 col-sm-offset-1">
+          <div class="list-group" id="list2">
+              {% for team,players in teams.items  %}
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                         {% if team == 'team_a' %}
+                            <h3 class="panel-title">Team A 
+                                <span class="badge badge-pill badge-primary pull-right">Score: {{team_score.team_a}}</span>
+                                <span class="badge badge-pill badge-primary pull-right">Size: {{team_size.team_a}}</span>
+                            </h3>
+                         {% else %}
+                            <h3 class="panel-title">Team B 
+                                <span class="badge badge-pill badge-primary pull-right">Score: {{team_score.team_b}}</span>
+                                <span class="badge badge-pill badge-primary pull-right">Size: {{team_size.team_b}}</span>
+                            </h3>
+                         {% endif %}
+                    </div>
+                    <div class="panel-body" id="{{team}}">
+                        {% for player in players %} 
+                            <div id="player_{{player.id}}" class="list-group-item player">{{player.first_name}} {{player.last_name}} - {{player.position}}
+                            
+
+                             <button type="button" class="btn btn-default btn-circle btn-xs pull-right" aria-label="Left Align">
+                                {% if team == 'team_a' %}
+                                    <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                {% endif %}
+                            </button>
+
+                            <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
+
+
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                </div>
+
+              {% endfor %}
+
+
+          </div>
+          
+          <button class="btn btn-danger btn-sm" type="submit" name="action" onclick="goBack()"">
+                    <span class="glyphicon glyphicon-backward" aria-hidden="true"></span> Back to Session
+          </button>
+          <button class="btn btn-success btn-sm" type="submit" name="action">
+                    Start New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
+          </button>
+
+
+        </form>
+
+
+
+        </div>
+
+    {% endif %}
+
+
+ </div>
+  </div>
+
+
+    <!-- Latest compiled and minified JavaScript -->
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>
+$( "button.btn-circle" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.list-group-item');
+
+    var btn = player.next('button.btn');
+    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
+
+  //change_team(player);
+    var team = player.closest('div.panel-body');
+    if (team.attr('id') == 'team_a') {
+        //var team_name = 'team_b[]'
+        //var inpu = player.closest("button.btn")
+        //( "input" ).find(".player_checkbox").val();
+        //alert(inpu.attr('class'));
+        //var btn = player.closest("button.btn")
+        //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
+        $( "#team_b" ).append(player);
+    } else {
+        $( "#team_a" ).append(player);
+    }
+
+
+});
+
+
+function goBack() {
+    window.history.back();
+}
+
+</script>
+
+  </body>
+</html>

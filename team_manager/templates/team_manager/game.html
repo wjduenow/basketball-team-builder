@@ -1,0 +1,150 @@
+{% load staticfiles %}
+<html>
+
+
+{% include 'team_manager/partial-user-menu.html' %}
+
+
+<style>
+.panel-heading {
+  background-color: #337ab7;
+}
+
+span.badge.pull-right {
+    margin-left: 10px;
+
+}
+
+.btn-circle {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  padding: 3px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+
+</style>
+
+
+ <!-- main content -->
+<div class="container theme-showcase" role="main">
+
+    <div class="page-header">
+        <h1>Gym Slot: {{gym_slot.name}}</h1>
+    </div>
+
+    <div class="container">
+
+    {% if teams %} 
+    {% for team in teams  %}
+
+        <div class="col-sm-5 col-sm-offset-1">
+            <div class="list-group" id="list2">
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                            <h3 class="panel-title">{{ team.name}}
+                                <!--
+                                <span class="badge badge-pill badge-primary pull-right">Score: {{team_score.team_a}}</span>
+                                <span class="badge badge-pill badge-primary pull-right">Size: {{team_size.team_a}}</span>
+                                -->
+                            </h3>
+                    </div>
+
+                    <div class="panel-body" id="{{team}}">
+                        {% for player in team.players.all %} 
+                            <div id="player_{{player.id}}" class="list-group-item player">
+                                {{player.first_name}} {{player.last_name}} - {{player.position}}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+
+    {% endfor %}
+    {% endif %}
+
+
+
+
+        <form action="/start_game/{{gym_slot.id}}" method="POST">
+            {% csrf_token %}
+        </form>
+
+    </div>
+
+<div class="starter-template">
+    <h1>Game Time Remaining</h1>
+    <div class="panel panel-default" data-toggle="tooltip" data-placement="top" title="Beautifull, insn't it?">
+      <div class="panel-body">
+        <div class="lead" id="clock"></div>
+      </div>
+    </div>
+
+<!--
+    <button type="button" class="btn btn-primary" id="btn-reset">
+      <i class="glyphicon glyphicon-repeat"></i>
+      Reset countdown
+    </button>
+
+    <div class="btn-group" data-toggle="buttons">
+      <label class="btn btn-default" id="btn-pause">
+        <input type="radio" name="options" id="option2" autocomplete="off">
+        <i class="glyphicon glyphicon-pause"></i>
+        Pause
+      </label>
+
+      <label class="btn btn-default active" id="btn-resume">
+        <input type="radio" name="options" id="option2" autocomplete="off" checked>
+        <i class="glyphicon glyphicon-play"></i>
+        Resume
+      </label>
+    </div>
+-->
+  </div>
+
+
+</div>
+
+
+    <!-- Latest compiled and minified JavaScript -->
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="//cdn.rawgit.com/hilios/jQuery.countdown/2.2.0/dist/jquery.countdown.min.js"></script>
+
+<script type="text/javascript">
+
+  var $clock = $('#clock');
+
+  $clock.countdown("{{game_end|date:"Y/m/d H:i:s"}}", function(event) {
+    $(this).html(event.strftime('%M minutes %S seconds'));
+  });
+
+
+
+  $('#btn-reset').click(function() {
+    $clock.countdown(get15dayFromNow());
+  });
+
+  $('#btn-pause').click(function() {
+    $clock.countdown('pause');
+  });
+
+  $('#btn-resume').click(function() {
+    $clock.countdown('resume');
+  });
+
+</script>
+
+  </body>
+</html>

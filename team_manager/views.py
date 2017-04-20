@@ -9,8 +9,11 @@ from django.template.context_processors import csrf
 from django.contrib import messages
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
+import json
 
-from .models import Player, Group, GymSlot, GymSession, Game, Team, TeamPlayer, PlayerStats
+
+
+from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats
 
 
 #Form to login  
@@ -50,10 +53,115 @@ def index(request):
     #return HttpResponse("Hello, world. You're at the team manager index.")
     template = loader.get_template('team_manager/index.html')
     today = (datetime.now() - timedelta(hours=8)).strftime("%A")
+    print((datetime.now() - timedelta(hours=8)))
     print(today)
     gym_slots_today = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).filter(day_of_week = today).all()
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
     context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other})
+    return HttpResponse(template.render(context, request))
+
+def view_game(request, game_id=None):
+    template = loader.get_template('team_manager/game.html')
+    game = Game.objects.get(id = game_id)
+
+    game_end = game.created_at + timedelta(minutes=20) + timedelta(hours=0)
+
+    gym_session = game.gym_session
+    teams = Team.objects.filter(game_id = game_id)
+
+    context = ({'teams': teams, 'game': game, 'gym_slot': gym_session.gym_slot, 'game_end': game_end})
+    return HttpResponse(template.render(context, request))
+
+
+def start_game(request, gym_slot_id=None):
+    #template = loader.get_template('team_manager/game.html')
+    team_a_ids = [ int(x) for x in request.POST.getlist('team_a[]') ]
+    team_b_ids = [ int(x) for x in request.POST.getlist('team_b[]') ]
+    team_a_players = Player.objects.filter(pk__in=team_a_ids)
+    team_b_players = Player.objects.filter(pk__in=team_b_ids)
+
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    gym_slot = GymSlot.objects.get(id = gym_slot_id)
+
+    gym_session = GymSession.objects.filter(gym_slot = gym_slot).filter(created_at__date = today)
+
+    if gym_session:
+        print("Found Existing Session")
+        gym_session = gym_session[0]
+    else:
+        print("Creating Session Session")
+        gym_session = GymSession.objects.create(gym_slot = gym_slot)
+
+    new_game = Game.objects.create(gym_session = gym_session)
+
+    team_a = Team.objects.create(game = new_game, name = 'Team A')
+    team_a.players = team_a_players
+    team_a.save
+
+    team_b = Team.objects.create(game = new_game, name = 'Team B')
+    team_b.players = team_b_players
+    team_b.save
+
+    teams = {'team_a': team_a, 'team_b': team_b}
+
+
+
+    context = ({'teams': teams, 'game': new_game, 'gym_slot': gym_slot})
+    return HttpResponseRedirect('/game/' + str(new_game.id))
+    #return HttpResponse(template.render(context, request))
+
+def new_game(request, gym_slot_id=None, teams=None):
+    template = loader.get_template('team_manager/new_game.html')
+
+    teams = json.loads(request.POST['teams'])
+
+    team_a_ids = [ int(x) for x in request.POST.getlist('team_a[]') ]
+    team_b_ids = [ int(x) for x in request.POST.getlist('team_b[]') ]
+    team_a = []
+    team_b = []
+
+    for team, players in teams.items():
+        if team == 'team_a':
+            for player in players:
+                if int(player['id']) in team_a_ids:
+                    team_a.append(player)
+
+        if team == 'team_b':
+            for player in players:
+                if int(player['id']) in team_b_ids:
+                    team_b.append(player)
+     
+    stats = PlayerStats.objects.raw("SELECT * FROM team_manager_playerstats s WHERE s.id in (SELECT MAX(id) as id FROM team_manager_playerstats GROUP BY player_id);")
+    stats_dict = {}
+
+    for stat in stats:
+        stats_dict[stat.player_id] = stat
+
+    #for player in players:
+    for player in team_a:
+        if player['id'] in stats_dict:
+            player['stats'] = stats_dict[int(player['id'] )]
+            player['player_score'] = player['player_score']#, 2)
+
+    for player in team_b:
+        if player['id'] in stats_dict:
+            player['stats'] = stats_dict[int(player['id'])]
+            player['player_score'] = player['player_score']#, 2)
+
+    teams = {'team_a': team_a, 'team_b': team_b}
+
+    if teams:
+        sorted_team = Team.sort_team_on_metric(teams, 'player_score')
+        team_score = {'team_a': sorted_team['team_a'], 'team_b': sorted_team['team_b']}
+        sorted_team_size = Team.sort_team_on_metric(teams, 'size')
+        team_size = {'team_a': sorted_team_size['team_a'], 'team_b': sorted_team_size['team_b']}
+
+
+    gym_slot = GymSlot.objects.get(id = gym_slot_id)
+    sessions = GymSession.objects.filter(gym_slot = gym_slot).all()
+
+    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot, 'sessions': sessions, 'teams': teams, 'team_score': team_score, 'team_size': team_size})
     return HttpResponse(template.render(context, request))
 
 def start_gym_slot_session(request, gym_slot_id=None):
@@ -87,7 +195,7 @@ def start_gym_slot_session(request, gym_slot_id=None):
     players = gym_slot.players.all().order_by('first_name')
     sessions = GymSession.objects.filter(gym_slot = gym_slot).all()
 
-    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot, 'sessions': sessions, 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights})
+    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot, 'sessions': sessions, 'teams_json': json.dumps(teams, default=date_handler), 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights})
     return HttpResponse(template.render(context, request))
 
 def gym_slot_session(request, gym_session_id=None):
@@ -136,7 +244,7 @@ def players(request):
     for player in players:
         if player.id in stats_dict:
             player.stats = stats_dict[int(player.id)]
-            player.player_score = round(player.stats.player_score(), 2)
+            player.player_score = round(player.stats.player_score, 2)
 
     context = ({'players': players, 'player_ids': player_ids})
     return HttpResponse(template.render(context, request))
@@ -160,7 +268,12 @@ def update_player_stats(request):
 
     return redirect(players)
 
-
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
+
+def date_handler(obj):
+    if hasattr(obj, 'isoformat'):
+        return obj.isoformat()
+    else:
+        raise TypeError
 

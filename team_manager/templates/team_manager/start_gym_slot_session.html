@@ -4,6 +4,30 @@
 
 {% include 'team_manager/partial-user-menu.html' %}
 
+<script>
+
+
+function change_team(player) {
+    var team = player.closest('div.panel-body');
+    if (team.attr('id') == 'team_a') {
+        //var team_name = 'team_b[]'
+        //var inpu = player.closest("button.btn")
+        //( "input" ).find(".player_checkbox").val();
+        //alert(inpu.attr('class'));
+        //var btn = player.closest("button.btn")
+        //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
+        $( "#team_b" ).append(player);
+    } else {
+        $( "#team_a" ).append(player);
+    }
+
+    var btn = player.closest("button.btn")
+    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down')
+
+}
+
+</script>
+
 <style>
 .panel-heading {
   background-color: #337ab7;
@@ -12,6 +36,16 @@
 span.badge.pull-right {
     margin-left: 10px;
 
+}
+
+.btn-circle {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  padding: 3px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
 }
 
 </style>
@@ -27,6 +61,8 @@ span.badge.pull-right {
 <div class="container">
 
     {% if teams %} 
+    <form action="/new_game/{{gym_slot.id}}" method="POST">
+    {% csrf_token %}
 
         <div class="col-sm-5 col-sm-offset-1">
           <div class="list-group" id="list2">
@@ -46,9 +82,24 @@ span.badge.pull-right {
                             </h3>
                          {% endif %}
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body" id="{{team}}">
                         {% for player in players %} 
-                            <a  class="list-group-item">{{player.first_name}} {{player.last_name}} - {{player.position}}</a>
+                            <div id="player_{{player.id}}" class="list-group-item player">{{player.first_name}} {{player.last_name}} - {{player.position}}
+                            
+
+                             <button type="button" class="btn btn-default btn-circle btn-xs pull-right" aria-label="Left Align">
+                                {% if team == 'team_a' %}
+                                    <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                {% endif %}
+                            </button>
+
+                            <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
+
+
+                            </div>
+
                         {% endfor %}
                     </div>
                 </div>
@@ -57,6 +108,16 @@ span.badge.pull-right {
 
 
           </div>
+          <input type="hidden" name="teams" value="{{ teams_json }}">
+          <button class="btn btn-success btn-sm" type="submit" name="action">
+                    New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
+          </button>
+
+
+        </form>
+
+
+
         </div>
 
     {% endif %}
@@ -314,6 +375,35 @@ $(function() {
 
 });//]]> 
 
+</script>
+
+<script>
+$( "button.btn-circle" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.list-group-item');
+
+
+    var btn = player.next('button.btn');
+    alert(btn.attr('name'));
+    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
+
+  //change_team(player);
+    var team = player.closest('div.panel-body');
+    if (team.attr('id') == 'team_a') {
+        //var team_name = 'team_b[]'
+        //var inpu = player.closest("button.btn")
+        //( "input" ).find(".player_checkbox").val();
+        //alert(inpu.attr('class'));
+        //var btn = player.closest("button.btn")
+        //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
+        $( "#team_b" ).append(player);
+    } else {
+        $( "#team_a" ).append(player);
+    }
+
+
+});
 </script>
 
 
