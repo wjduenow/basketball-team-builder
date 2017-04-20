@@ -10,6 +10,8 @@ from django.contrib import messages
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 import json
+import operator
+
 
 
 
@@ -64,12 +66,31 @@ def view_game(request, game_id=None):
     template = loader.get_template('team_manager/game.html')
     game = Game.objects.get(id = game_id)
 
-    game_end = game.created_at + timedelta(minutes=20) + timedelta(hours=0)
+    team_scores = {} ## Used for Stores Scores to Calculate the Winner
+    if request.method == 'POST':
+        for team in game.teams.all():
+            team.score = int(request.POST[str(team.id)])
+            team_scores[team.id] = team.score
+            team.won = False
+            team.save()
 
-    gym_session = game.gym_session
-    teams = Team.objects.filter(game_id = game_id)
+        ## Find the Winner and Save
+        winning_team = max(team_scores.iteritems(), key=operator.itemgetter(1))[0]
+        winner = Team.objects.get(id = winning_team)
+        winner.won = True
+        winner.save()
 
-    context = ({'teams': teams, 'game': game, 'gym_slot': gym_session.gym_slot, 'game_end': game_end})
+        #Set the Game End Time Unless it is already set
+        if game.end_time == None:
+            game.end_time = datetime.now()
+            game.save()
+            game = Game.objects.get(id = game_id) # For Some Reason Game Length is being nulled on save
+
+
+    scores = range(0, 21)
+    game_end = game.created_at + timedelta(minutes=21) + timedelta(hours=0)
+
+    context = ({'game': game, 'game_end': game_end, 'scores': scores})
     return HttpResponse(template.render(context, request))
 
 
@@ -95,13 +116,18 @@ def start_game(request, gym_slot_id=None):
 
     new_game = Game.objects.create(gym_session = gym_session)
 
-    team_a = Team.objects.create(game = new_game, name = 'Team A')
+    team_a = Team.objects.create(name = 'Team A')
     team_a.players = team_a_players
-    team_a.save
+    team_a.save()
 
-    team_b = Team.objects.create(game = new_game, name = 'Team B')
+    team_b = Team.objects.create(name = 'Team B')
     team_b.players = team_b_players
-    team_b.save
+    team_b.save()
+
+    new_game.teams = [team_a, team_b]
+    new_game.save()
+
+
 
     teams = {'team_a': team_a, 'team_b': team_b}
 

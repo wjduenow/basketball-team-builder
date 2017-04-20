@@ -25,6 +25,14 @@ span.badge.pull-right {
   border-radius: 15px;
 }
 
+span.badge..badge-error {
+  background-color: #b94a48;
+}
+
+span.badge..badge-success {
+  background-color: #468847;
+}
+
 </style>
 
 
@@ -32,13 +40,13 @@ span.badge.pull-right {
 <div class="container theme-showcase" role="main">
 
     <div class="page-header">
-        <h1>Gym Slot: {{gym_slot.name}}</h1>
+        <h1>Gym Slot: {{game.gym_session.gym_slot.name}}</h1>
     </div>
 
     <div class="container">
 
-    {% if teams %} 
-    {% for team in teams  %}
+    {% if game.teams.all %} 
+    {% for team in game.teams.all  %}
 
         <div class="col-sm-5 col-sm-offset-1">
             <div class="list-group" id="list2">
@@ -47,10 +55,13 @@ span.badge.pull-right {
                 <div class="panel panel-default">
                     <div class="panel-heading">
                             <h3 class="panel-title">{{ team.name}}
-                                <!--
-                                <span class="badge badge-pill badge-primary pull-right">Score: {{team_score.team_a}}</span>
-                                <span class="badge badge-pill badge-primary pull-right">Size: {{team_size.team_a}}</span>
-                                -->
+                                {% if team.won != Null %}
+                                    {% if team.won %}
+                                        <span class="badge badge-pill badge-primary pull-right badge-success">Winner: {{team.score}}</span>
+                                    {% else %}
+                                        <span class="badge badge-pill badge-primary pull-right badge-error">Loser: {{team.score}}</span>
+                                    {% endif %}
+                                {% endif %}
                             </h3>
                     </div>
 
@@ -74,16 +85,23 @@ span.badge.pull-right {
 
 
 
-
-        <form action="/start_game/{{gym_slot.id}}" method="POST">
-            {% csrf_token %}
-        </form>
-
     </div>
 
+{% if game.end_time %}
+
+<div class="starter-template">
+    <h1>Game Time</h1>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="lead">{{ game.game_duration_friendly }}</div>
+      </div>
+    </div>
+</div>
+
+{% else %}
 <div class="starter-template">
     <h1>Game Time Remaining</h1>
-    <div class="panel panel-default" data-toggle="tooltip" data-placement="top" title="Beautifull, insn't it?">
+    <div class="panel panel-default">
       <div class="panel-body">
         <div class="lead" id="clock"></div>
       </div>
@@ -112,6 +130,34 @@ span.badge.pull-right {
   </div>
 
 
+<div class="starter-template">
+    <h1>Record Scores</h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+          <form action="/game/{{game.id}}" method="POST" class="form-inline">
+            {% csrf_token %}
+
+            {% for team in game.teams.all %}
+
+                <div class="form-group">
+                    <label for="exampleInputName2">{{ team.name}} Score:</label>
+                    <select class="form-control" name="{{ team.id }}">
+                      {% for score in scores %}
+                        <option value="{{ score }}" {% if score == team.score %}SELECTED{% endif %}>{{score}}</option>
+                      {% endfor %}
+                    </select>
+                </div>
+
+            {% endfor %}
+
+
+            <button type="submit" class="btn btn-success btn-sm">End Game</button>
+        </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 </div>
 
 
@@ -124,11 +170,15 @@ span.badge.pull-right {
 
 <script type="text/javascript">
 
-  var $clock = $('#clock');
-
-  $clock.countdown("{{game_end|date:"Y/m/d H:i:s"}}", function(event) {
-    $(this).html(event.strftime('%M minutes %S seconds'));
-  });
+    $('#clock').countdown("{{game_end|date:"Y/m/d H:i:s"}}", {elapse: true})
+        .on('update.countdown', function(event) {
+      var $this = $(this);
+      if (event.elapsed) {
+        $this.html(event.strftime('OverTime: <span>%H Hours %M Minutes %S Seconds</span>'));
+      } else {
+        $this.html(event.strftime('Time Remaining: <span>%H Hours %M Minutes %S Seconds</span>'));
+      }
+    });
 
 
 

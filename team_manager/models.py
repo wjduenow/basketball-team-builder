@@ -65,9 +65,23 @@ class PlayerStats(models.Model):
     def player_score(self):
         return mean([self.scoring, self.outside_shooting, self.passing, self.rebounding, self.defend_large, self.defend_fast, self.movement, self.awareness, self.player.size])
 
+class GymSession(models.Model):
+    players = models.ManyToManyField(Player)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    status = models.CharField(max_length=200, blank=True, null=True)
+    start_time = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def end_session(self):
+        self.end_time = datetime.now()
+        self.save
+
 class GymSlot(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
+    gym_sessions = models.ManyToManyField(GymSession)
     players = models.ManyToManyField(Player)
     status = models.CharField(max_length=200, blank=True, null=True)
     start_date = models.DateField()
@@ -87,40 +101,7 @@ class GymSlot(models.Model):
     def __str__(self):
         return self.name
 
-
-class GymSession(models.Model):
-    gym_slot = models.ForeignKey(GymSlot, on_delete=models.CASCADE)
-    players = models.ManyToManyField(Player)
-    name = models.CharField(max_length=200, blank=True, null=True)
-    status = models.CharField(max_length=200, blank=True, null=True)
-    start_time = models.DateTimeField(auto_now_add=True)
-    end_time = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def end_session(self):
-        self.end_time = datetime.now()
-        self.save
-
-class Game(models.Model):
-    gym_session = models.ForeignKey(GymSession, on_delete=models.CASCADE)
-    court = models.CharField(max_length=200, blank=True, null=True)
-    name = models.CharField(max_length=200)
-    status = models.CharField(max_length=200, blank=True, null=True)
-    start_time = models.DateTimeField(auto_now_add=True)
-    end_time = models.DateTimeField(null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
-
-    def end_game(self):
-        self.end_time = datetime.now()
-        self.save
-
 class Team(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     players = models.ManyToManyField(Player)
     score = models.IntegerField(null=True)
@@ -242,6 +223,33 @@ class Team(models.Model):
             sorted_team[team] = int(outside_shooting)
 
         return sorted_team
+
+class Game(models.Model):
+    gym_session = models.ForeignKey(GymSession, on_delete=models.CASCADE)
+    teams = models.ManyToManyField(Team)
+    court = models.CharField(max_length=200, blank=True, null=True)
+    name = models.CharField(max_length=200)
+    status = models.CharField(max_length=200, blank=True, null=True)
+    start_time = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    def end_game(self):
+        self.end_time = datetime.now()
+        self.save
+
+    @property
+    def game_duration(self):
+        return self.end_time - self.start_time
+
+    @property
+    def game_duration_friendly(self):
+        min_secs = divmod(self.game_duration.days * 86400 + self.game_duration.seconds, 60)
+        return "%s Minutes and %s Seconds" % (min_secs[0], min_secs[1])
 
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
