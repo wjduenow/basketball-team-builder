@@ -37,6 +37,15 @@ span.badge..badge-success {
 
 
  <!-- main content -->
+
+     <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        {% if user.is_superuser %}
+          <li><a href="/players">Players</a></li>
+        {% endif %}
+        <li class="active">Player</li>
+    </ol>
+    
 <div class="container theme-showcase" role="main">
 
     <div class="page-header">
@@ -88,13 +97,7 @@ span.badge..badge-success {
 
 
 </div>
-    <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
-        {% if user.is_superuser %}
-          <li><a href="/players">Players</a></li>
-        {% endif %}
-        <li class="active">Player</li>
-    </ol>
+
 
     <!-- Latest compiled and minified JavaScript -->
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

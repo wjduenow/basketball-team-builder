@@ -34,7 +34,13 @@ span.badge..badge-success {
 }
 
 </style>
-
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        {% if user.is_superuser %}
+          <li><a href="/players">Players</a></li>
+        {% endif %}
+        <li class="active">Player</li>
+    </ol>
 
  <!-- main content -->
 <div class="container theme-showcase" role="main">
@@ -117,13 +123,7 @@ span.badge..badge-success {
 
 
 </div>
-    <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
-        {% if user.is_superuser %}
-          <li><a href="/players">Players</a></li>
-        {% endif %}
-        <li class="active">Player</li>
-    </ol>
+
 
     <!-- Latest compiled and minified JavaScript -->
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
