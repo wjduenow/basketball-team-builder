@@ -146,8 +146,10 @@ class Team(models.Model):
                 
 
                 ## Add in Weights
+                print model_weights
                 for k,v in model_weights.items():
-                    if v.isnumeric():
+                    print v
+                    if 1==1: #v.isnumeric():
                         print("%s - %s" % (k,v))
                         player[k] = float(player[k]) * float(v)
 

@@ -386,17 +386,21 @@ $( "button.btn-circle" ).click(function(e) {
     var btn = player.find('span');
     btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
 
+    var inpt = player.find('input');
+
   //change_team(player);
     var team = player.closest('div.panel-body');
     if (team.attr('id') == 'team_a') {
         //var team_name = 'team_b[]'
         //var inpu = player.closest("button.btn")
         //( "input" ).find(".player_checkbox").val();
+        inpt.attr('name', "team_b[]")
         //alert(inpu.attr('class'));
         //var btn = player.closest("button.btn")
         //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
         $( "#team_b" ).append(player);
     } else {
+        inpt.attr('name', "team_a[]")
         $( "#team_a" ).append(player);
     }
 

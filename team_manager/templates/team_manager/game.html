@@ -35,6 +35,12 @@ span.badge..badge-success {
 
 </style>
 
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li><a href="/gym_slot/{{game.gym_session.gym_slot.id}}">Gym Slot</a></li>
+        <li><a href="/gym_session/{{game.gym_session.id}}">Gym Session</a></li>
+        <li class="active">Game</li>
+    </ol>
 
  <!-- main content -->
 <div class="container theme-showcase" role="main">
@@ -159,6 +165,8 @@ span.badge..badge-success {
 {% endif %}
 
 </div>
+
+
 
 
     <!-- Latest compiled and minified JavaScript -->

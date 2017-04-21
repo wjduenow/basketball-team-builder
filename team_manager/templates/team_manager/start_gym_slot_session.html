@@ -26,6 +26,11 @@ span.badge.pull-right {
 }
 
 </style>
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li><a href="/gym_slot/{{gym_session.gym_slot.id}}">Gym Slot</a></li>
+        <li class="active">Session</li>
+    </ol>
 
 
     <!-- main content -->
@@ -35,7 +40,7 @@ span.badge.pull-right {
         <h1>Gym Slot: {{gym_session.gym_slot.name}}</h1>
         <h2>Session: {{ gym_session.start_time|date:"SHORT_DATE_FORMAT" }}</h2>
     </div>
-
+              <form action="/start_gym_slot_session/{{ gym_session.gym_slot.id }}" method="post">
 <div class="container">
 {% csrf_token %}
 
@@ -54,6 +59,7 @@ span.badge.pull-right {
                         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 
                 </button>
                 <input type="hidden" name="player_id" value="{{ player.id}}">
+                <input type="hidden" name="players_group[]" value="{{ player.id}}">
               </a>
           {% endfor %}
           <a href="#!" class="list-group-item text-center ">
@@ -74,10 +80,13 @@ span.badge.pull-right {
                 {{game.start_time|time:"H:i"}} - {{game.end_time|time:"H:i"}}
               </a>
           {% endfor %}
-          <a href="/start_gym_slot_session/{{gym_session.gym_slot.id}}" class="list-group-item text-center ">
+          <a href="//{{gym_session.gym_slot.id}}" class="list-group-item text-center ">
+
+              {% csrf_token %}
               <button class="btn btn-success btn-sm" type="submit" name="action">
                         Start New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 
               </button>
+
           </a>
 
           </div><!-- end list -->
@@ -85,6 +94,7 @@ span.badge.pull-right {
 
   </div>
 
+                </form>
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -111,6 +121,7 @@ span.badge.pull-right {
                         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> 
                 </button>
                 <input type="hidden" name="player_id" value="{{ player.id}}">
+                <input type="hidden" name="players_group[]" value="{{ player.id}}">
               </a>
           {% endfor %}
 
@@ -120,7 +131,7 @@ span.badge.pull-right {
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <a class="btn btn-default" data-dismiss="modal">Close</a>
       </div>
     </div>
   </div>
@@ -130,11 +141,6 @@ span.badge.pull-right {
 
 </div>
 </div>
-    <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
-        <li><a href="/gym_slot/{{gym_session.gym_slot.id}}">Gym Slot</a></li>
-        <li class="active">Session</li>
-    </ol>
 
 
 

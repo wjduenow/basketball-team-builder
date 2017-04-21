@@ -228,16 +228,17 @@ def new_game(request, gym_slot_id=None, teams=None):
     team_a = []
     team_b = []
 
-    for team, players in teams.items():
-        if team == 'team_a':
-            for player in players:
-                if int(player['id']) in team_a_ids:
-                    team_a.append(player)
+    #for team, players in teams.items():
+    #    if team == 'team_a':
+    players = Player.objects.values()
+    for player in players:
+        if int(player['id']) in team_a_ids:
+            team_a.append(player)
 
-        if team == 'team_b':
-            for player in players:
-                if int(player['id']) in team_b_ids:
-                    team_b.append(player)
+    #    if team == 'team_b':
+    for player in players:
+        if int(player['id']) in team_b_ids:
+            team_b.append(player)
      
     stats = PlayerStats.objects.raw("SELECT * FROM team_manager_playerstats s WHERE s.id in (SELECT MAX(id) as id FROM team_manager_playerstats GROUP BY player_id);")
     stats_dict = {}
@@ -249,12 +250,12 @@ def new_game(request, gym_slot_id=None, teams=None):
     for player in team_a:
         if player['id'] in stats_dict:
             player['stats'] = stats_dict[int(player['id'] )]
-            player['player_score'] = player['player_score']#, 2)
+            player['player_score'] = stats_dict[int(player['id'])].player_score
 
     for player in team_b:
         if player['id'] in stats_dict:
             player['stats'] = stats_dict[int(player['id'])]
-            player['player_score'] = player['player_score']#, 2)
+            player['player_score'] = stats_dict[int(player['id'])].player_score
 
     teams = {'team_a': team_a, 'team_b': team_b}
 
@@ -279,15 +280,15 @@ def start_gym_slot_session(request, gym_slot_id=None):
     team_score = ""
     team_size = ""
 
-    model_weights = {'scoring': request.POST.get("scoring", 1), 
-                     'outside_shooting': request.POST.get("outside_shooting", 1), 
-                     'passing': request.POST.get("passing", 1), 
-                     'rebounding': request.POST.get("rebounding", 1),  
-                     'defend_large': request.POST.get("defend_large", 1),  
-                     'defend_fast': request.POST.get("defend_fast", 1), 
-                     'movement': request.POST.get("movement", 1), 
-                     'awareness': request.POST.get("awareness", 1), 
-                     'size': request.POST.get("size", 2)}
+    model_weights = {'scoring': request.POST.get("scoring", '1'), 
+                     'outside_shooting': request.POST.get("outside_shooting", '1'), 
+                     'passing': request.POST.get("passing", '1'), 
+                     'rebounding': request.POST.get("rebounding", '1'),  
+                     'defend_large': request.POST.get("defend_large", '1'),  
+                     'defend_fast': request.POST.get("defend_fast", '1'), 
+                     'movement': request.POST.get("movement", '1'), 
+                     'awareness': request.POST.get("awareness", '1'), 
+                     'size': request.POST.get("size", '2')}
 
     if players_group:
         teams = Team.make_team(players_group, model_weights)
