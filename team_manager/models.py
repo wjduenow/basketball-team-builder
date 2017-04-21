@@ -143,12 +143,15 @@ class Team(models.Model):
                 player['defend_fast'] = stats_dict[int(player['id'])].defend_fast
                 player['movement'] = stats_dict[int(player['id'])].movement
                 player['awareness'] = stats_dict[int(player['id'])].awareness
-                player['player_score'] = stats_dict[int(player['id'])].player_score
+                
 
                 ## Add in Weights
                 for k,v in model_weights.items():
                     if v.isnumeric():
+                        print("%s - %s" % (k,v))
                         player[k] = float(player[k]) * float(v)
+
+                player['player_score'] = mean([player['scoring'], player['outside_shooting'], player['passing'], player['rebounding'], player['defend_large'], player['defend_fast'], player['movement'], player['awareness'], player['size']])
 
             else:
                 print("DID NOT FIND STATS FOR %s" % (player['id']))
@@ -164,19 +167,27 @@ class Team(models.Model):
         if group_size < 4:
             return teams
 
-        ### Sort by Ball Handler and Assign Best Ball Handlers to Teams A and B
-        sl = sorted(sl, key=itemgetter('ball_handler', 'player_score'), reverse=True)        
-        team_b.append(sl.pop(0))
-        team_a.append(sl.pop(0))
+
+
+        ### Scoring Existing Teams for OutSide Shooting and Assign Best Shooter to Worst Team
+        sl = sorted(sl, key=itemgetter('player_score'), reverse=True)
+
+        sorted_team = Team.sort_team_on_metric(teams, 'player_score')
+        if sorted_team['team_a'] < sorted_team['team_a']:
+            team_a.append(sl.pop(0))
+            team_b.append(sl.pop(0))
+        else:
+            team_b.append(sl.pop(0))
+            team_a.append(sl.pop(0))
 
         if group_size < 6:
             return teams
 
-        ### Scoring Existing Teams for OutSide Shooting and Assign Best Shooter to Worst Team
+        ### Scoring Existing Teams for player_score and Assign Best Movement to Worst Team
         sl = sorted(sl, key=itemgetter('outside_shooting'), reverse=True)
 
-        sorted_team = Team.sort_team_on_metric(teams, 'outside_shooting')
-        if sorted_team['team_a'] < sorted_team['team_a']:
+        sorted_team = sort_team_on_metric_size(teams, 'player_score')
+        if sorted_team['team_a'] < sorted_team['team_b']:
             team_a.append(sl.pop(0))
             team_b.append(sl.pop(0))
         else:
@@ -186,7 +197,7 @@ class Team(models.Model):
         if group_size < 8:
             return teams
 
-        ### Scoring Existing Teams for player_score and Assign Best Movement to Worst Team
+        ### Scoring Existing Teams for player_score and Assign Best big player_score to Worst Team
         sl = sorted(sl, key=itemgetter('player_score'), reverse=True)
 
         sorted_team = sort_team_on_metric_size(teams, 'player_score')
@@ -200,16 +211,13 @@ class Team(models.Model):
         if group_size < 10:
             return teams
 
-        ### Scoring Existing Teams for player_score and Assign Best big player_score to Worst Team
-        sl = sorted(sl, key=itemgetter('player_score'), reverse=True)
 
-        sorted_team = sort_team_on_metric_size(teams, 'player_score')
-        if sorted_team['team_a'] < sorted_team['team_b']:
-            team_a.append(sl.pop(0))
-            team_b.append(sl.pop(0))
-        else:
-            team_b.append(sl.pop(0))
-            team_a.append(sl.pop(0))
+        ### Sort by Ball Handler and Assign Best Ball Handlers to Teams A and B
+        sl = sorted(sl, key=itemgetter('ball_handler', 'player_score'), reverse=True)        
+        team_b.append(sl.pop(0))
+        team_a.append(sl.pop(0))
+
+
 
         ### Calculate Team Scores
         sorted_team = Team.sort_team_on_metric(teams, 'player_score')

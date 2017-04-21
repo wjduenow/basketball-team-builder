@@ -221,7 +221,7 @@ span.badge.pull-right {
                         Size:
                     </div>
                     <div class="col-xs-3">
-                        <input size="3" type="text" name="size" value="{% firstof model_weights.size 1 %}">
+                        <input size="3" type="text" name="size" value="{% firstof model_weights.size 2 %}">
                     </div>
                 </div>
       </div>
@@ -383,8 +383,7 @@ $( "button.btn-circle" ).click(function(e) {
 
     var player = $( this ).closest('div.list-group-item');
 
-
-    var btn = player.next('button.btn');
+    var btn = player.find('span');
     btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
 
   //change_team(player);

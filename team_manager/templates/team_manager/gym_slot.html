@@ -72,10 +72,14 @@ span.badge.pull-right {
           {% for session in gym_slot.gymsession_set.all %}
               <a href="/gym_session/{{session.id}}" class="list-group-item text-center{%if session.start_time.date == today %} list-group-item-warning{%endif%}">{{session.start_time|date:"SHORT_DATE_FORMAT"}}</a>
           {% endfor %}
-          <a href="/start_gym_slot_session/{{gym_slot.id}}" class="list-group-item text-center ">
+          <a href="#!" class="list-group-item text-center ">
+              <form action="create_gym_session" method="POST">
               <button class="btn btn-success btn-sm" type="submit" name="action">
                         Start New Session <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 
               </button>
+              {% csrf_token %}
+              <input name="gym_slot_id" value="{{ gym_slot.id }}" type="hidden">
+              </form>
           </a>
 
           </div><!-- end list -->
@@ -102,6 +106,12 @@ span.badge.pull-right {
 
     </div>
 </div>
+
+
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li class="active">Gym Slot</li>
+    </ol>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

@@ -37,19 +37,23 @@ span.badge.pull-right {
     </div>
 
 <div class="container">
-
+{% csrf_token %}
 
   <div class="row">
         <div class="col-sm-5" id="general-content" >
         <div class="list-group" id="session_players">
                   
-          <a href="#" class="list-group-item active " id="general">Players</a>
+          <a href="#" class="list-group-item active " id="general">
+          Players
+          <i><span class="badge badge-pill badge-primary counter"></span></i>
+          </a>
           {% for player in gym_session.players.all %}
-              <a href="#!" class="list-group-item text-center">
+              <a href="#!" class="list-group-item text-center player">
                 {{player}}
-                <button class="btn btn-danger btn-xs pull-right btn-circle text-center" type="submit" name="action">
+                <button class="btn btn-danger removeplayer btn-xs pull-right btn-circle text-center" type="submit" name="action">
                         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 
                 </button>
+                <input type="hidden" name="player_id" value="{{ player.id}}">
               </a>
           {% endfor %}
           <a href="#!" class="list-group-item text-center ">
@@ -70,7 +74,7 @@ span.badge.pull-right {
                 {{game.start_time|time:"H:i"}} - {{game.end_time|time:"H:i"}}
               </a>
           {% endfor %}
-          <a href="/start_gym_slot_session/{{gym_slot.id}}" class="list-group-item text-center ">
+          <a href="/start_gym_slot_session/{{gym_session.gym_slot.id}}" class="list-group-item text-center ">
               <button class="btn btn-success btn-sm" type="submit" name="action">
                         Start New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 
               </button>
@@ -88,19 +92,25 @@ span.badge.pull-right {
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Adjust Model Weights</h4>
+        <h4 class="modal-title" id="myModalLabel">Add Players to Current Session</h4>
+
       </div>
       <div class="modal-body">
 
         <div class="list-group" id="available_players">
                   
-          <a href="#" class="list-group-item active " id="general">Players</a>
+          <a href="#" class="list-group-item active " id="general">
+                Players
+                <button type="button" class="btn btn-default pull-right btn-xs" id="add_all_players_to_session">Add All </button>
+          </a>
+
           {% for player in available_players %}
-              <a href="#!" class="list-group-item text-center">
+              <a href="#!" class="list-group-item text-center player">
                 {{player}}
-                <button class="btn btn-success btn-xs pull-right btn-circle text-center" type="submit" name="action">
+                <button class="btn btn-success addplayer btn-xs pull-right btn-circle text-center" type="submit" name="action">
                         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> 
                 </button>
+                <input type="hidden" name="player_id" value="{{ player.id}}">
               </a>
           {% endfor %}
 
@@ -114,12 +124,17 @@ span.badge.pull-right {
       </div>
     </div>
   </div>
-
+<!-- End Modal -->
 
 </div>
 
-
-
+</div>
+</div>
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li><a href="/gym_slot/{{gym_session.gym_slot.id}}">Gym Slot</a></li>
+        <li class="active">Session</li>
+    </ol>
 
 
 
@@ -130,39 +145,140 @@ span.badge.pull-right {
 
 
 <script>
-$( "button.btn-danger" ).click(function(e) {
+$( "button.removeplayer" ).click(function(e) {
     e.preventDefault();
 
     var player = $( this ).closest('a.list-group-item');
-
-
-    var btn = player.next('button.btn');
-    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
-
-  //change_team(player);
-    var team = $("#available_players")
-    player.remove()
-
+    remove_player(player);
 
 });
 
-$( "button.btn-success" ).click(function(e) {
+$( "button.addplayer" ).click(function(e) {
     e.preventDefault();
 
     var player = $( this ).closest('a.list-group-item');
-
-    var btn = player.next('button.btn');
-    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
-
-  //change_team(player);
-    var team = $("#session_players")
-    team.append(player)
-
+    add_player(player);
 
 });
+
+$( "#add_all_players_to_session" ).click(function(e) {
+    e.preventDefault();
+    var available_players_section = $( "#available_players" );
+    var available_players = available_players_section.find('a.list-group-item.player')
+
+
+    available_players.each(function( i ) {
+        player = $( this );
+        add_player(player);
+    })
+});
+
+
+
+function add_player(player) {
+
+    var btn_ok = player.find('span.glyphicon-ok');
+    btn_ok.toggleClass('glyphicon-ok glyphicon-remove');
+
+    var player_id = player.find('input').val()
+
+    var btn = player.find('button.btn-success');
+    btn.toggleClass('btn-success btn-danger');
+    btn.toggleClass('addplayer removeplayer');
+
+    var team = $("#session_players");
+    add_player_to_session(player_id);
+    team.append(player);
+    updateCounter();
+
+    btn.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        var player = $( this ).closest('a.list-group-item');
+        remove_player(player);
+    })
+
+}
+
+function remove_player(player) {
+
+    var btn_ok = player.find('span.glyphicon-remove');
+    btn_ok.toggleClass('glyphicon-remove glyphicon-ok');
+
+    var player_id = player.find('input').val()
+
+    var btn = player.find('button.btn-danger');
+    btn.toggleClass('btn-success btn-danger');
+    btn.toggleClass('removeplayer addplayer');
+
+    var team = $("#available_players");
+    remove_player_from_session(player_id);
+    team.append(player);
+    updateCounter();
+
+    btn.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        var player = $( this ).closest('a.list-group-item');
+        add_player(player);
+    })
+
+}
+
+function add_player_to_session(player) {
+    $.ajax({
+        url: "/add_player_to_session",
+        type: "POST",
+        data: {
+          'csrfmiddlewaretoken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+          'player_id': player, 
+          'gym_session_id': {{ gym_session.id }}
+        },
+        dataType: 'json'
+    });
+}
+
+function remove_player_from_session(player) {
+    $.ajax({
+        url: "/remove_player_from_session",
+        type: "POST",
+        data: {
+            'csrfmiddlewaretoken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            'player_id': player, 
+            'gym_session_id': {{ gym_session.id }}
+        },
+        dataType: 'json'
+    });
+}
+
+function updateCounter() {
+    var len = $("#session_players a.player").length;
+    if(len>0){$("#general i .counter").text(len + ' total');}else{$("#general i .counter").text('0 total');}
+}
+
 </script>
 
+<script type='text/javascript'>//<![CDATA[
+$(window).load(function(){
+$(function() {
+    $('#general i .counter').text(' ');
+    
+    var generallen = $("#session_players a.player").length;
+    if(generallen>0){$("#general i .counter").text(generallen + ' total');}else{$("#general i .counter").text('0 total');}
+})
 
+
+
+$("#general-content input:checkbox").on("change", function() {
+    updateCounter();
+});
+
+$("#general-content a").click(function(){
+      updateCounter();
+});
+
+
+});//]]> 
+
+</script>
 
   </body>
 </html>

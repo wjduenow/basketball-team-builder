@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
@@ -11,6 +12,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 import json
 import operator
+from django.http import JsonResponse
 
 
 
@@ -57,6 +59,23 @@ def index(request):
     context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other})
     return HttpResponse(template.render(context, request))
 
+
+def create_gym_session(request):
+    gym_slot = GymSlot.objects.get(id = request.POST['gym_slot_id'])
+
+    today = datetime.now().date()
+    gym_session = GymSession.objects.filter(gym_slot = gym_slot).filter(created_at__date = today)
+
+    if gym_session:
+        print("Found Existing Session")
+        gym_session = gym_session[0]
+    else:
+        print("Creating Session Session")
+        gym_session = GymSession.objects.create(gym_slot = gym_slot)
+
+    return HttpResponseRedirect('/gym_session/' + str(gym_session.id))
+
+
 def view_gym_slot(request, gym_slot_id=None):
     template = loader.get_template('team_manager/gym_slot.html')
     gym_slot = GymSlot.objects.get(id = gym_slot_id)
@@ -71,7 +90,6 @@ def view_gym_session(request, gym_session_id=None):
     gym_session = GymSession.objects.get(id = gym_session_id)
 
     available_players = Player.objects.exclude(pk__in=gym_session.players.values_list('id', flat=True)).filter(pk__in=gym_session.gym_slot.players.values_list('id', flat=True))
-    print available_players.count()
 
     context = ({'gym_session': gym_session, 'available_players': available_players})
     return HttpResponse(template.render(context, request))
@@ -220,7 +238,7 @@ def start_gym_slot_session(request, gym_slot_id=None):
                      'defend_fast': request.POST.get("defend_fast", 1), 
                      'movement': request.POST.get("movement", 1), 
                      'awareness': request.POST.get("awareness", 1), 
-                     'size': request.POST.get("size", 1)}
+                     'size': request.POST.get("size", 2)}
 
     if players_group:
         teams = Team.make_team(players_group, model_weights)
@@ -256,18 +274,18 @@ def gym_slot_session_update(request, gym_session_id=None):
     context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot})
     return HttpResponse(template.render(context, request))
 
-def gym_slot_session_create(request, gym_slot_id=None):
-    template = loader.get_template('team_manager/start_gym_slot_session.html')
-
-    gym_slot = GymSlot.objects.get(id = gym_slot_id)
-    players = gym_slot.players.all().order_by('last_name')
-    gym_session = GymSession.objects.create(gym_slot = gym_slot)
-    gym_session.players = players
-    gym_session.save()
-
-
-    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot})
-    return HttpResponse(template.render(context, request))
+#def gym_slot_session_create(request, gym_slot_id=None):
+#    template = loader.get_template('team_manager/start_gym_slot_session.html')
+#
+#    gym_slot = GymSlot.objects.get(id = gym_slot_id)
+#    players = gym_slot.players.all().order_by('last_name')
+#    gym_session = GymSession.objects.create(gym_slot = gym_slot)
+#    gym_session.players = players
+#    gym_session.save()
+#
+#
+#    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot})
+#    return HttpResponse(template.render(context, request))
 
 @login_required    
 def players(request):
@@ -307,6 +325,28 @@ def update_player_stats(request):
                                    defend_large = defend_large, defend_fast = defend_fast, movement = movement, awareness = awareness)
 
     return redirect(players)
+
+@require_http_methods(["POST"])
+def add_player_to_session(request):
+    print request.POST.dict
+    gym_session = GymSession.objects.get(id = request.POST['gym_session_id'])
+    player = Player.objects.get(id = request.POST['player_id'])
+    gym_session.players.add(player)
+
+    data = {'success': True}
+
+    return JsonResponse(data)
+
+@require_http_methods(["POST"])
+def remove_player_from_session(request):
+    print request.POST.dict
+    gym_session = GymSession.objects.get(id = request.POST['gym_session_id'])
+    player = Player.objects.get(id = request.POST['player_id'])
+    gym_session.players.remove(player)
+
+    data = {'success': True}
+
+    return JsonResponse(data)
 
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
