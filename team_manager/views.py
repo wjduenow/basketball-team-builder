@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 import json
 import operator
 from django.http import JsonResponse
+from .forms import PlayerForm
 
 
 
@@ -83,6 +84,54 @@ def view_gym_slot(request, gym_slot_id=None):
     today = datetime.now().date()
 
     context = ({'gym_slot': gym_slot, 'today': today})
+    return HttpResponse(template.render(context, request))
+
+def view_player(request, player_id=None):
+    template = loader.get_template('team_manager/player.html')
+    player = Player.objects.get(id = player_id)
+
+    context = ({'player': player})
+    return HttpResponse(template.render(context, request))
+
+
+def new_player(request):
+    template = loader.get_template('team_manager/player_form.html')
+    player = "Add Player"
+    form = PlayerForm()
+
+    context = ({'player': player, 'form': form})
+    return HttpResponse(template.render(context, request))
+
+def add_update_player(request):
+    #print request.POST.dict
+    print request.POST.getlist('player*')
+    template = loader.get_template('team_manager/player_form.html')
+    
+
+    if request.method == "POST":
+        if 'player_id' in request.POST:
+            player = Player.objects.get(id = request.POST['player_id'])
+            form = PlayerForm(request.POST, instance=player)
+        else: 
+            form = PlayerForm(request.POST)
+
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.save()
+            return redirect('/players')
+    else:
+        form = PostForm()
+
+    context = ({'player': player, 'form': form})
+    return HttpResponse(template.render(context, request))
+
+def edit_player(request, player_id=None):
+    template = loader.get_template('team_manager/player_form.html')
+    player = Player.objects.get(id = player_id)
+
+    form = PlayerForm(instance=player)
+
+    context = ({'player': player, 'form': form})
     return HttpResponse(template.render(context, request))
 
 def view_gym_session(request, gym_session_id=None):

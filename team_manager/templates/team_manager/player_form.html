@@ -1,0 +1,135 @@
+{% load staticfiles %}
+<html>
+
+
+{% include 'team_manager/partial-user-menu.html' %}
+
+
+<style>
+.panel-heading {
+  background-color: #337ab7;
+}
+
+span.badge.pull-right {
+    margin-left: 10px;
+
+}
+
+.btn-circle {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  padding: 3px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+
+span.badge..badge-error {
+  background-color: #b94a48;
+}
+
+span.badge..badge-success {
+  background-color: #468847;
+}
+
+</style>
+
+
+ <!-- main content -->
+<div class="container theme-showcase" role="main">
+
+    <div class="page-header">
+        <h1>Player: {{player}}</h1>
+    </div>
+
+    <div class="container">
+
+
+<form action="/add_update_player" method="POST">
+
+{% csrf_token %}
+        <div class="col-sm-7 col-sm-offset-1">
+            <div class="list-group" id="list2">
+
+
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                            <h3 class="panel-title">{{ player }}</h3>
+                    </div>
+
+                    <div class="panel-body" id="{{team}}">
+                            {{ form.as_p }}
+                            {% if player.id %}
+                              <input type="hidden" name="player_id" value="{{player.id}}">
+                            {% endif %}
+
+                    </div>
+
+                    <div class="panel-footer">
+                            <button class="btn btn-success btn-sm" type="submit" name="action">Save
+                                <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+                            </button>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+
+</div>
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        {% if user.is_superuser %}
+          <li><a href="/players">Players</a></li>
+        {% endif %}
+        <li class="active">Player</li>
+    </ol>
+
+    <!-- Latest compiled and minified JavaScript -->
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="//cdn.rawgit.com/hilios/jQuery.countdown/2.2.0/dist/jquery.countdown.min.js"></script>
+
+<script type="text/javascript">
+
+    $('#clock').countdown("{{game_end|date:"Y/m/d H:i:s"}}", {elapse: true})
+        .on('update.countdown', function(event) {
+      var $this = $(this);
+      if (event.elapsed) {
+        $this.html(event.strftime('OverTime: <span>%H Hours %M Minutes %S Seconds</span>'));
+      } else {
+        $this.html(event.strftime('Time Remaining: <span>%H Hours %M Minutes %S Seconds</span>'));
+      }
+    });
+
+
+
+  $('#btn-reset').click(function() {
+    $clock.countdown(get15dayFromNow());
+  });
+
+  $('#btn-pause').click(function() {
+    $clock.countdown('pause');
+  });
+
+  $('#btn-resume').click(function() {
+    $clock.countdown('resume');
+  });
+
+</script>
+
+  </body>
+</html>

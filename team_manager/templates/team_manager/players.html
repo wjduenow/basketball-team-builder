@@ -73,7 +73,7 @@ thead {
 
                     {% for player in players %}
                     <tr>
-                        <td class="td-name">{{player}}<input type="hidden" name="player[{{ player.id }}]" value="{{ player.id }}"></td>
+                        <td class="td-name"><a href="/player/{{ player.id }}">{{player}}</a><input type="hidden" name="player[{{ player.id }}]" value="{{ player.id }}"></td>
                         <td>{{player.player_score}}</td>
                         <td>
                             <select id="scoring" name="scoring[{{ player.id }}]">
@@ -171,6 +171,10 @@ thead {
             <br />
             <button class="btn btn-primary" type="submit" name="action">Update Stats <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> 
             </button>
+                <a href="/new_player" class="btn btn-primary">
+                    Add Player <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
+
+                </a>
             </form>
             
 
