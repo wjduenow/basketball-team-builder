@@ -177,7 +177,7 @@ def view_game(request, game_id=None):
 
         #Set the Game End Time Unless it is already set
         if game.end_time == None:
-            game.end_time = datetime.now()
+            game.end_time = datetime.now() + timedelta(hours=8)
             game.save()
             game = Game.objects.get(id = game_id) # For Some Reason Game Length is being nulled on save
 

@@ -117,6 +117,9 @@ class GymSession(models.Model):
         self.end_time = datetime.now()
         self.save
 
+    #def __str__(self):
+    #    return self.start_time
+
     class Meta:
         ordering = ('-start_time',)
 
@@ -125,7 +128,10 @@ class Team(models.Model):
     players = models.ManyToManyField(Player)
     score = models.IntegerField(null=True)
     won = models.NullBooleanField(null=True)
-    
+
+    def __str__(self):
+        return self.name   
+
     @classmethod
     def make_team(cls, player_ids, model_weights = {}):
         team_a = []
@@ -265,7 +271,7 @@ class Game(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return "%s: %s (%s)"  % (self.name, self.start_time, self.game_duration_friendly)
 
     def end_game(self):
         self.end_time = datetime.now()
