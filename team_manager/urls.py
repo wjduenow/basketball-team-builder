@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'create_gym_session$', views.create_gym_session, name='create_gym_session'),
     url(r'players$', views.players, name='players'),
     url(r'^player/([0-9]*)$', views.view_player, name='view_player'),
+    url(r'^player_win_loss/([0-9]*)$', views.player_win_loss, name='player_win_loss'),
     url(r'^edit_player/([0-9]*)$', views.edit_player, name='edit_player'),
     url(r'^new_player$', views.new_player, name='new_player'),
     url(r'^add_update_player$', views.add_update_player, name='add_update_player'),

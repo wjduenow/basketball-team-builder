@@ -3,6 +3,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http import JsonResponse
 from django.template import RequestContext
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.template import loader
@@ -18,7 +19,7 @@ from .forms import PlayerForm
 
 
 
-from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats
+from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats, PlayerSummary
 
 
 #Form to login  
@@ -75,6 +76,19 @@ def create_gym_session(request):
         gym_session = GymSession.objects.create(gym_slot = gym_slot)
 
     return HttpResponseRedirect('/gym_session/' + str(gym_session.id))
+
+def player_win_loss(request, player_id=None):
+    ps = PlayerSummary.objects.filter(player_id = player_id).values('game_date', 'win_loss')
+
+    ps2 = [{'date': '24-Apr-07','close': '93.24'},
+          {'date': '25-Apr-07','close': '95.35'},
+          {'date': '26-Apr-07','close': '98.84'},
+          {'date': '27-Apr-07','close': '99.92'},
+          {'date': '30-Apr-07','close': '99.80'},
+          {'date': '1-May-07','close': '99.47'}]
+
+
+    return JsonResponse(list(ps), safe=False)
 
 
 def view_gym_slot(request, gym_slot_id=None):
