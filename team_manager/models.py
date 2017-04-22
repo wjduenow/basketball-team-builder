@@ -68,6 +68,18 @@ class PlayerStats(models.Model):
     def player_score(self):
         return mean([self.scoring, self.outside_shooting, self.passing, self.rebounding, self.defend_large, self.defend_fast, self.movement, self.awareness, self.player.size])
 
+class PlayerSummary(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
+    first_name = models.CharField(max_length=200)
+    played = models.IntegerField(default=2)
+    won = models.IntegerField(default=2)
+    win_loss = models.FloatField(default=2)
+    game_date = models.DateField()
+ 
+    class Meta:
+        managed = False
+        db_table = 'vw_player_win_summary'
+
 class GymSlot(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
