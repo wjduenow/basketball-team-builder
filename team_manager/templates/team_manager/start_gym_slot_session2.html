@@ -50,18 +50,25 @@ span.badge.pull-right {
 
 </style>
 
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li><a href="/gym_slot/{{gym_session.gym_slot.id}}">Gym Slot</a></li>
+        <li><a href="/gym_session/{{gym_session.id}}">Gym Session</a></li>
+        <li class="active">New Game</li>
+    </ol>
 
     <!-- main content -->
     <div class="container theme-showcase" role="main">
 
     <div class="page-header">
-        <h1>Gym Slot: {{gym_slot.name}}</h1>
+        <h1>Gym Slot: {{gym_session.gym_slot.name}}</h1>
+        <h2>Session: {{ gym_session.start_time|date:"SHORT_DATE_FORMAT" }}</h2>
     </div>
 
 <div class="container">
 
     {% if teams %} 
-    <form action="/new_game/{{gym_slot.id}}" method="POST">
+    <form action="/new_game/{{gym_session.id}}" method="POST">
     {% csrf_token %}
 
         <div class="col-sm-5 col-sm-offset-1">

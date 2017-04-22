@@ -9,7 +9,7 @@ import sqlparse
 class Migration(migrations.Migration):
 
 
-    run_sql = "CREATE OR REPLACE VIEW vw_player_win_summary AS SELECT UUID() as id, player_id, first_name, SUM(1) as played, sum(won) as won, (sum(won)/Sum(1)) as win_loss, DATE(start_time) game_date FROM (SELECT p.id as player_id, p.first_name, t.won, g.start_time FROM team_manager_team t INNER JOIN team_manager_game_teams gt on gt.team_id = t.id INNER JOIN team_manager_game g on g.id = gt.game_id INNER JOIN team_manager_team_players tp on tp.team_id = t.id INNER JOIN team_manager_player p on p.id = tp.player_id) st GROUP BY player_id, first_name, DATE(start_time);"
+    run_sql = "CREATE OR REPLACE VIEW vw_player_win_summary AS SELECT UUID() as id, player_id, first_name, SUM(1) as played, sum(won) as won, (sum(won)/Sum(1)) as win_loss, DATE(created_at) game_date FROM (SELECT p.id as player_id, p.first_name, t.won, gs.created_at  FROM team_manager_team t INNER JOIN team_manager_game_teams gt on gt.team_id = t.id INNER JOIN team_manager_game g on g.id = gt.game_id INNER JOIN team_manager_game INNER JOIN team_manager_gymsession gs on gs.id = g.gym_session_id INNER JOIN team_manager_team_players tp on tp.team_id = t.id INNER JOIN team_manager_player p on p.id = tp.player_id) st GROUP BY player_id, first_name, DATE(created_at);"
 
     dependencies = [
         ('team_manager', '0019_auto_20170421_1402'),

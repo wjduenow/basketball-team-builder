@@ -189,7 +189,7 @@ def view_game(request, game_id=None):
     return HttpResponse(template.render(context, request))
 
 
-def start_game(request, gym_slot_id=None):
+def start_game(request, gym_session_id=None):
     #template = loader.get_template('team_manager/game.html')
     team_a_ids = [ int(x) for x in request.POST.getlist('team_a[]') ]
     team_b_ids = [ int(x) for x in request.POST.getlist('team_b[]') ]
@@ -198,17 +198,7 @@ def start_game(request, gym_slot_id=None):
 
     today = datetime.now().strftime("%Y-%m-%d")
 
-    gym_slot = GymSlot.objects.get(id = gym_slot_id)
-
-    gym_session = GymSession.objects.filter(gym_slot = gym_slot).filter(created_at__date = today)
-
-    if gym_session:
-        print("Found Existing Session")
-        gym_session = gym_session[0]
-    else:
-        print("Creating Session Session")
-        gym_session = GymSession.objects.create(gym_slot = gym_slot)
-
+    gym_session = GymSession.objects.get(id = gym_session_id)
     new_game = Game.objects.create(gym_session = gym_session)
 
     team_a = Team.objects.create(name = 'Team A')
@@ -228,11 +218,11 @@ def start_game(request, gym_slot_id=None):
 
 
 
-    context = ({'teams': teams, 'game': new_game, 'gym_slot': gym_slot})
+    context = ({'teams': teams, 'game': new_game, 'gym_session': gym_session})
     return HttpResponseRedirect('/game/' + str(new_game.id))
     #return HttpResponse(template.render(context, request))
 
-def new_game(request, gym_slot_id=None, teams=None):
+def new_game(request, gym_session_id=None, teams=None):
     template = loader.get_template('team_manager/new_game.html')
 
     teams = json.loads(request.POST['teams'])
@@ -280,13 +270,12 @@ def new_game(request, gym_slot_id=None, teams=None):
         team_size = {'team_a': sorted_team_size['team_a'], 'team_b': sorted_team_size['team_b']}
 
 
-    gym_slot = GymSlot.objects.get(id = gym_slot_id)
-    sessions = GymSession.objects.filter(gym_slot = gym_slot).all()
+    gym_session = GymSession.objects.get(id = gym_session_id)
 
-    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot, 'sessions': sessions, 'teams': teams, 'team_score': team_score, 'team_size': team_size})
+    context = ({'players': players, 'gym_session_id': gym_session.id, 'gym_session': gym_session, 'teams': teams, 'team_score': team_score, 'team_size': team_size})
     return HttpResponse(template.render(context, request))
 
-def start_gym_slot_session(request, gym_slot_id=None):
+def start_gym_slot_session(request, gym_session_id=None):
     template = loader.get_template('team_manager/start_gym_slot_session2.html')
 
     players_group = request.POST.getlist('players_group[]')
@@ -313,11 +302,10 @@ def start_gym_slot_session(request, gym_slot_id=None):
         team_size = {'team_a': sorted_team_size['team_a'], 'team_b': sorted_team_size['team_b']}
 
     players_group = map(int, players_group)
-    gym_slot = GymSlot.objects.get(id = gym_slot_id)
-    players = gym_slot.players.all().order_by('first_name')
-    sessions = GymSession.objects.filter(gym_slot = gym_slot).all()
-
-    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot, 'sessions': sessions, 'teams_json': json.dumps(teams, default=date_handler), 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights})
+    gym_session = GymSession.objects.get(id = gym_session_id)
+    players = gym_session.players.order_by('first_name')
+    
+    context = ({'players': players, 'gym_session_id': gym_session_id, 'gym_session': gym_session, 'teams_json': json.dumps(teams, default=date_handler), 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights})
     return HttpResponse(template.render(context, request))
 
 def gym_slot_session(request, gym_session_id=None):
