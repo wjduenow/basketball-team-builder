@@ -40,8 +40,9 @@ span.badge.pull-right {
         <h1>Gym Slot: {{gym_session.gym_slot.name}}</h1>
         <h2>Session: {{ gym_session.start_time|date:"SHORT_DATE_FORMAT" }}</h2>
     </div>
-              <form action="/start_gym_slot_session/{{ gym_session.id }}" method="post">
+              
 <div class="container">
+<form action="/start_gym_slot_session/{{ gym_session.id }}" method="post">
 {% csrf_token %}
 
   <div class="row">
