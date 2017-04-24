@@ -128,9 +128,26 @@ class Team(models.Model):
     players = models.ManyToManyField(Player)
     score = models.IntegerField(null=True)
     won = models.NullBooleanField(null=True)
+    point_differential = models.IntegerField(null=True)
 
     def __str__(self):
         return self.name   
+
+    def update_results(self):
+        point_differential = Team.objects.raw("""SELECT t.id, t.score - t2.score as point_differential 
+                                                    FROM team_manager_team t INNER JOIN team_manager_game_teams gt on gt.team_id = t.id 
+                                                    INNER JOIN team_manager_game_teams gt2 ON gt.game_id = gt2.game_id AND gt2.team_id <> t.id 
+                                                    INNER JOIN team_manager_team t2 on t2.id = gt2.team_id 
+                                                    WHERE t.id = %s;""" % (self.id))[0]
+
+        if point_differential.point_differential > 0:
+            self.won = True
+
+        self.point_differential = point_differential.point_differential
+        self.save()
+
+
+
 
     @classmethod
     def make_team(cls, player_ids, model_weights = {}):

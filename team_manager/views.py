@@ -169,12 +169,10 @@ def view_game(request, game_id=None):
             team.won = False
             team.save()
 
-        ## Find the Winner and Save
-        winning_team = max(team_scores.iteritems(), key=operator.itemgetter(1))[0]
-        winner = Team.objects.get(id = winning_team)
-        winner.won = True
-        winner.save()
-
+        ## Find the Winner and Save Point Differential
+        for team in game.teams.all():
+            team.update_results()
+        
         #Set the Game End Time Unless it is already set
         if game.end_time == None:
             game.end_time = datetime.now() + timedelta(hours=8)
