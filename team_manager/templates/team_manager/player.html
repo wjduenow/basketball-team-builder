@@ -309,7 +309,12 @@ d3.json("http://localhost:8000/player_win_loss/{{player.id}}", ready);
 
 function ready(err, data) {
 
-  if (err) throw "error loading data";
+  if(err) { console.log(err); }
+
+  if (d3.selectAll(data).size() < 1) {
+    d3.select("#point_differential_well").remove();
+    d3.select("#win_loss_well").remove();
+  }
   console.log("hello");
 
   //FORMAT data
@@ -319,6 +324,7 @@ function ready(err, data) {
     d.date = parseDate(d.game_date);
   });
 
+  //d3.select("#point_differential_well").remove();
   console.log(data);
 
   //Appends chart headline
@@ -366,8 +372,6 @@ function ready(err, data) {
     .datum(data)
     .attr("class", "line")
     .attr("d", line2);  
-
-
 
   //Tooltips
   var focus = svg.append("g")
