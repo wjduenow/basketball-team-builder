@@ -78,7 +78,7 @@ def create_gym_session(request):
     return HttpResponseRedirect('/gym_session/' + str(gym_session.id))
 
 def player_win_loss(request, player_id=None):
-    ps = PlayerSummary.objects.filter(player_id = player_id).values('game_date', 'win_loss')
+    ps = PlayerSummary.objects.filter(player_id = player_id).values('game_date', 'win_loss', 'point_differential').order_by('game_date')
 
     ps2 = [{'date': '24-Apr-07','close': '93.24'},
           {'date': '25-Apr-07','close': '95.35'},

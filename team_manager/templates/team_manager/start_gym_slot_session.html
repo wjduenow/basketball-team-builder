@@ -47,12 +47,13 @@ span.badge.pull-right {
 
   <div class="row">
         <div class="col-sm-5" id="general-content" >
-        <div class="list-group" id="session_players">
+        <div class="list-group">
                   
           <a href="#" class="list-group-item active " id="general">
           Players
           <i><span class="badge badge-pill badge-primary counter"></span></i>
           </a>
+          <div id="session_players">
           {% for player in gym_session.players.all %}
               <a href="#!" class="list-group-item text-center player">
                 {{player}}
@@ -63,6 +64,7 @@ span.badge.pull-right {
                 <input type="hidden" name="players_group[]" value="{{ player.id}}">
               </a>
           {% endfor %}
+          </div>
           <a href="#!" class="list-group-item text-center ">
              <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal"> Add Players 
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>

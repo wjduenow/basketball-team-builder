@@ -32,6 +32,26 @@ span.badge..badge-success {
   background-color: #468847;
 }
 
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
+}
+.svg-content-responsive {
+    display: inline-block;
+    top: 10px;
+    left: 0;
+}
+
+path.line
+{
+    fill: none;
+    stroke: #000;
+}
+
 </style>
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
@@ -114,80 +134,186 @@ span.badge..badge-success {
 
             </div>
         </div>
+            </div>
 
 
-<svg width="500" height="400"></svg>
-<script src="http://d3js.org/d3.v3.js"></script>
+<div class="well">
+      <svg width="500" height="200" id="win_loss"></svg>
+</div>
+<div class="well">
+      <svg width="500" height="200" id="win_margin"></svg>
+</div>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
 <script>
 
-var svg = d3.select("svg"),
-    margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// set the dimensions and margins of the graph
+var margin = {top: 50, right: 840, bottom: 60, left: 35};
 
+var widther = window.outerWidth;
 
+var width = widther - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
 
-var parseDate = d3.time.format("%Y-%m-%d").parse; // for dates like "2014-01-01"
-//var parseDate = d3.time.format("%Y-%m-%dT00:00:00Z").parse;  // for dates like "2014-01-01T00:00:00Z"
+// parse the date / time
+var parseTime = d3.timeParse("%Y-%m-%d");
 
-var x = d3.time.scale()
-    .range([0, width]);
+// set the ranges
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, 0]);
 
-var y = d3.scale.linear()
-    .range([height, 0]);
+// define the line
+var valueline = d3.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.close); });
 
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left");
-
-var line = d3.svg.line()
-    .x(function(d) { return x(d.month); })
-    .y(function(d) { return y(d.count_items); });
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg1 = d3.select("svg#win_loss").append("svg")
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 600 400")
+    .classed("svg-content-responsive", true)
   .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("http://localhost:8000/player_win_loss/1", function(error, data) {
+
+
+//d3.json("http://localhost:8000/player_win_loss/1", function(error, data) {
+//  data.forEach(function(d) {
+//    d.date = parseDate(d.game_date);
+//    d.count_items = +d.win_loss;
+//  });
+
+
+// Get the data
+d3.json("http://localhost:8000/player_win_loss/{{player.id}}", function(error, data) {
+  if (error) throw error;
+
+  // format the data
   data.forEach(function(d) {
-    d.month = parseDate(d.game_date);
-    d.count_items = +d.win_loss;
+      d.date = parseTime(d.game_date);
+      console.log(d.date)
+      d.close = +d.win_loss;
   });
 
-  x.domain(d3.extent(data, function(d) { return d.month; }));
-  y.domain(d3.extent(data, function(d) { return d.count_items; }));
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain([0, d3.max(data, function(d) { return d.close; })]);
 
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Play count");
-
-  svg.append("path")
-      .datum(data)
+  // Add the valueline path.
+  svg1.append("path")
+      .data([data])
       .attr("class", "line")
-      .attr("d", line);
+      .attr("d", valueline);
+
+  // Add the X Axis
+  svg1.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x)
+              .tickFormat(d3.timeFormat("%Y-%m-%d")))
+      .selectAll("text")  
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-90)");
+
+  // Add the Y Axis
+  svg1.append("g")
+      .attr("class", "axis")
+      .call(d3.axisLeft(y));
+
+  svg1.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 8))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("Win Loss Ratio");
+
 });
 
 </script>
 
 
+<script>
+
+
+// set the ranges
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, -20]);
+
+// define the line
+var valueline = d3.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.close); });
+
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg2 = d3.select("svg#win_margin").append("svg")
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 600 400")
+    .classed("svg-content-responsive", true)
+    .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+
+// Get the data
+d3.json("http://localhost:8000/player_win_loss/{{player.id}}", function(error, data) {
+  if (error) throw error;
+
+  // format the data
+  data.forEach(function(d) {
+      d.date = parseTime(d.game_date);
+      d.close = +d.point_differential;
+  });
+
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain([d3.min(data, function(d) { return d.close; }), d3.max(data, function(d) { return d.close; })]);
+
+  // Add the valueline path.
+  svg2.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("d", valueline);
+
+  // Add the X Axis
+  svg2.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x)
+              .tickFormat(d3.timeFormat("%Y-%m-%d")))
+      .selectAll("text")  
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-65)");
+
+  // Add the Y Axis
+  svg2.append("g")
+      .attr("class", "axis")
+      .call(d3.axisLeft(y));
+
+
+  svg2.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 8))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "18px") 
+        .style("text-decoration", "underline")  
+        .text("Average Point Differential");
+
+});
+
+
+
+</script>
 
     </div>
 

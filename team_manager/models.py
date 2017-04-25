@@ -74,6 +74,7 @@ class PlayerSummary(models.Model):
     played = models.IntegerField(default=2)
     won = models.IntegerField(default=2)
     win_loss = models.FloatField(default=2)
+    point_differential = models.FloatField(default=2)
     game_date = models.DateField()
  
     class Meta:
