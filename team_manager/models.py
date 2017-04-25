@@ -84,8 +84,8 @@ class PlayerSummary(models.Model):
         db_table = 'vw_player_win_summary'
 
 class PlayerPlayerSummary(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='player_id')
-    other_player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='other_player_id')
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='player_player_summary')
+    other_player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='+')
     played = models.IntegerField(default=2)
     won = models.IntegerField(default=2)
     win_loss = models.FloatField(default=2)

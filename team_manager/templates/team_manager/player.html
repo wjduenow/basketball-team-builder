@@ -3,6 +3,7 @@
 
 {% include 'team_manager/partial-user-menu.html' %}
 
+
 <style>
 .panel-heading {
   background-color: #337ab7;
@@ -228,7 +229,9 @@ path.line
 
 
     <div class="row">
-      <div class="col-sm-8 well" id="point_differential_well">
+
+      <div class="col-sm-8 well">
+      <h5 class="g-hed">Players Played With</h5>
         <table data-toggle="table" class="table table-condensed table-striped table table-bordered">
             <thead>
               <tr>
@@ -240,7 +243,7 @@ path.line
                   <th class="td-name" data-sortable="true">MS</th>
                 </tr>
               </thead>
-          {% for ps in pps %}
+          {% for ps in player.player_player_summary.all %}
                 <tr>
                   <td>{{ps.other_player}}</td>
                   <td>{{ps.played}}</td>

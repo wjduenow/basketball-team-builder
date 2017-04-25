@@ -43,7 +43,7 @@ def login(request):
         context = {}
         return HttpResponse(template.render(context, request))
     messages.error(request, 'Email or password are invalid!')
-    return HttpResponseRedirect("team_manager//login/")
+    return HttpResponseRedirect("/login/")
 
 #Logs a user out, redirects to login page
 def logout(request):
@@ -104,9 +104,9 @@ def view_gym_slot(request, gym_slot_id=None):
 def view_player(request, player_id=None):
     template = loader.get_template('team_manager/player.html')
     player = Player.objects.get(id = player_id)
-    pps = PlayerPlayerSummary.objects.filter(player = player_id).exclude(other_player = player_id).all()
+    #pps = PlayerPlayerSummary.objects.filter(player = player_id).exclude(other_player = player_id).all()
 
-    context = ({'player': player, 'pps': pps})
+    context = ({'player': player}) #, 'pps': pps})
     return HttpResponse(template.render(context, request))
 
 
@@ -339,9 +339,30 @@ def gym_slot_session_update(request, gym_session_id=None):
 #    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot})
 #    return HttpResponse(template.render(context, request))
 
-#@login_required    
+    
 def players(request):
     template = loader.get_template('team_manager/players.html')
+    players = Player.objects.all().order_by('last_name')
+    player_ids = ','.join([str(p.id) for p in players])
+    stats = PlayerStats.objects.raw("SELECT * FROM team_manager_playerstats s WHERE s.id in (SELECT MAX(id) as id FROM team_manager_playerstats GROUP BY player_id);")
+    stats_dict = {}
+
+    for stat in stats:
+        stats_dict[stat.player_id] = stat
+
+    #for player in players:
+    for player in players:
+        if player.id in stats_dict:
+            player.stats = stats_dict[int(player.id)]
+            player.player_score = round(player.stats.player_score, 2)
+
+    context = ({'players': players, 'player_ids': player_ids})
+    return HttpResponse(template.render(context, request))
+
+
+@login_required    
+def player_stats(request):
+    template = loader.get_template('team_manager/player_stats.html')
     players = Player.objects.all().order_by('last_name')
     player_ids = ','.join([str(p.id) for p in players])
     stats = PlayerStats.objects.raw("SELECT * FROM team_manager_playerstats s WHERE s.id in (SELECT MAX(id) as id FROM team_manager_playerstats GROUP BY player_id);")
@@ -376,13 +397,14 @@ def update_player_stats(request):
                                    outside_shooting = outside_shooting, passing = passing, rebounding = rebounding, 
                                    defend_large = defend_large, defend_fast = defend_fast, movement = movement, awareness = awareness)
 
-    return redirect(players)
+    return HttpResponseRedirect('/player_stats')
 
 ###  Background Job Methods ###
 def update_player_to_player_stats(request):
     PlayerPlayerSummary.update()
 
-    return JsonResponse({'foo':'bar'})
+    data = {'success': True}
+    return JsonResponse(data)
 
 
 ###  AJAX METHODS  ###

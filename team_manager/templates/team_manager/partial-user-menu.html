@@ -1,12 +1,7 @@
   <head>
      <meta name="viewport" content="width=device-width, initial-scale=1">
      <title>Basketball Group Manager</title>
-    <!--Import materialize.css-->
-    <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css">
-
-
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
   </head>
 
@@ -41,6 +36,7 @@
             <li><a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
             <li><a href="/players"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Players</a></li>
             {% if user.is_superuser %}
+                <li><a href="/player_stats"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Player Stats</a></li>
                 <li><a href="/admin"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Admin</a></li>
             {% endif %}
             {% if user.is_authenticated %}
