@@ -408,11 +408,10 @@ def update_player_stats(request):
 
 ###  Background Job Methods ###
 @login_required    
-def update_player_to_player_stats(request):
+def update_game_stats(request):
     PlayerPlayerSummary.update()
 
-    data = {'success': True}
-    return JsonResponse(data)
+    return HttpResponseRedirect('/')
 
 
 ###  AJAX METHODS  ###
