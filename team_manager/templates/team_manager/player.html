@@ -244,6 +244,7 @@ path.line
                 </tr>
               </thead>
           {% for ps in player.player_player_summary.all %}
+              {% if ps.other_player.id != player.id %}
                 <tr>
                   <td>{{ps.other_player}}</td>
                   <td>{{ps.played}}</td>
@@ -252,6 +253,7 @@ path.line
                   <td>{{ps.point_differential|floatformat:2}}</td>
                   <td>{{ps.meta_score|floatformat:2}}</td>
                 </tr>
+              {% endif %}
           {% endfor %}
         </table>
       </div>
