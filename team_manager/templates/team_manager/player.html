@@ -3,7 +3,6 @@
 
 {% include 'team_manager/partial-user-menu.html' %}
 
-
 <style>
 .panel-heading {
   background-color: #337ab7;
@@ -32,19 +31,7 @@ span.badge..badge-success {
   background-color: #468847;
 }
 
-.svg-container {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-    padding-bottom: 100%; /* aspect ratio */
-    vertical-align: top;
-    overflow: hidden;
-}
-.svg-content-responsive {
-    display: inline-block;
-    top: 10px;
-    left: 0;
-}
+
 
 path.line
 {
@@ -52,27 +39,112 @@ path.line
     stroke: #000;
 }
 
+
+
 </style>
+
+
+<style type="text/css">
+  /*css to go here*/
+
+
+  .g-hed {
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size:22px; 
+    margin: 3px 0;
+  }
+
+  .g-source-bold {
+    text-align: left;
+    font-size:10px;
+    font-weight: bold; 
+  }
+
+  .g-source {
+    margin: 10px 0;
+  }
+
+  .g-source-bold {
+    text-align: left;
+    font-size:10px; 
+  }
+
+  .g-intro {
+    font-size: 16px;
+    margin: 0px 0px 10px 0px;
+  }
+
+  .g-labels {
+    font-family: 'Proxima-Nova', sans-serif;
+    fill: white;
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  .axis line {
+    fill: none;
+    stroke: #ccc;
+    stroke-dasharray: 2px 3px;
+    shape-rendering: crispEdges;
+    stroke-width: 1px;
+  }
+
+  .axis text {
+    font-family: 'Proxima-Nova', sans-serif;
+    font-size: 13px;
+    pointer-events: none;
+    fill: #7e7e7e;
+  }
+
+  .y.axis text {
+    text-anchor: end !important;
+    font-size:14px;
+    fill: #7e7e7e;
+  }
+
+  .domain {
+    display: none;
+  }
+
+  .line {
+    stroke: #2f5491;
+    stroke-width: 3px;
+    fill: none;
+  }
+
+  .overlay {
+    fill: none;
+    pointer-events: all;
+  }
+
+  .focus {
+    font-size: 14px;
+  }
+
+  .focus circle {
+    fill: #5e8dc9;
+  }
+
+</style>
+
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
-        {% if user.is_superuser %}
-          <li><a href="/players">Players</a></li>
-        {% endif %}
+        <li><a href="/players">Players</a></li>
         <li class="active">Player</li>
     </ol>
 
  <!-- main content -->
 <div class="container theme-showcase" role="main">
 
-    <div class="page-header">
+  <div class="page-header">
         <h1>Player: {{player}}</h1>
-    </div>
+  </div>
 
-    <div class="container">
+    <div class="row">
 
-
-
-        <div class="col-sm-5 col-sm-offset-1">
+        <div class="col-sm-8">
             <div class="list-group" id="list2">
 
 
@@ -120,198 +192,274 @@ path.line
 
 
                     <div class="panel-footer">
+                    {% if user.is_superuser %}
                       <a href="/edit_player/{{player.id}}">
                             <button class="btn btn-success btn-sm" type="submit" name="action">Edit
                                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                             </button>
                       </a>
+                     {% endif %}
                     </div>
 
                 </div>
-
-
-
-
             </div>
         </div>
-            </div>
+    </div> <!-- End Row -->
 
 
-<div class="well">
-      <svg width="500" height="200" id="win_loss"></svg>
-</div>
-<div class="well">
-      <svg width="500" height="200" id="win_margin"></svg>
-</div>
+    <div class="row">
+      <div class="col-sm-8 well" id="win_loss_well">
+        <h5 class="g-hed" id="win_loss_head"></h5>
+        <p class="g-intro" id="win_loss_intro"></p>
+        <div id="win_loss_chart"></div>
+      </div>
+    </div>
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
+
+    <div class="row">
+      <div class="col-sm-8 well" id="point_differential_well">
+        <h5 class="g-hed" id="point_differential_head"></h5>
+        <p class="g-intro" id="point_differential_intro"></p>
+        <div id="point_differential_chart"></div>
+      </div>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
 <script>
+//Margin conventions
+var margin = {top: 40, right: 70, bottom: 40, left: 35};
 
-// set the dimensions and margins of the graph
-var margin = {top: 50, right: 840, bottom: 60, left: 35};
+//var widther = window.outerWidth;
 
-var widther = window.outerWidth;
+var element = d3.select('#point_differential_well').node();
+var widther = element.getBoundingClientRect().width;
 
 var width = widther - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
-// parse the date / time
-var parseTime = d3.timeParse("%Y-%m-%d");
+//Parses date for correct time format
+var parseDate = d3.time.format("%Y-%m-%d").parse;
 
-// set the ranges
-var x = d3.scaleTime().range([0, width]);
-var y = d3.scaleLinear().range([height, 0]);
+//Divides date for tooltip placement
+var bisectDate = d3.bisector(function(d) { return d.date; }).left;    
 
-// define the line
-var valueline = d3.line()
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.close); });
-
-// append the svg obgect to the body of the page
-// appends a 'group' element to 'svg'
-// moves the 'group' element to the top left margin
-var svg1 = d3.select("svg#win_loss").append("svg")
-    .attr("preserveAspectRatio", "xMinYMin meet")
-    .attr("viewBox", "0 0 600 400")
-    .classed("svg-content-responsive", true)
+//Appends the svg to the chart-container div
+var svg = d3.select("#point_differential_chart").append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
   .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+//Appends the svg to the chart-container div
+var svg2 = d3.select("#win_loss_chart").append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
+//Creates the xScale 
+var xScale = d3.time.scale()
+  .range([0, width]);
 
-//d3.json("http://localhost:8000/player_win_loss/1", function(error, data) {
-//  data.forEach(function(d) {
-//    d.date = parseDate(d.game_date);
-//    d.count_items = +d.win_loss;
-//  });
+//Creates the yScale
+var yScale = d3.scale.linear()
+  .range([height, 0]);
+
+var yScale2 = d3.scale.linear()
+  .range([height, 0]);
+
+//Defines the y axis styles
+var yAxis = d3.svg.axis()
+  .scale(yScale)
+  .tickSize(-width)
+  .tickPadding(8)
+  .orient("left");
 
 
-// Get the data
-d3.json("http://localhost:8000/player_win_loss/{{player.id}}", function(error, data) {
-  if (error) throw error;
+var yAxis2 = d3.svg.axis()
+  .scale(yScale2)
+  .tickSize(-width)
+  .tickPadding(8)
+  .orient("left");
 
-  // format the data
+//Defines the y axis styles
+var xAxis = d3.svg.axis()
+  .scale(xScale)
+  .tickPadding(8)
+  .orient("bottom")
+  .tickSize(height)
+  .ticks(numTicks(width))
+  .tickFormat(d3.time.format("%Y-%m-%d")); 
+
+//line function convention (feeds an array)
+var line = d3.svg.line()
+  .x(function(d) { return xScale(d.date); })
+  .y(function(d) { return yScale(d.num); });    
+
+var line2 = d3.svg.line()
+  .x(function(d) { return xScale(d.date); })
+  .y(function(d) { return yScale(d.win_loss); });  
+
+//Loads the data
+//d3.csv("linetemplate.csv", ready);
+d3.json("http://localhost:8000/player_win_loss/{{player.id}}", ready);
+
+function ready(err, data) {
+
+  if (err) throw "error loading data";
+  console.log("hello");
+
+  //FORMAT data
   data.forEach(function(d) {
-      d.date = parseTime(d.game_date);
-      console.log(d.date)
-      d.close = +d.win_loss;
+    d.num = +d.point_differential;
+    d.win_loss = +d.win_loss;
+    d.date = parseDate(d.game_date);
   });
 
-  // Scale the range of the data
-  x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain([0, d3.max(data, function(d) { return d.close; })]);
+  console.log(data);
 
-  // Add the valueline path.
-  svg1.append("path")
-      .data([data])
-      .attr("class", "line")
-      .attr("d", valueline);
+  //Appends chart headline
+  d3.select("#point_differential_head").text("Game Point Differential");
+  d3.select("#win_loss_head").text("Win Loss Ratio");
 
-  // Add the X Axis
-  svg1.append("g")
-      .attr("class", "axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x)
-              .tickFormat(d3.timeFormat("%Y-%m-%d")))
-      .selectAll("text")  
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-90)");
+  //Appends chart intro text
+  d3.select("#point_differential_intro").text("");
+  d3.select("#win_loss_intro").text("");
 
-  // Add the Y Axis
-  svg1.append("g")
-      .attr("class", "axis")
-      .call(d3.axisLeft(y));
+  data.sort(function(a,b) { return a.date - b.date; });
 
-  svg1.append("text")
-        .attr("x", (width / 2))             
-        .attr("y", 0 - (margin.top / 8))
-        .attr("text-anchor", "middle")  
-        .style("font-size", "16px") 
-        .style("text-decoration", "underline")  
-        .text("Win Loss Ratio");
+  //Defines the xScale max
+  xScale.domain(d3.extent(data, function(d) { return d.date; }));
 
-});
+  //Defines the yScale max
+  yScale.domain(d3.extent(data, function(d) { return d.num; }));
+  yScale2.domain(d3.extent(data, function(d) { return d.win_loss; }));
 
-</script>
+  //Appends the y axis
+  var yAxisGroup = svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
 
+  var yAxisGroup = svg2.append("g")
+    .attr("class", "y axis")
+    .call(yAxis2);
 
-<script>
+  //Appends the x axis    
+  var xAxisGroup = svg.append("g")
+    .attr("class", "x axis")
+    .call(xAxis);
 
+  var xAxisGroup = svg2.append("g")
+    .attr("class", "x axis")
+    .call(xAxis);
 
-// set the ranges
-var x = d3.scaleTime().range([0, width]);
-var y = d3.scaleLinear().range([height, -20]);
+  //Binds the data to the line
+  var drawline = svg.append("path")
+    .datum(data)
+    .attr("class", "line")
+    .attr("d", line); 
 
-// define the line
-var valueline = d3.line()
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.close); });
-
-// append the svg obgect to the body of the page
-// appends a 'group' element to 'svg'
-// moves the 'group' element to the top left margin
-var svg2 = d3.select("svg#win_margin").append("svg")
-    .attr("preserveAspectRatio", "xMinYMin meet")
-    .attr("viewBox", "0 0 600 400")
-    .classed("svg-content-responsive", true)
-    .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+  var drawline = svg2.append("path")
+    .datum(data)
+    .attr("class", "line")
+    .attr("d", line2);  
 
 
-// Get the data
-d3.json("http://localhost:8000/player_win_loss/{{player.id}}", function(error, data) {
-  if (error) throw error;
 
-  // format the data
-  data.forEach(function(d) {
-      d.date = parseTime(d.game_date);
-      d.close = +d.point_differential;
-  });
+  //Tooltips
+  var focus = svg.append("g")
+      .attr("class", "focus")
+      .style("display", "none");
 
-  // Scale the range of the data
-  x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain([d3.min(data, function(d) { return d.close; }), d3.max(data, function(d) { return d.close; })]);
+  //Adds circle to focus point on line
+  focus.append("circle")
+      .attr("r", 4);
 
-  // Add the valueline path.
-  svg2.append("path")
-      .data([data])
-      .attr("class", "line")
-      .attr("d", valueline);
+  //Adds text to focus point on line    
+  focus.append("text")
+      .attr("x", 9)
+      .attr("dy", ".35em");    
+  
+  //Creates larger area for tooltip   
+  var overlay = svg.append("rect")
+      .attr("class", "overlay")
+      .attr("width", width)
+      .attr("height", height)
+      .on("mouseover", function() { focus.style("display", null); })
+      .on("mouseout", function() { focus.style("display", "none"); })
+      .on("mousemove", mousemove);
+  
+  //Tooltip mouseovers            
+  function mousemove() {
+    var x0 = xScale.invert(d3.mouse(this)[0]),
+        i = bisectDate(data, x0, 1),
+        d0 = data[i - 1],
+        d1 = data[i],
+        d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+    focus.attr("transform", "translate(" + xScale(d.date) + "," + yScale(d.num) + ")");
+    focus.select("text").text(d.num);
+  }; 
 
-  // Add the X Axis
-  svg2.append("g")
-      .attr("class", "axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x)
-              .tickFormat(d3.timeFormat("%Y-%m-%d")))
-      .selectAll("text")  
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-65)");
+      
+  //RESPONSIVENESS
+  d3.select(window).on("resize", resized);
 
-  // Add the Y Axis
-  svg2.append("g")
-      .attr("class", "axis")
-      .call(d3.axisLeft(y));
+  function resized() {
+
+    //new margin
+    var newMargin = {top: 10, right: 80, bottom: 20, left: 50};
+
+    //Get the width of the window
+    var w = d3.select(".g-chart").node().clientWidth;
+    console.log("resized", w);
+
+    //Change the width of the svg
+    d3.select("svg")
+      .attr("width", w);
+
+    //Change the xScale
+    xScale
+      .range([0, w - newMargin.right]);
+
+    //Update the line
+    line = d3.svg.line()
+      .x(function(d) { return xScale(d.date); })
+      .y(function(d) { return yScale(d.num); }); 
+
+    d3.selectAll('.line')
+      .attr("d", line);  
 
 
-  svg2.append("text")
-        .attr("x", (width / 2))             
-        .attr("y", 0 - (margin.top / 8))
-        .attr("text-anchor", "middle")  
-        .style("font-size", "18px") 
-        .style("text-decoration", "underline")  
-        .text("Average Point Differential");
+    //Updates xAxis
+    xAxisGroup
+      .call(xAxis);   
 
-});
+    //Updates ticks
+    xAxis
+      .scale(xScale)
+      .ticks(numTicks(w));
 
+    //Updates yAxis  
+    yAxis
+      .tickSize(-w - newMargin.right)
+  };
 
+}
+
+//Determines number of ticks base on width
+function numTicks(widther) {
+  if (widther <= 900) {
+    return 4
+    console.log("return 4")
+  }
+  else {
+    return 12
+    console.log("return 5")
+  }
+}
 
 </script>
 

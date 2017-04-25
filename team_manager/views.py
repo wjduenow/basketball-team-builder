@@ -337,7 +337,7 @@ def gym_slot_session_update(request, gym_session_id=None):
 #    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot})
 #    return HttpResponse(template.render(context, request))
 
-@login_required    
+#@login_required    
 def players(request):
     template = loader.get_template('team_manager/players.html')
     players = Player.objects.all().order_by('last_name')

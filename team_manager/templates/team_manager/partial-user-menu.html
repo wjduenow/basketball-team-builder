@@ -39,8 +39,8 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
+            <li><a href="/players"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Players</a></li>
             {% if user.is_superuser %}
-                <li><a href="/players"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Players</a></li>
                 <li><a href="/admin"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Admin</a></li>
             {% endif %}
             {% if user.is_authenticated %}
