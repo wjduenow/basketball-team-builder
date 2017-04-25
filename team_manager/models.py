@@ -7,6 +7,8 @@ from collections import defaultdict
 
 from django.core.signals import request_finished
 from django.dispatch import receiver
+from django.db import connection
+
 
 # Create your models here.
 
@@ -26,7 +28,7 @@ class Player(models.Model):
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200, blank=True, null=True)
     nick_name = models.CharField(max_length=200, blank=True, null=True)
-    referred_by = models.ForeignKey('self', blank=True, null=True)
+    referred_by = models.ForeignKey('self', blank=True, null=True, related_name='referred')
     status = models.CharField(max_length=200, blank=True, null=True, choices=[('Active', 'Active'), ('Inactive', 'Inactive')])
     size = models.IntegerField(blank=True, null=True, choices=[(1, 'Small'), (2, 'Medium'), (3, 'Large')])
     position = models.CharField(max_length=200, blank=True, null=True, choices=[('Guard', 'Guard'), ('Forward', 'Forward')])
@@ -80,6 +82,50 @@ class PlayerSummary(models.Model):
     class Meta:
         managed = False
         db_table = 'vw_player_win_summary'
+
+class PlayerPlayerSummary(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='player_id')
+    other_player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='other_player_id')
+    played = models.IntegerField(default=2)
+    won = models.IntegerField(default=2)
+    win_loss = models.FloatField(default=2)
+    point_differential = models.FloatField(default=2)
+    relationship = models.CharField(max_length=200)
+
+    class Meta:
+        managed = False
+        db_table = 'player_player_stats'
+
+    @property
+    def meta_score(self):
+        return self.win_loss * self.point_differential
+
+    @classmethod
+    def update(cls):
+        summary_sql = """   INSERT INTO player_player_stats (SELECT UUID() as id, my_teams.player_id as my_player_id, their_teams.player_id as their_player_id, sum(1) as played, SUM(won) as won, (sum(won)/Sum(1)) as win_loss, AVG(t.point_differential) as point_differential, "WITH" as relationship
+                    FROM team_manager_team_players my_teams 
+                    INNER JOIN team_manager_team_players their_teams on my_teams.team_id = their_teams.team_id
+                    INNER JOIN team_manager_team t ON my_teams.team_id = t.id
+                    INNER JOIN team_manager_game_teams gt on gt.team_id = t.id 
+                    INNER JOIN team_manager_game g on g.id = gt.game_id 
+                    INNER JOIN team_manager_gymsession gs on gs.id = g.gym_session_id 
+                    WHERE my_teams.player_id=PLAYER1
+                    AND their_teams.player_id=PLAYER2
+                    AND gs.created_at > DATE_SUB(NOW(), INTERVAL 180 DAY) 
+                    GROUP BY 1,2);"""
+
+        players1 = Player.objects.all()
+        players2 = Player.objects.all()
+
+        with connection.cursor() as cursor:
+            cursor.execute("TRUNCATE player_player_stats;")
+
+            for player in players1:
+                for other_player in players2:
+                    str_sql = summary_sql.replace("PLAYER1", str(player.id)).replace("PLAYER2", str(other_player.id))
+
+                    print str_sql
+                    cursor.execute(str_sql)
 
 class GymSlot(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)

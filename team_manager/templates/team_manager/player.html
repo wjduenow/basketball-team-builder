@@ -39,7 +39,9 @@ path.line
     stroke: #000;
 }
 
-
+.table-condensed{
+    font-size: 11px;
+}
 
 </style>
 
@@ -223,6 +225,35 @@ path.line
         <div id="point_differential_chart"></div>
       </div>
     </div>
+
+
+    <div class="row">
+      <div class="col-sm-8 well" id="point_differential_well">
+        <table data-toggle="table" class="table table-condensed table-striped table table-bordered">
+            <thead>
+              <tr>
+                  <th class="td-name" data-sortable="true">Name</th>
+                  <th class="td-name" data-sortable="true">P</th>
+                  <th class="td-name" data-sortable="true">W</th>
+                  <th class="td-name" data-sortable="true">Ratio</th>
+                  <th class="td-name" data-sortable="true">Diff</th>
+                  <th class="td-name" data-sortable="true">MS</th>
+                </tr>
+              </thead>
+          {% for ps in pps %}
+                <tr>
+                  <td>{{ps.other_player}}</td>
+                  <td>{{ps.played}}</td>
+                  <td>{{ps.won}}</td>
+                  <td>{{ps.win_loss|floatformat:2}}</td>
+                  <td>{{ps.point_differential|floatformat:2}}</td>
+                  <td>{{ps.meta_score|floatformat:2}}</td>
+                </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
@@ -417,7 +448,7 @@ function ready(err, data) {
     var newMargin = {top: 10, right: 80, bottom: 20, left: 50};
 
     //Get the width of the window
-    var w = d3.select(".g-chart").node().clientWidth;
+    var w = d3.select("#point_differential_well").node().clientWidth;
     console.log("resized", w);
 
     //Change the width of the svg
@@ -479,6 +510,7 @@ function numTicks(widther) {
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="//cdn.rawgit.com/hilios/jQuery.countdown/2.2.0/dist/jquery.countdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
 
 <script type="text/javascript">
 

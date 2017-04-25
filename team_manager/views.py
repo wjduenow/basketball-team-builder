@@ -19,7 +19,8 @@ from .forms import PlayerForm
 
 
 
-from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats, PlayerSummary
+
+from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats, PlayerSummary, PlayerPlayerSummary
 
 
 #Form to login  
@@ -103,8 +104,9 @@ def view_gym_slot(request, gym_slot_id=None):
 def view_player(request, player_id=None):
     template = loader.get_template('team_manager/player.html')
     player = Player.objects.get(id = player_id)
+    pps = PlayerPlayerSummary.objects.filter(player = player_id).exclude(other_player = player_id).all()
 
-    context = ({'player': player})
+    context = ({'player': player, 'pps': pps})
     return HttpResponse(template.render(context, request))
 
 
@@ -376,6 +378,14 @@ def update_player_stats(request):
 
     return redirect(players)
 
+###  Background Job Methods ###
+def update_player_to_player_stats(request):
+    PlayerPlayerSummary.update()
+
+    return JsonResponse({'foo':'bar'})
+
+
+###  AJAX METHODS  ###
 @require_http_methods(["POST"])
 def add_player_to_session(request):
     print request.POST.dict
