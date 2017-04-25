@@ -15,11 +15,6 @@ import json
 import operator
 from django.http import JsonResponse
 from .forms import PlayerForm
-
-
-
-
-
 from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats, PlayerSummary, PlayerPlayerSummary
 
 
@@ -50,7 +45,8 @@ def logout(request):
     auth_logout(request)
     messages.success(request, 'You have successfully logged out.')
     return HttpResponseRedirect("/")
-    
+
+@login_required        
 def index(request):
     #return HttpResponse("Hello, world. You're at the team manager index.")
     template = loader.get_template('team_manager/index.html')
@@ -62,7 +58,7 @@ def index(request):
     context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other})
     return HttpResponse(template.render(context, request))
 
-
+@login_required    
 def create_gym_session(request):
     gym_slot = GymSlot.objects.get(id = request.POST['gym_slot_id'])
 
@@ -78,6 +74,7 @@ def create_gym_session(request):
 
     return HttpResponseRedirect('/gym_session/' + str(gym_session.id))
 
+@login_required    
 def player_win_loss(request, player_id=None):
     ps = PlayerSummary.objects.filter(player_id = player_id).values('game_date', 'win_loss', 'point_differential').order_by('game_date')
 
@@ -91,7 +88,7 @@ def player_win_loss(request, player_id=None):
 
     return JsonResponse(list(ps), safe=False)
 
-
+@login_required    
 def view_gym_slot(request, gym_slot_id=None):
     template = loader.get_template('team_manager/gym_slot.html')
     gym_slot = GymSlot.objects.get(id = gym_slot_id)
@@ -101,6 +98,7 @@ def view_gym_slot(request, gym_slot_id=None):
     context = ({'gym_slot': gym_slot, 'today': today})
     return HttpResponse(template.render(context, request))
 
+@login_required    
 def view_player(request, player_id=None):
     template = loader.get_template('team_manager/player.html')
     player = Player.objects.get(id = player_id)
@@ -110,6 +108,7 @@ def view_player(request, player_id=None):
     return HttpResponse(template.render(context, request))
 
 
+@login_required    
 def new_player(request):
     template = loader.get_template('team_manager/player_form.html')
     player = "Add Player"
@@ -118,6 +117,7 @@ def new_player(request):
     context = ({'player': player, 'form': form})
     return HttpResponse(template.render(context, request))
 
+@login_required    
 def add_update_player(request):
     #print request.POST.dict
     print request.POST.getlist('player*')
@@ -141,6 +141,7 @@ def add_update_player(request):
     context = ({'player': player, 'form': form})
     return HttpResponse(template.render(context, request))
 
+@login_required    
 def edit_player(request, player_id=None):
     template = loader.get_template('team_manager/player_form.html')
     player = Player.objects.get(id = player_id)
@@ -150,6 +151,7 @@ def edit_player(request, player_id=None):
     context = ({'player': player, 'form': form})
     return HttpResponse(template.render(context, request))
 
+@login_required    
 def view_gym_session(request, gym_session_id=None):
     template = loader.get_template('team_manager/start_gym_slot_session.html')
     gym_session = GymSession.objects.get(id = gym_session_id)
@@ -159,6 +161,7 @@ def view_gym_session(request, gym_session_id=None):
     context = ({'gym_session': gym_session, 'available_players': available_players})
     return HttpResponse(template.render(context, request))
 
+@login_required    
 def view_game(request, game_id=None):
     template = loader.get_template('team_manager/game.html')
     game = Game.objects.get(id = game_id)
@@ -188,7 +191,7 @@ def view_game(request, game_id=None):
     context = ({'game': game, 'game_end': game_end, 'scores': scores})
     return HttpResponse(template.render(context, request))
 
-
+@login_required    
 def start_game(request, gym_session_id=None):
     #template = loader.get_template('team_manager/game.html')
     team_a_ids = [ int(x) for x in request.POST.getlist('team_a[]') ]
@@ -222,6 +225,7 @@ def start_game(request, gym_session_id=None):
     return HttpResponseRedirect('/game/' + str(new_game.id))
     #return HttpResponse(template.render(context, request))
 
+@login_required    
 def new_game(request, gym_session_id=None, teams=None):
     template = loader.get_template('team_manager/new_game.html')
 
@@ -275,6 +279,7 @@ def new_game(request, gym_session_id=None, teams=None):
     context = ({'players': players, 'gym_session_id': gym_session.id, 'gym_session': gym_session, 'teams': teams, 'team_score': team_score, 'team_size': team_size})
     return HttpResponse(template.render(context, request))
 
+@login_required    
 def start_gym_slot_session(request, gym_session_id=None):
     template = loader.get_template('team_manager/start_gym_slot_session2.html')
 
@@ -308,6 +313,7 @@ def start_gym_slot_session(request, gym_session_id=None):
     context = ({'players': players, 'gym_session_id': gym_session_id, 'gym_session': gym_session, 'teams_json': json.dumps(teams, default=date_handler), 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights})
     return HttpResponse(template.render(context, request))
 
+@login_required    
 def gym_slot_session(request, gym_session_id=None):
     template = loader.get_template('team_manager/gym_slot_session.html')
 
@@ -317,6 +323,7 @@ def gym_slot_session(request, gym_session_id=None):
     context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot})
     return HttpResponse(template.render(context, request))
 
+@login_required    
 def gym_slot_session_update(request, gym_session_id=None):
     template = loader.get_template('team_manager/start_gym_slot_session.html')
 
@@ -339,7 +346,7 @@ def gym_slot_session_update(request, gym_session_id=None):
 #    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot})
 #    return HttpResponse(template.render(context, request))
 
-    
+@login_required    
 def players(request):
     template = loader.get_template('team_manager/players.html')
     players = Player.objects.all().order_by('last_name')
@@ -400,6 +407,7 @@ def update_player_stats(request):
     return HttpResponseRedirect('/player_stats')
 
 ###  Background Job Methods ###
+@login_required    
 def update_player_to_player_stats(request):
     PlayerPlayerSummary.update()
 
@@ -408,6 +416,7 @@ def update_player_to_player_stats(request):
 
 
 ###  AJAX METHODS  ###
+@login_required    
 @require_http_methods(["POST"])
 def add_player_to_session(request):
     print request.POST.dict
@@ -419,6 +428,7 @@ def add_player_to_session(request):
 
     return JsonResponse(data)
 
+@login_required    
 @require_http_methods(["POST"])
 def remove_player_from_session(request):
     print request.POST.dict
