@@ -339,7 +339,7 @@ class Game(models.Model):
 
     def end_game(self):
         self.end_time = datetime.now()
-        self.save
+        self.save()
 
     @property
     def game_duration(self):

@@ -78,14 +78,6 @@ def create_gym_session(request):
 def player_win_loss(request, player_id=None):
     ps = PlayerSummary.objects.filter(player_id = player_id).values('game_date', 'win_loss', 'point_differential').order_by('game_date')
 
-    ps2 = [{'date': '24-Apr-07','close': '93.24'},
-          {'date': '25-Apr-07','close': '95.35'},
-          {'date': '26-Apr-07','close': '98.84'},
-          {'date': '27-Apr-07','close': '99.92'},
-          {'date': '30-Apr-07','close': '99.80'},
-          {'date': '1-May-07','close': '99.47'}]
-
-
     return JsonResponse(list(ps), safe=False)
 
 @login_required    
@@ -180,8 +172,7 @@ def view_game(request, game_id=None):
         
         #Set the Game End Time Unless it is already set
         if game.end_time == None:
-            game.end_time = datetime.now() + timedelta(hours=8)
-            game.save()
+            game.end_game()
             game = Game.objects.get(id = game_id) # For Some Reason Game Length is being nulled on save
 
 
