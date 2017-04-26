@@ -55,7 +55,8 @@ def index(request):
     print(today)
     gym_slots_today = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).filter(day_of_week = today).all()
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
-    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other})
+    active_games = Game.objects.filter(end_time = None)
+    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games})
     return HttpResponse(template.render(context, request))
 
 @login_required    

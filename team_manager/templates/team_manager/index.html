@@ -40,7 +40,21 @@
     </div>
   </div>
 
-            
+
+  <div class="col-sm-12">
+    <div class="list-group">
+      <a href="#" class="list-group-item active">
+        Active Games
+      </a>
+      {% if gym_slots_today %}
+        {% for game in active_games %}
+           <a href="game/{{game.id}}" class="list-group-item list-group-item-action"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> {{gym_session.start_time}} </a>
+         {% endfor %}
+      {% else %}
+          <a href="" class="list-group-item list-group-item-action">No Active Games</a>
+      {% endif %}
+    </div>
+  </div>
 
 
 </div>
