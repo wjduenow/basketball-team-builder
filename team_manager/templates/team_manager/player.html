@@ -16,7 +16,7 @@
 
     <div class="row">
 
-        <div class="col-sm-8">
+        <div class="col-sm-13">
             <div class="list-group" id="list2">
 
 
@@ -80,7 +80,7 @@
 
 
     <div class="row">
-      <div class="col-sm-8 well" id="win_loss_well">
+      <div class="col-sm-12 well" id="win_loss_well">
         <h5 class="g-hed" id="win_loss_head"></h5>
         <p class="g-intro" id="win_loss_intro"></p>
         <div id="win_loss_chart"></div>
@@ -89,7 +89,7 @@
 
 
     <div class="row">
-      <div class="col-sm-8 well" id="point_differential_well">
+      <div class="col-sm-12 well" id="point_differential_well">
         <h5 class="g-hed" id="point_differential_head"></h5>
         <p class="g-intro" id="point_differential_intro"></p>
         <div id="point_differential_chart"></div>
@@ -99,7 +99,7 @@
 
     <div class="row">
 
-      <div class="col-sm-8 well">
+      <div class="col-sm-12 well">
       <h5 class="g-hed">Players Played With</h5>
         <table data-toggle="table" class="table table-condensed table-striped table table-bordered">
             <thead>
@@ -154,6 +154,7 @@ var bisectDate = d3.bisector(function(d) { return d.date; }).left;
 var svg = d3.select("#point_differential_chart").append("svg")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
+  .attr("id", "point_differential_svg")
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -161,6 +162,7 @@ var svg = d3.select("#point_differential_chart").append("svg")
 var svg2 = d3.select("#win_loss_chart").append("svg")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
+  .attr("id", "win_loss_svg")
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -271,11 +273,13 @@ function ready(err, data) {
   var drawline = svg.append("path")
     .datum(data)
     .attr("class", "line")
+    .attr("id", "point_differential_line")
     .attr("d", line); 
 
   var drawline = svg2.append("path")
     .datum(data)
     .attr("class", "line")
+    .attr("id", "win_loss_line")
     .attr("d", line2);  
 
   //Tooltips
@@ -326,7 +330,10 @@ function ready(err, data) {
     console.log("resized", w);
 
     //Change the width of the svg
-    d3.select("svg")
+    d3.select("svg#point_differential_svg")
+      .attr("width", w);
+
+    d3.select("svg#win_loss_svg")
       .attr("width", w);
 
     //Change the xScale
@@ -334,12 +341,20 @@ function ready(err, data) {
       .range([0, w - newMargin.right]);
 
     //Update the line
-    line = d3.svg.line()
+    line1 = d3.svg.line()
       .x(function(d) { return xScale(d.date); })
       .y(function(d) { return yScale(d.num); }); 
 
-    d3.selectAll('.line')
-      .attr("d", line);  
+
+    line2 = d3.svg.line()
+      .x(function(d) { return xScale(d.date); })
+      .y(function(d) { return yScale(d.win_loss); }); 
+
+    d3.selectAll('#point_differential_line')
+      .attr("d", line1);  
+
+    d3.selectAll('#win_loss_line')
+      .attr("d", line2); 
 
 
     //Updates xAxis
