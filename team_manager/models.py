@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
-
+from __future__ import division
 from django.db import models
 from datetime import datetime
 from operator import itemgetter
 from collections import defaultdict
-
 from django.core.signals import request_finished
 from django.dispatch import receiver
 from django.db import connection
+from django.db.models import Count, Avg, Sum, Min, Max
 
 
 # Create your models here.

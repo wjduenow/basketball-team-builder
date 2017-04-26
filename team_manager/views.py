@@ -1,3 +1,4 @@
+from __future__ import division
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
@@ -16,7 +17,9 @@ import operator
 from django.http import JsonResponse
 from .forms import PlayerForm
 from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats, PlayerSummary, PlayerPlayerSummary
-
+from django.db.models import Count, Avg, Sum, Min, Max
+from operator import itemgetter
+from collections import defaultdict
 
 #Form to login  
 def login(request):
@@ -51,12 +54,30 @@ def index(request):
     #return HttpResponse("Hello, world. You're at the team manager index.")
     template = loader.get_template('team_manager/index.html')
     today = (datetime.now() - timedelta(hours=8)).strftime("%A")
-    print((datetime.now() - timedelta(hours=8)))
-    print(today)
+
     gym_slots_today = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).filter(day_of_week = today).all()
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
     active_games = Game.objects.filter(end_time = None)
-    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games})
+
+
+    player_summary = []
+    ps = PlayerSummary.objects.values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential')).filter(played__sum__gt=1)
+    for p in ps:
+        p['win_ratio'] = p['won__sum'] / p['played__sum']
+        p['player'] = Player.objects.get(id = p['player_id'])
+
+    ps_win_ratio = sorted(ps, key=itemgetter('win_ratio'), reverse=True)[:5]
+    for p in ps_win_ratio:
+        print p['player']
+
+    ps_point_differential = sorted(ps, key=itemgetter('point_differential__avg'), reverse=True)[:5]
+    for p in ps_point_differential:
+        print p['player']
+
+
+
+
+    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential})
     return HttpResponse(template.render(context, request))
 
 @login_required    
