@@ -1,31 +1,5 @@
-{% load staticfiles %}
-<html>
-
-
 {% include 'team_manager/partial-user-menu.html' %}
 
-
-<style>
-.panel-heading {
-  background-color: #337ab7;
-}
-
-span.badge.pull-right {
-    margin-left: 10px;
-
-}
-
-.btn-circle {
-  width: 20px;
-  height: 20px;
-  text-align: center;
-  padding: 3px 0;
-  font-size: 12px;
-  line-height: 1.428571429;
-  border-radius: 15px;
-}
-
-</style>
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
         <li><a href="/gym_slot/{{gym_session.gym_slot.id}}">Gym Slot</a></li>

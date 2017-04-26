@@ -1,0 +1,160 @@
+/* CSS REQUIRED */
+.v-center {
+  min-height:200px;
+  display: flex;
+  justify-content:center;
+  flex-flow: column wrap;
+}
+
+.panel-blue {
+  background-color: #2780e3;
+  color: #FFFFFF;
+}
+
+.panel-heading {
+  background-color: #337ab7;
+}
+
+span.badge.pull-right {
+    margin-left: 10px;
+
+}
+
+.btn-circle {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  padding: 3px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+
+span.badge..badge-error {
+  background-color: #b94a48;
+}
+
+span.badge..badge-success {
+  background-color: #468847;
+}
+
+.panel-heading {
+  background-color: #337ab7;
+}
+
+span.badge.pull-right {
+    margin-left: 10px;
+
+}
+
+
+path.line
+{
+    fill: none;
+    stroke: #000;
+}
+
+.table-condensed{
+    font-size: 11px;
+}
+
+
+tbody td, thead th {
+    width: 9%;
+}
+
+.td-name {
+    width: 19%;
+}
+
+thead {
+    background-color: #337ab7;
+    font-size: 12px;
+    color: #fff;
+
+    border-radius: @border-radius-base;
+    text-shadow: 0 -1px 0 darken(@list-group-active-bg, 10%);
+    #gradient > .vertical(@start-color: @list-group-active-bg; @end-color: darken(@list-group-active-bg, 7.5%));
+    border-color: darken(@list-group-active-border, 7.5%);
+}
+
+
+/*Chart CSS*/
+  .g-hed {
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size:22px; 
+    margin: 3px 0;
+  }
+
+  .g-source-bold {
+    text-align: left;
+    font-size:10px;
+    font-weight: bold; 
+  }
+
+  .g-source {
+    margin: 10px 0;
+  }
+
+  .g-source-bold {
+    text-align: left;
+    font-size:10px; 
+  }
+
+  .g-intro {
+    font-size: 16px;
+    margin: 0px 0px 10px 0px;
+  }
+
+  .g-labels {
+    font-family: 'Proxima-Nova', sans-serif;
+    fill: white;
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  .axis line {
+    fill: none;
+    stroke: #ccc;
+    stroke-dasharray: 2px 3px;
+    shape-rendering: crispEdges;
+    stroke-width: 1px;
+  }
+
+  .axis text {
+    font-family: 'Proxima-Nova', sans-serif;
+    font-size: 13px;
+    pointer-events: none;
+    fill: #7e7e7e;
+  }
+
+  .y.axis text {
+    text-anchor: end !important;
+    font-size:14px;
+    fill: #7e7e7e;
+  }
+
+  .domain {
+    display: none;
+  }
+
+  .line {
+    stroke: #2f5491;
+    stroke-width: 3px;
+    fill: none;
+  }
+
+  .overlay {
+    fill: none;
+    pointer-events: all;
+  }
+
+  .focus {
+    font-size: 14px;
+  }
+
+  .focus circle {
+    fill: #5e8dc9;
+  }
