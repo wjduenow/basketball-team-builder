@@ -341,7 +341,7 @@ var line2 = d3.svg.line()
 
 //Loads the data
 //d3.csv("linetemplate.csv", ready);
-d3.json("http://localhost:8000/player_win_loss/{{player.id}}", ready);
+d3.json("/player_win_loss/{{player.id}}", ready);
 
 function ready(err, data) {
 
