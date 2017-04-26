@@ -45,7 +45,7 @@ function change_team(player) {
     <form action="/new_game/{{gym_session.id}}" method="POST">
     {% csrf_token %}
 
-        <div class="col-sm-5 col-sm-offset-1">
+        <div class="col-sm-6">
           <div class="list-group" id="list2">
               {% for team,players in teams.items  %}
 
@@ -107,7 +107,7 @@ function change_team(player) {
   <div class="row">
     <form action="" method="post">
     {% csrf_token %}
-        <div class="col-sm-5 col-sm-offset-1" id="general-content" >
+        <div class="col-sm-6" id="general-content" >
           <div class="list-group" id="list1">
           <a href="#" class="list-group-item active" id="general">Select Players <i><span class="badge badge-pill badge-primary counter"></span></i> <input title="toggle all" type="checkbox" class="all pull-right"></a>
           {% for player in players %}

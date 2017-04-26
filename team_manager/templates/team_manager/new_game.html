@@ -38,7 +38,7 @@ span.badge.pull-right {
     <form action="/start_game/{{gym_session.id}}" method="POST">
     {% csrf_token %}
 
-        <div class="col-sm-7 col-sm-offset-1">
+        <div class="col-sm-12">
           <div class="list-group" id="list2">
               {% for team,players in teams.items  %}
 
