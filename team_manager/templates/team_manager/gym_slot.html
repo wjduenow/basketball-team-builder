@@ -50,7 +50,8 @@ function change_team(player) {
                   
           <a href="#" class="list-group-item active " id="general">Past Sessions</a>
           {% for session in gym_slot.gymsession_set.all %}
-              <a href="/gym_session/{{session.id}}" class="list-group-item text-center{%if session.start_time.date == today %} list-group-item-warning{%endif%}">{{session.start_time|date:"SHORT_DATE_FORMAT"}}</a>
+              <a href="/gym_session/{{session.id}}" class="list-group-item text-center{%if session.start_time.date == today %} list-group-item-warning{%endif%}">{{session.start_time|date:"SHORT_DATE_FORMAT"}} 
+              <span class="badge">{{ session.game_set.all.count }} Games</span></a>
           {% endfor %}
           <a href="#!" class="list-group-item text-center ">
               <form action="create_gym_session" method="POST">

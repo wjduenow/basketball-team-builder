@@ -48,7 +48,7 @@
       </a>
       {% if active_games %}
         {% for game in active_games %}
-           <a href="game/{{game.id}}" class="list-group-item list-group-item-action"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> {{game.start_time}} </a>
+           <a href="game/{{game.id}}" class="list-group-item list-group-item-action"><span class="fa fa-dribbble" aria-hidden="true"></span> {{game.start_time}} </a>
          {% endfor %}
       {% else %}
           <a href="" class="list-group-item list-group-item-action">No Active Games</a>

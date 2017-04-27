@@ -54,6 +54,7 @@
           <a href="#" class="list-group-item active " id="general">Session Games</a>
           {% for game in gym_session.game_set.all %}
               <a href="/game/{{game.id}}" class="list-group-item text-center">
+                <span class="fa fa-dribbble" aria-hidden="true"></span> 
                 {{game.start_time|time:"H:i"}} - {{game.end_time|time:"H:i"}}
               </a>
           {% endfor %}

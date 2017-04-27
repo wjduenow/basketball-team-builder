@@ -107,7 +107,7 @@
                   <th class="td-name" data-sortable="true">Name</th>
                   <th class="td-name" data-sortable="true">P</th>
                   <th class="td-name" data-sortable="true">W</th>
-                  <th class="td-name" data-sortable="true">Ratio</th>
+                  <th class="td-name" data-sortable="true">Win %</th>
                   <th class="td-name" data-sortable="true">Diff</th>
                   <th class="td-name" data-sortable="true">MS</th>
                 </tr>
@@ -208,7 +208,7 @@ var line = d3.svg.line()
 
 var line2 = d3.svg.line()
   .x(function(d) { return xScale(d.date); })
-  .y(function(d) { return yScale(d.win_loss); });  
+  .y(function(d) { return yScale2(d.win_loss); });  
 
 //Loads the data
 //d3.csv("linetemplate.csv", ready);
@@ -236,7 +236,7 @@ function ready(err, data) {
 
   //Appends chart headline
   d3.select("#point_differential_head").text("Game Point Differential");
-  d3.select("#win_loss_head").text("Win Loss Ratio");
+  d3.select("#win_loss_head").text("Win Percentage");
 
   //Appends chart intro text
   d3.select("#point_differential_intro").text("");

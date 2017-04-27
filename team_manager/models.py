@@ -134,6 +134,7 @@ class PlayerPlayerSummary(models.Model):
                     WHERE my_teams.player_id=PLAYER1
                     AND their_teams.player_id=PLAYER2
                     AND their_teams.player_id<>PLAYER1
+                    AND g.end_time IS NOT NULL
                     AND gs.created_at > DATE_SUB(NOW(), INTERVAL 180 DAY) 
                     GROUP BY 1,2);"""
 
@@ -366,7 +367,10 @@ class Game(models.Model):
 
     @property
     def game_duration(self):
-        return self.end_time - self.start_time
+        if self.end_time != None:
+            return self.end_time - self.start_time
+        else:
+            return self.start_time - self.start_time
 
     @property
     def game_duration_friendly(self):
