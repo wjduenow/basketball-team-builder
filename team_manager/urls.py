@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'add_player_to_session$', views.add_player_to_session, name='add_player_to_session'),
     url(r'remove_player_from_session$', views.remove_player_from_session, name='remove_player_from_session'),
     url(r'^update_game_stats$', views.update_game_stats, name='update_game_stats'),
+    url(r'^test_task$', views.test_task, name='test_task'),
     url(r'^usage/([0-9]*)$', views.start_gym_slot_session, name='start_gym_slot_session'),
 ]
 

@@ -20,6 +20,7 @@ from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats,
 from django.db.models import Count, Avg, Sum, Min, Max
 from operator import itemgetter
 from collections import defaultdict
+#from google.appengine.api.taskqueue import taskqueue
 
 #Form to login  
 def login(request):
@@ -421,6 +422,21 @@ def update_player_stats(request):
     return HttpResponseRedirect('/player_stats')
 
 ###  Background Job Methods ###
+
+def test_task(request):
+    #task = taskqueue.add(
+    #            url='/update_game_stats',
+    #            target='worker',
+    #            params={'amount': 1})
+    #
+    #print task.name
+    #print task.eta
+
+    return HttpResponseRedirect('/')
+
+
+
+
 @login_required    
 def update_game_stats(request):
     PlayerPlayerSummary.update()

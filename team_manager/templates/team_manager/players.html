@@ -19,7 +19,7 @@
                         <th class="td-name" data-sortable="true">Name</th>
                         <th class="td-name" data-sortable="true">Position</th>
                         <th class="td-name" data-sortable="true">Size</th>
-                        <th class="td-name" data-sortable="true">Last Game Played</th>
+                        <th class="td-name" data-field="date" data-sortable="true" data-sort-name="_date_data" data-sorter="dateSorter">Last Game Played</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -27,8 +27,16 @@
                     <tr>
                         <td class="td-name"><a href="/player/{{ player.id }}">{{player}}</a></td>
                         <td class="td-name">{{player.position}}</td>
-                        <td class="td-name">{{player.size}}</td>
-                        <td class="td-name"><a href="/game/{{player.last_game_id}}">{{player.last_game_date|date:"SHORT_DATE_FORMAT"}}</a></td>
+                        <td class="td-name">
+                            {% if player.size == 1 %}
+                                Small
+                            {% elif player.size == 2 %}
+                                Medium
+                            {% else %}
+                                Large
+                            {% endif %}
+                        </td>
+                        <td class="td-name" data-month="{{player.last_game_date}}"><a href="/game/{{player.last_game_id}}">{{player.last_game_date|date:"SHORT_DATE_FORMAT"}}</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -50,7 +58,14 @@
 </div>
 
 
+<script type="text/javascript">
+    function dateSorter(a, b) {
+        if (a.month < b.month) return -1;
+        if (a.month > b.month) return 1;
+        return 0;
+    }
 
+</script>
 
 
 
