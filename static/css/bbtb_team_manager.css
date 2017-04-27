@@ -185,3 +185,18 @@ thead {
   .focus circle {
     fill: #5e8dc9;
   }
+
+ .list-group-item-default {
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+ a.list-group-item-default {
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+a.list-group-item-default:hover {
+    background-color: #333333;
+    color: #FFFFFF;
+}
