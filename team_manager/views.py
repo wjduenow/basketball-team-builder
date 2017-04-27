@@ -196,6 +196,7 @@ def view_game(request, game_id=None):
         if game.end_time == None:
             game.end_game()
             game = Game.objects.get(id = game_id) # For Some Reason Game Length is being nulled on save
+            Player.update_player_game_stats()
 
 
     scores = range(0, 21)
@@ -423,6 +424,7 @@ def update_player_stats(request):
 @login_required    
 def update_game_stats(request):
     PlayerPlayerSummary.update()
+    Player.update_player_game_stats()
 
     return HttpResponseRedirect('/')
 

@@ -33,8 +33,13 @@ class Player(models.Model):
     size = models.IntegerField(blank=True, null=True, choices=[(1, 'Small'), (2, 'Medium'), (3, 'Large')])
     position = models.CharField(max_length=200, blank=True, null=True, choices=[('Guard', 'Guard'), ('Forward', 'Forward')])
     ball_handler = models.BooleanField(default=False)
+    last_game_date = models.DateTimeField(null=True)
+    last_game_id = models.IntegerField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('first_name',)
 
     def __str__(self):
         if self.nick_name:
@@ -51,8 +56,25 @@ class Player(models.Model):
             player_stats.save
             return player_stats
 
-    class Meta:
-        ordering = ('first_name',)
+    @classmethod
+    def update_player_game_stats(cls):
+        str_sql = """UPDATE team_manager_player INNER JOIN (
+                        SELECT p.id, MAX(gt.game_id) game_id, MAX(gs.created_at) as created_at 
+                            FROM team_manager_player p 
+                            INNER JOIN team_manager_team_players tp on tp.player_id = p.id 
+                            INNER JOIN team_manager_game_teams gt on gt.id = tp.team_id 
+                            INNER JOIN team_manager_game g on g.id = gt.game_id 
+                            INNER JOIN team_manager_gymsession gs on gs.id = g.gym_session_id 
+                            GROUP BY 1) tmp_query 
+                        ON tmp_query.id = team_manager_player.id
+                        SET 
+                            last_game_date = tmp_query.created_at,
+                            last_game_id = tmp_query.game_id;"""
+
+        with connection.cursor() as cursor:
+            cursor.execute(str_sql)
+
+
 
 class PlayerStats(models.Model):
     player = models.ForeignKey(Player, blank=True, null=True, db_index=True)

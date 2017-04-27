@@ -17,12 +17,18 @@
                 <thead>
                     <tr>
                         <th class="td-name" data-sortable="true">Name</th>
+                        <th class="td-name" data-sortable="true">Position</th>
+                        <th class="td-name" data-sortable="true">Size</th>
+                        <th class="td-name" data-sortable="true">Last Game Played</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for player in players %}
                     <tr>
                         <td class="td-name"><a href="/player/{{ player.id }}">{{player}}</a></td>
+                        <td class="td-name">{{player.position}}</td>
+                        <td class="td-name">{{player.size}}</td>
+                        <td class="td-name"><a href="/game/{{player.last_game_id}}">{{player.last_game_date|date:"SHORT_DATE_FORMAT"}}</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

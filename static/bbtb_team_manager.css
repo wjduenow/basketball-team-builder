@@ -1,4 +1,25 @@
-/* CSS REQUIRED */
+html,
+body,
+.view {
+    height: 100%;
+}
+
+.view {
+    background: url("/static/images/bb_court.png")no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.vertical-center {
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
+}
+
 .v-center {
   min-height:200px;
   display: flex;
