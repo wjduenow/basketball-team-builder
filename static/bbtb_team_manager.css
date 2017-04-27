@@ -4,6 +4,12 @@ body,
     height: 100%;
 }
 
+.index_leaderboard {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+
 .view {
     background: url("/static/images/bb_court.png")no-repeat center center fixed;
     -webkit-background-size: cover;

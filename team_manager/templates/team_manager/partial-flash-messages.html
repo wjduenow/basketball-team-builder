@@ -1,20 +1,10 @@
 {% if messages %}
+<div class="container">
   {% for message in messages %}
-  <div class="flash {% if message.tags %}{{ message.tags }}{% endif %}">
-    <a href="#"></a>
-    <i></i>
-    <span>{{ message }}</span>
-  </div>
+    <div class="alert alert-{{ message.tags }} alert-dismissable fade in">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+      {{ message }}
+    </div>
   {% endfor %}
-  <script>
-  $("body").on('click', 'div.flash a', function(e){
-    e.preventDefault();
-    var link = $(this);
-    link.parent('div').addClass('flipOutX');
-  });
-  // automatically close flash after 10 sec
-  setTimeout(function(){
-    $("div.flash").addClass('flipOutX');
-  }, 10000);
-  </script>
+  </div>
 {% endif %}

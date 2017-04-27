@@ -22,6 +22,7 @@ from operator import itemgetter
 from collections import defaultdict
 #from google.appengine.api.taskqueue import taskqueue
 
+
 #Form to login  
 def login(request):
     if request.method == 'POST':
@@ -62,21 +63,13 @@ def index(request):
 
 
     player_summary = []
-    ps = PlayerSummary.objects.values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential')).filter(played__sum__gt=1)
+    ps = PlayerSummary.objects.values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential')).filter(played__sum__gt=2)
     for p in ps:
         p['win_ratio'] = p['won__sum'] / p['played__sum']
         p['player'] = Player.objects.get(id = p['player_id'])
 
     ps_win_ratio = sorted(ps, key=itemgetter('win_ratio'), reverse=True)[:5]
-    for p in ps_win_ratio:
-        print p['player']
-
     ps_point_differential = sorted(ps, key=itemgetter('point_differential__avg'), reverse=True)[:5]
-    for p in ps_point_differential:
-        print p['player']
-
-
-
 
     context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential})
     return HttpResponse(template.render(context, request))
