@@ -61,7 +61,7 @@ def index(request):
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
     active_games = Game.objects.filter(end_time = None)
 
-
+    ### Leaderboard Stuff
     player_summary = []
     ps = PlayerSummary.objects.values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential')).filter(played__sum__gt=2)
     for p in ps:
@@ -71,7 +71,10 @@ def index(request):
     ps_win_ratio = sorted(ps, key=itemgetter('win_ratio'), reverse=True)[:5]
     ps_point_differential = sorted(ps, key=itemgetter('point_differential__avg'), reverse=True)[:5]
 
-    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential})
+    best_tandem_point_differential = PlayerPlayerSummary.objects.filter(played=2).order_by("-point_differential")[:5]
+    best_tandem_win_ratio = PlayerPlayerSummary.objects.filter(played=2).order_by("-win_loss")[:5]
+
+    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential, 'best_tandem_point_differential': best_tandem_point_differential, 'best_tandem_win_ratio': best_tandem_win_ratio})
     return HttpResponse(template.render(context, request))
 
 @login_required    

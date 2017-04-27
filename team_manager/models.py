@@ -133,6 +133,7 @@ class PlayerPlayerSummary(models.Model):
                     INNER JOIN team_manager_gymsession gs on gs.id = g.gym_session_id 
                     WHERE my_teams.player_id=PLAYER1
                     AND their_teams.player_id=PLAYER2
+                    AND their_teams.player_id<>PLAYER1
                     AND gs.created_at > DATE_SUB(NOW(), INTERVAL 180 DAY) 
                     GROUP BY 1,2);"""
 
