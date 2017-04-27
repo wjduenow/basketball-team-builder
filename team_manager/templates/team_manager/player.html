@@ -271,13 +271,15 @@ function ready(err, data) {
   //Binds the data to the line
   var drawline = svg.append("path")
     .datum(data)
-    .attr("class", "line")
+    .attr("class", "line")  
+    .style("stroke", "#3fb618")
     .attr("id", "point_differential_line")
     .attr("d", line); 
 
   var drawline = svg2.append("path")
     .datum(data)
     .attr("class", "line")
+    .style("stroke", "#9954bb")
     .attr("id", "win_loss_line")
     .attr("d", line2);  
 
