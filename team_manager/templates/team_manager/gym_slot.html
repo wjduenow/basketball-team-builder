@@ -55,7 +55,7 @@ function change_team(player) {
           {% endfor %}
           <a href="#!" class="list-group-item text-center ">
               <form action="create_gym_session" method="POST">
-              <button class="btn btn-success btn-sm" type="submit" name="action">
+              <button class="btn btn-success btn-block" type="submit" name="action">
                         Start New Session <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 
               </button>
               {% csrf_token %}

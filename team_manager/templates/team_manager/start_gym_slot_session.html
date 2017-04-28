@@ -31,7 +31,7 @@
           {% for player in gym_session.players.all %}
               <a href="#!" class="list-group-item text-center player">
                 {{player}}
-                <button class="btn btn-danger removeplayer btn-xs pull-right btn-circle text-center" type="submit" name="action">
+                <button class="btn btn-danger removeplayer pull-right btn-circle text-center" type="submit" name="action">
                         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 
                 </button>
                 <input type="hidden" name="player_id" value="{{ player.id}}">
@@ -40,13 +40,13 @@
           {% endfor %}
           </div>
           <a href="#!" class="list-group-item text-center ">
-             <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal"> Add Players 
+             <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#myModal"> Add Players 
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                 </button>
 
 
-                            
-              <button class="btn btn-success btn-sm" type="submit" name="action">
+
+              <button class="btn btn-success btn-block" type="submit" name="action">
                         Start New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 
               </button>
                 </form>
