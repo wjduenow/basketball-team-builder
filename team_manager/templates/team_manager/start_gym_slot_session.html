@@ -56,7 +56,16 @@
               <a href="/game/{{game.id}}" class="list-group-item text-center">
                 <span class="fa fa-dribbble" aria-hidden="true"></span> 
                 {{game.start_time|time:"H:i"}} - {{game.end_time|time:"H:i"}}
+                <span class="pull-right">
+                  <form action="/start_gym_slot_session/{{game.gym_session.id}}" method="POST" class="form-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="game_id" value="{{game.id}}">
+                    <button type="submit" class="btn btn-xs pull-right text-center">Rematch</button>
+
+                </form>
+                </span>
               </a>
+
           {% endfor %}
           <a href="/start_gym_slot_session/{{gym_session.id}}" class="list-group-item text-center ">
 

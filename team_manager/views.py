@@ -299,6 +299,23 @@ def start_gym_slot_session(request, gym_session_id=None):
     team_score = ""
     team_size = ""
 
+    rematch_game_id = request.POST.get('game_id')
+    if rematch_game_id:
+        print "Rematching %s" % (rematch_game_id)
+        teams = {'team_a': [], 'team_b': []}
+        old_team_ids = Game.objects.get(id = rematch_game_id).teams.values_list('id', flat=True)
+        team_a = Game.objects.get(id = rematch_game_id)
+
+        team_a_players = Team.objects.get(id = old_team_ids[0]).players.values()
+        for player in team_a_players:
+            teams['team_a'].append(player)
+            print player
+
+        team_b_players = Team.objects.get(id = old_team_ids[1]).players.values()
+        for player in team_b_players:
+            teams['team_b'].append(player)
+
+
     model_weights = {'scoring': request.POST.get("scoring", '1'), 
                      'outside_shooting': request.POST.get("outside_shooting", '1'), 
                      'passing': request.POST.get("passing", '1'), 
