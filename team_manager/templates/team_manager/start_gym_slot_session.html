@@ -43,6 +43,13 @@
              <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal"> Add Players 
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                 </button>
+
+
+                            
+              <button class="btn btn-success btn-sm" type="submit" name="action">
+                        Start New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 
+              </button>
+                </form>
           </a>
 
           </div><!-- end list -->
@@ -60,8 +67,9 @@
                   <form action="/start_gym_slot_session/{{game.gym_session.id}}" method="POST" class="form-inline">
                     {% csrf_token %}
                     <input type="hidden" name="game_id" value="{{game.id}}">
-                    <button type="submit" class="btn btn-xs pull-right text-center">Rematch</button>
-
+                    <button type="submit" class="btn btn-info btn-xs pull-right text-center">
+                        <span class="fa fa-repeat" aria-hidden="true"></span> Rematch
+                    </button>
                 </form>
                 </span>
               </a>
@@ -69,10 +77,6 @@
           {% endfor %}
           <a href="/start_gym_slot_session/{{gym_session.id}}" class="list-group-item text-center ">
 
-              {% csrf_token %}
-              <button class="btn btn-success btn-sm" type="submit" name="action">
-                        Start New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 
-              </button>
 
           </a>
 
@@ -81,7 +85,7 @@
 
   </div>
 
-                </form>
+
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

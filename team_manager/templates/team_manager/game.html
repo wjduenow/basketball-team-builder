@@ -74,7 +74,9 @@
   <form action="/start_gym_slot_session/{{game.gym_session.id}}" method="POST" class="form-inline">
       {% csrf_token %}
       <input type="hidden" name="game_id" value="{{game.id}}">
-      <button type="submit" class="btn btn-primary active">Rematch</button>
+      <button type="submit" class="btn btn-info btn-primary active">
+        <span class="fa fa-repeat" aria-hidden="true"></span> Rematch
+      </button>
 
   </form>
 

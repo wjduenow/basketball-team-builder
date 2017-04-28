@@ -36,7 +36,7 @@ function change_team(player) {
 
     <div class="page-header">
         <h1>Gym Slot: {{gym_session.gym_slot.name}}</h1>
-        <h2>Session: {{ gym_session.start_time|date:"SHORT_DATE_FORMAT" }}</h2>
+        <h2>Session: {{ gym_session.start_time|date:"SHORT_DATE_FORMAT" }} {% if rematch_game_id %}<strong>Rematch</strong>{% endif %}</h2>
     </div>
 
 <div class="container">

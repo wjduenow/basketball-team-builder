@@ -252,11 +252,11 @@ class Team(models.Model):
                 
 
                 ## Add in Weights
-                print model_weights
+                #print model_weights
                 for k,v in model_weights.items():
-                    print v
+                    #print v
                     if 1==1: #v.isnumeric():
-                        print("%s - %s" % (k,v))
+                        #print("%s - %s" % (k,v))
                         player[k] = float(player[k]) * float(v)
 
                 player['player_score'] = mean([player['scoring'], player['outside_shooting'], player['passing'], player['rebounding'], player['defend_large'], player['defend_fast'], player['movement'], player['awareness'], player['size']])

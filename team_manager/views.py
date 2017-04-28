@@ -309,7 +309,6 @@ def start_gym_slot_session(request, gym_session_id=None):
         team_a_players = Team.objects.get(id = old_team_ids[0]).players.values()
         for player in team_a_players:
             teams['team_a'].append(player)
-            print player
 
         team_b_players = Team.objects.get(id = old_team_ids[1]).players.values()
         for player in team_b_players:
@@ -327,6 +326,7 @@ def start_gym_slot_session(request, gym_session_id=None):
                      'size': request.POST.get("size", '2')}
 
     if players_group:
+        print "Using Team Maker"
         teams = Team.make_team(players_group, model_weights)
         sorted_team = Team.sort_team_on_metric(teams, 'player_score')
         team_score = {'team_a': sorted_team['team_a'], 'team_b': sorted_team['team_b']}
@@ -338,7 +338,7 @@ def start_gym_slot_session(request, gym_session_id=None):
     gym_session = GymSession.objects.get(id = gym_session_id)
     players = gym_session.players.order_by('first_name')
     
-    context = ({'players': players, 'gym_session_id': gym_session_id, 'gym_session': gym_session, 'teams_json': json.dumps(teams, default=date_handler), 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights})
+    context = ({'rematch_game_id': rematch_game_id, 'players': players, 'gym_session_id': gym_session_id, 'gym_session': gym_session, 'teams_json': json.dumps(teams, default=date_handler), 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights})
     return HttpResponse(template.render(context, request))
 
 @login_required    
