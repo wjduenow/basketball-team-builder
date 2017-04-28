@@ -104,7 +104,11 @@ def view_gym_slot(request, gym_slot_id=None):
     template = loader.get_template('team_manager/gym_slot.html')
     gym_slot = GymSlot.objects.get(id = gym_slot_id)
 
-    today = datetime.now().date()
+
+    today =  datetime.now().date()
+    print today
+    today = datetime.now().date() - timedelta(hours=8)
+    print today
 
     context = ({'gym_slot': gym_slot, 'today': today})
     return HttpResponse(template.render(context, request))
