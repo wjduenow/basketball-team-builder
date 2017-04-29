@@ -338,10 +338,15 @@ def start_gym_slot_session(request, gym_session_id=None):
         sorted_team_size = Team.sort_team_on_metric(teams, 'size')
         team_size = {'team_a': sorted_team_size['team_a'], 'team_b': sorted_team_size['team_b']}
 
+    selected_players_list = []
+    for team in teams:
+        for player in teams[team]:
+            selected_players_list.append(str(player['id']))
+
     players_group = map(int, players_group)
     gym_session = GymSession.objects.get(id = gym_session_id)
-    players = gym_session.players.order_by('first_name')
-    
+
+    players = Player.objects.filter(pk__in=gym_session.players.values_list('id', flat=True)).exclude(pk__in=selected_players_list).order_by('first_name')    
     context = ({'rematch_game_id': rematch_game_id, 'players': players, 'gym_session_id': gym_session_id, 'gym_session': gym_session, 'teams_json': json.dumps(teams, default=date_handler), 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights})
     return HttpResponse(template.render(context, request))
 

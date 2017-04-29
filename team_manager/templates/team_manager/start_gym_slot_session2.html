@@ -1,29 +1,5 @@
 {% include 'team_manager/partial-user-menu.html' %}
 
-<script>
-
-
-function change_team(player) {
-    var team = player.closest('div.panel-body');
-    if (team.attr('id') == 'team_a') {
-        //var team_name = 'team_b[]'
-        //var inpu = player.closest("button.btn")
-        //( "input" ).find(".player_checkbox").val();
-        //alert(inpu.attr('class'));
-        //var btn = player.closest("button.btn")
-        //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
-        $( "#team_b" ).append(player);
-    } else {
-        $( "#team_a" ).append(player);
-    }
-
-    var btn = player.closest("button.btn")
-    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down')
-
-}
-
-</script>
-
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
         <li><a href="/gym_slot/{{gym_session.gym_slot.id}}">Gym Slot</a></li>
@@ -66,17 +42,22 @@ function change_team(player) {
                     <div class="panel-body" id="{{team}}">
                         {% for player in players %} 
                             <div id="player_{{player.id}}" class="list-group-item player">{{player.first_name}} {{player.last_name}} - {{player.position}}
-                            
-
-                             <button type="button" class="btn btn-default btn-circle btn-xs pull-right" aria-label="Left Align">
-                                {% if team == 'team_a' %}
-                                    <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
-                                {% else %}
-                                    <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
-                                {% endif %}
-                            </button>
-
                             <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
+                            <span class="pull-right commands">
+                                <button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action">
+                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 
+                                </button>
+                                <span class="pull-right">&nbsp;</span>
+                                <button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align">
+                                    {% if team == 'team_a' %}
+                                        <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                                    {% else %}
+                                        <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                    {% endif %}
+                                </button>
+                            </span>
+
+                            
 
 
                             </div>
@@ -101,13 +82,41 @@ function change_team(player) {
 
         </div>
 
-    {% endif %}
+        <div class="col-sm-6">
+            <div class="list-group" id="list2">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                            <h3 class="panel-title">Available Players</h3>
+                    </div>
+                    <div class="panel-body" id="available_players">
+                        {% for player in players %} 
+                            <div id="player_{{player.id}}" class="list-group-item player">{{player.first_name}} {{player.last_name}} - {{player.position}}
+                            <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
+                            <span class="pull-right commands">
+                                <button class="btn btn-danger add_to_b pull-right btn-sm text-center" type="submit" name="action">
+                                    <span class="glyphicon glyphicon-bold" aria-hidden="true"></span>
+                                </button>
+                                <span class="pull-right">&nbsp;</span>
+                                <button class="btn btn-danger add_to_a pull-right btn-sm text-center" type="submit" name="action">
+                                   <span class="glyphicon glyphicon-font" aria-hidden="true"></span>
+                                </button>
+                            </span>
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    {% else %}
 
 
   <div class="row">
     <form action="" method="post">
     {% csrf_token %}
-        <div class="col-sm-6" id="general-content" >
+        <div class="col-sm-6">
           <div class="list-group" id="list1">
           <a href="#" class="list-group-item active" id="general">Select Players <i><span class="badge badge-pill badge-primary counter"></span></i> <input title="toggle all" type="checkbox" class="all pull-right"></a>
           {% for player in players %}
@@ -222,26 +231,11 @@ function change_team(player) {
 
 
 </div>
+{% endif %}
 
 
 
 
-
-<!--
-        <div class="col l3">
-            <div class="card pink darken-1">
-                <div class="card-content white-text">
-                    <span class="card-title">Past Sessions</span>
-                </div>
-                <div class="card-action">
-                        {% for session in sessions %}
-                            <a href="#">{{session.start_time|date:"SHORT_DATE_FORMAT"}}<br/></a>
-                        {% endfor %}
-                    </div>
-                </div>
-
-            </div>
--->
         </div>
 
     </div>
@@ -359,34 +353,170 @@ $(function() {
 </script>
 
 <script>
-$( "button.btn-circle" ).click(function(e) {
-    e.preventDefault();
 
-    var player = $( this ).closest('div.list-group-item');
+function remove_player(player) {
 
-    var btn = player.find('span');
-    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
+    var inpt = player.find('input');
+    var new_buttons = $('<span class="pull-right commands"><button class="btn btn-danger add_to_b pull-right btn-sm text-center" type="submit" name="action"><span class="glyphicon glyphicon-bold" aria-hidden="true"></span></button><span class="pull-right">&nbsp;</span><button class="btn btn-danger add_to_a pull-right btn-sm text-center" type="submit" name="action"><span class="glyphicon glyphicon-font" aria-hidden="true"></span></button></span>');
+
+    $( "#available_players" ).append(player);
+
+    var old_commands = player.find('span.commands').first();
+    old_commands.remove()
+
+    player.append(new_buttons);
+
+    var btn_a = player.find('button.add_to_a');
+    var btn_b = player.find('button.add_to_b');
+
+
+
+    btn_a.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        add_to_a(player);
+    })
+
+    btn_b.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        add_to_b(player);
+    })
+
+
+}
+
+
+
+function add_to_a(player) {
+
+    var new_a_commands = $('<span class="pull-right commands"><button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </button><span class="pull-right">&nbsp;</span><button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></button></span>');
 
     var inpt = player.find('input');
 
-  //change_team(player);
+    inpt.attr('name', "team_a[]")
+    $( "#team_a" ).append(player);
+
+    var old_commands = player.find('span.commands');
+    old_commands.remove()
+    player.append(new_a_commands);
+
+    var btn_a = player.find('button.removeplayer');
+    var btn_b = player.find('button.move_player');
+
+    btn_a.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        remove_player(player);
+    })
+
+    btn_b.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        move_player(player);
+    })
+
+}
+
+
+
+function add_to_b(player) {
+
+    var new_b_commands = $('<span class="pull-right commands"><button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </button><span class="pull-right">&nbsp;</span><button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span></button></span>');
+
+    var inpt = player.find('input');
+    inpt.attr('name', "team_b[]")
+    $( "#team_b" ).append(player);
+
+    var old_commands = player.find('span.commands');
+    old_commands.remove()
+    player.append(new_b_commands);
+
+    var btn_a = player.find('button.removeplayer');
+    var btn_b = player.find('button.move_player');
+
+    btn_a.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        remove_player(player);
+    })
+
+    btn_b.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        move_player(player);
+    })
+
+}
+
+
+function move_player(player){
+
+    //var old_commands = player.find('span.commands').first();
+    //old_commands.remove()
+
+    var btn = player.find('span.glyphicon');
+    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
+
     var team = player.closest('div.panel-body');
+    var inpt = player.find('input');
+
     if (team.attr('id') == 'team_a') {
-        //var team_name = 'team_b[]'
-        //var inpu = player.closest("button.btn")
-        //( "input" ).find(".player_checkbox").val();
         inpt.attr('name', "team_b[]")
-        //alert(inpu.attr('class'));
-        //var btn = player.closest("button.btn")
-        //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
         $( "#team_b" ).append(player);
+        //player.append(new_b_commands);
     } else {
         inpt.attr('name', "team_a[]")
         $( "#team_a" ).append(player);
+        //player.append(new_a_commands);
     }
 
+    //var btn_a = player.find('button.removeplayer');
+    //var btn_b = player.find('button.move_player');
+
+/*    btn_a.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        remove_player(player);
+    })
+
+    btn_b.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        move_player(player);
+    })*/
+
+}
+
+
+$( "button.move_player" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.player');
+    move_player(player);
+    
+});
+
+$( "button.add_to_a" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.player');
+    add_to_a(player);
 
 });
+
+
+$( "button.add_to_b" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.player');
+    add_to_b(player);
+
+});
+
+$( "button.removeplayer" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.player');
+    remove_player(player);
+
+});
+
+
+
+
 </script>
 
 
