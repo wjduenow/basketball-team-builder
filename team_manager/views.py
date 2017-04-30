@@ -338,45 +338,17 @@ def start_gym_slot_session(request, gym_session_id=None):
         sorted_team_size = Team.sort_team_on_metric(teams, 'size')
         team_size = {'team_a': sorted_team_size['team_a'], 'team_b': sorted_team_size['team_b']}
 
+    selected_players_list = []
+    for team in teams:
+        for player in teams[team]:
+            selected_players_list.append(str(player['id']))
+
     players_group = map(int, players_group)
     gym_session = GymSession.objects.get(id = gym_session_id)
-    players = gym_session.players.order_by('first_name')
-    
+
+    players = Player.objects.filter(pk__in=gym_session.players.values_list('id', flat=True)).exclude(pk__in=selected_players_list).order_by('first_name')    
     context = ({'rematch_game_id': rematch_game_id, 'players': players, 'gym_session_id': gym_session_id, 'gym_session': gym_session, 'teams_json': json.dumps(teams, default=date_handler), 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights})
     return HttpResponse(template.render(context, request))
-
-@login_required    
-def gym_slot_session(request, gym_session_id=None):
-    template = loader.get_template('team_manager/gym_slot_session.html')
-
-    gym_slot = GymSession.objects.get(id = gym_session_id)
-    players = gym_slot.players.all().order_by('last_name')
-
-    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot})
-    return HttpResponse(template.render(context, request))
-
-@login_required    
-def gym_slot_session_update(request, gym_session_id=None):
-    template = loader.get_template('team_manager/start_gym_slot_session.html')
-
-    gym_slot = GymSession.objects.get(id = gym_session_id)
-    players = gym_slot.players.all().order_by('last_name')
-
-    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot})
-    return HttpResponse(template.render(context, request))
-
-#def gym_slot_session_create(request, gym_slot_id=None):
-#    template = loader.get_template('team_manager/start_gym_slot_session.html')
-#
-#    gym_slot = GymSlot.objects.get(id = gym_slot_id)
-#    players = gym_slot.players.all().order_by('last_name')
-#    gym_session = GymSession.objects.create(gym_slot = gym_slot)
-#    gym_session.players = players
-#    gym_session.save()
-#
-#
-#    context = ({'players': players, 'gym_slot_id': gym_slot_id, 'gym_slot': gym_slot})
-#    return HttpResponse(template.render(context, request))
 
 @login_required    
 def players(request):

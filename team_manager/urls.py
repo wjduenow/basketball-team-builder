@@ -8,8 +8,6 @@ urlpatterns = [
     url(r'^accounts/login/$', views.login),
     url(r'^logout/$', views.logout),
     url(r'^start_gym_slot_session/([0-9]*)$', views.start_gym_slot_session, name='start_gym_slot_session'),
-    url(r'^gym_slot_session/([0-9]*)$', views.gym_slot_session, name='gym_slot_session'),
-    url(r'^gym_slot_session_update/([0-9]*)$', views.gym_slot_session_update, name='gym_slot_session_update'),
     url(r'create_gym_session$', views.create_gym_session, name='create_gym_session'),
     url(r'^update_player_stats$', views.update_player_stats, name='update_player_stats'),
     url(r'player_stats$', views.player_stats, name='player_stats'),
