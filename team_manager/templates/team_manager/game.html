@@ -71,6 +71,8 @@
     </div>
 </div>
 
+
+{% if user.is_superuser or today == game.end_time %}
   <form action="/start_gym_slot_session/{{game.gym_session.id}}" method="POST" class="form-inline">
       {% csrf_token %}
       <input type="hidden" name="game_id" value="{{game.id}}">
@@ -79,6 +81,7 @@
       </button>
 
   </form>
+{% endif %}
 
 {% else %}
 <div class="starter-template">
@@ -89,27 +92,7 @@
       </div>
     </div>
 
-<!--
-    <button type="button" class="btn btn-primary" id="btn-reset">
-      <i class="glyphicon glyphicon-repeat"></i>
-      Reset countdown
-    </button>
-
-    <div class="btn-group" data-toggle="buttons">
-      <label class="btn btn-default" id="btn-pause">
-        <input type="radio" name="options" id="option2" autocomplete="off">
-        <i class="glyphicon glyphicon-pause"></i>
-        Pause
-      </label>
-
-      <label class="btn btn-default active" id="btn-resume">
-        <input type="radio" name="options" id="option2" autocomplete="off" checked>
-        <i class="glyphicon glyphicon-play"></i>
-        Resume
-      </label>
-    </div>
--->
-  </div>
+</div>
 
 
 <div class="starter-template">

@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^game/([0-9]*)$', views.view_game, name='view_game'),
     url(r'^gym_slot/([0-9]*)$', views.view_gym_slot, name='view_gym_slot'),
     url(r'^gym_session/([0-9]*)$', views.view_gym_session, name='view_gym_session'),
+    url(r'^edit_gym_session/([0-9]*)$', views.edit_gym_session, name='edit_gym_session'),
     url(r'^start_game/([0-9]*)$', views.start_game, name='start_game'),
     url(r'add_player_to_session$', views.add_player_to_session, name='add_player_to_session'),
     url(r'remove_player_from_session$', views.remove_player_from_session, name='remove_player_from_session'),

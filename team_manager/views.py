@@ -168,8 +168,34 @@ def edit_player(request, player_id=None):
 
 @login_required    
 def view_gym_session(request, gym_session_id=None):
-    template = loader.get_template('team_manager/start_gym_slot_session.html')
+    today =  datetime.now().date()
     gym_session = GymSession.objects.get(id = gym_session_id)
+
+    print gym_session.start_time.date()
+    print today
+
+    if gym_session.start_time.date == today:
+        template = loader.get_template('team_manager/start_gym_slot_session.html')
+    else:
+        template = loader.get_template('team_manager/gym_slot_session.html')
+    
+
+    available_players = Player.objects.exclude(pk__in=gym_session.players.values_list('id', flat=True)).filter(pk__in=gym_session.gym_slot.players.values_list('id', flat=True))
+
+    context = ({'gym_session': gym_session, 'available_players': available_players})
+    return HttpResponse(template.render(context, request))
+
+@login_required    
+def edit_gym_session(request, gym_session_id=None):
+
+    gym_session = GymSession.objects.get(id = gym_session_id)
+
+    if request.user.is_superuser == False:
+        return HttpResponseRedirect('/gym_session/' + str(gym_session.id))
+
+    template = loader.get_template('team_manager/start_gym_slot_session.html')
+    
+       
 
     available_players = Player.objects.exclude(pk__in=gym_session.players.values_list('id', flat=True)).filter(pk__in=gym_session.gym_slot.players.values_list('id', flat=True))
 
@@ -180,6 +206,8 @@ def view_gym_session(request, gym_session_id=None):
 def view_game(request, game_id=None):
     template = loader.get_template('team_manager/game.html')
     game = Game.objects.get(id = game_id)
+
+    today =  datetime.now().date()
 
     team_scores = {} ## Used for Stores Scores to Calculate the Winner
     if request.method == 'POST':
@@ -203,7 +231,7 @@ def view_game(request, game_id=None):
     scores = range(0, 21)
     game_end = game.created_at + timedelta(minutes=21) + timedelta(hours=0)
 
-    context = ({'game': game, 'game_end': game_end, 'scores': scores})
+    context = ({'game': game, 'game_end': game_end, 'scores': scores, 'today': today})
     return HttpResponse(template.render(context, request))
 
 @login_required    
