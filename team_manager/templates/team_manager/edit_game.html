@@ -1,0 +1,302 @@
+{% include 'team_manager/partial-user-menu.html' %}
+
+
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li><a href="/gym_slot/{{game.gym_session.gym_slot.id}}">Gym Slot</a></li>
+        <li><a href="/gym_session/{{game.gym_session.id}}">Gym Session</a></li>
+        <li class="active">Game</li>
+    </ol>
+
+ <!-- main content -->
+<div class="container theme-showcase" role="main">
+
+    <div class="page-header">
+        <h1>Gym Slot: {{game.gym_session.gym_slot.name}}</h1>
+          <h2>Session: {{ game.gym_session.start_time|date:"SHORT_DATE_FORMAT" }}</h2>
+    </div>
+
+    <div class="container">
+
+    {% if game.teams.all %} 
+    {% for team in game.teams.all  %}
+
+        <div class="col-sm-6">
+            <div class="list-group" id="list2">
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                            <h3 class="panel-title">{{ team.name}}
+                                {% if team.won != Null %}
+                                    {% if team.won %}
+                                        <span class="badge badge-pill badge-primary pull-right badge-success">Winner: {{team.score}}</span>
+                                    {% else %}
+                                        <span class="badge badge-pill badge-primary pull-right badge-error">Loser: {{team.score}}</span>
+                                    {% endif %}
+                                {% endif %}
+                            </h3>
+                    </div>
+
+                    <div class="panel-body">
+                      <div id="{{team.id}}">
+                        {% for player in team.players.all %} 
+                            <div id="player_{{player.id}}" class="list-group-item text-center player">
+                                {{player.first_name}} {{player.last_name}} - {{player.position}}
+                                <button class="btn btn-danger removeplayer pull-right btn-circle text-center" type="submit" name="action">
+                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 
+                                </button>
+                                <input type="hidden" name="player_id" value="{{ player.id }}">
+                                <input type="hidden" name="team_id" value="{{ team.id }}">
+                            </div>
+                        {% endfor %}
+                      </div>
+                        <div class="list-group-item">
+                          <button type="button" class="btn btn-primary show_players btn-block" data-toggle="modal" data-target="#myModal"> Add Players 
+                              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                              <input type="hidden" name="team" value="{{ team.id }}">
+                          </button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+
+    {% endfor %}
+    {% endif %}
+
+
+
+    </div>
+
+
+
+<div class="starter-template">
+    <h1>Game Time</h1>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="lead">{{ game.game_duration_friendly }}</div>
+      </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<div class="starter-template">
+    <h1>Record Scores</h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+          <form action="/edit_game/{{game.id}}" method="POST" class="form-inline">
+            {% csrf_token %}
+
+            {% for team in game.teams.all %}
+
+                <div class="form-group">
+                    <label for="exampleInputName2">{{ team.name}} Score:</label>
+                    <select class="form-control" name="{{ team.id }}">
+                      {% for score in scores %}
+                        <option value="{{ score }}" {% if score == team.score %}SELECTED{% endif %}>{{score}}</option>
+                      {% endfor %}
+                    </select>
+                </div>
+
+            {% endfor %}
+
+            <br /><br />
+            <button type="submit" class="btn btn-success btn-block">Update Game Scores</button>
+        </form>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add Players to Team</h4>
+
+      </div>
+      <div class="modal-body">
+
+        <div class="list-group" id="available_players">
+                  
+
+
+          {% for player in available_players %}
+              <div class="list-group-item text-center player">
+                {{player}}
+                <button class="btn btn-success addplayer btn-xs pull-right btn-circle text-center" type="submit" name="action">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> 
+                </button>
+                <input type="hidden" name="player_id" value="{{ player.id }}">
+                <input type="hidden" name="team_id" value="{{ team.id }}">
+              </div>
+          {% endfor %}
+
+          </div><!-- end list -->
+
+
+
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-default" data-dismiss="modal">Close</a>
+      </div>
+    </div>
+  </div>
+<!-- End Modal -->
+
+</div>
+
+
+
+
+
+
+    <!-- Latest compiled and minified JavaScript -->
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="//cdn.rawgit.com/hilios/jQuery.countdown/2.2.0/dist/jquery.countdown.min.js"></script>
+
+<script type="text/javascript">
+
+    $('#clock').countdown("{{game_end|date:"Y/m/d H:i:s"}}", {elapse: true})
+        .on('update.countdown', function(event) {
+      var $this = $(this);
+      if (event.elapsed) {
+        $this.html(event.strftime('OverTime: <span>%H Hours %M Minutes %S Seconds</span>'));
+      } else {
+        $this.html(event.strftime('Time Remaining: <span>%H Hours %M Minutes %S Seconds</span>'));
+      }
+    });
+
+
+
+  $('#btn-reset').click(function() {
+    $clock.countdown(get15dayFromNow());
+  });
+
+  $('#btn-pause').click(function() {
+    $clock.countdown('pause');
+  });
+
+  $('#btn-resume').click(function() {
+    $clock.countdown('resume');
+  });
+
+
+var team_to_add_to = '';
+
+$( "button.show_players" ).click(function(e) {
+    team_to_add_to = $( this ).find('input[name="team"]').val();
+});
+
+$( "button.removeplayer" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.player');
+    remove_player(player);
+
+});
+
+$( "button.addplayer" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.player');
+    add_player(player);
+
+});
+
+function add_player(player) {
+
+    var btn_ok = player.find('span.glyphicon');
+    btn_ok.toggleClass('glyphicon-ok glyphicon-remove');
+
+    var player_id = player.find('input[name="player_id"]').val();
+    player.find('input[name="team_id"]').val(team_to_add_to);
+
+    var btn = player.find('button.addplayer');
+    btn.toggleClass('btn-success btn-danger');
+    btn.toggleClass('addplayer removeplayer');
+
+    var team_div = $('#' + team_to_add_to);
+    add_player_to_team(player_id, team_to_add_to);
+    team_div.append(player);
+
+    btn.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        remove_player(player);
+    })
+
+}
+
+function remove_player(player) {
+
+    var btn_ok = player.find('span.glyphicon');
+    btn_ok.toggleClass('glyphicon-remove glyphicon-ok');
+
+    var player_id = player.find('input[name="player_id"]').val();
+    var team_id = player.find('input[name="team_id"]').val();
+
+    var btn = player.find('button.removeplayer');
+    btn.toggleClass('btn-success btn-danger');
+    btn.toggleClass('removeplayer addplayer');
+
+    var available_players = $("#available_players");
+    
+    remove_player_from_team(player_id, team_id);
+    available_players.append(player);
+
+    btn.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        add_player(player);
+    })
+
+}
+
+function add_player_to_team(player, team) {
+    $.ajax({
+        url: "/add_player_to_team",
+        type: "POST",
+        dataType: 'json',
+        data: {
+          'csrfmiddlewaretoken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+          'player_id': player, 
+          'team_id': team
+        }
+        
+    });
+}
+
+function remove_player_from_team(player, team) {
+    $.ajax({
+        url: "/remove_player_from_team",
+        type: "POST",
+        dataType: 'json',
+        data: {
+            'csrfmiddlewaretoken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            'player_id': player, 
+            'team_id': team
+        }
+       
+    });
+}
+
+</script>
+
+  </body>
+</html>

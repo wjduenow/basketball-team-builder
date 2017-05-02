@@ -1,0 +1,113 @@
+{% include 'team_manager/partial-user-menu.html' %}
+
+    <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li><a href="/gym_slot/{{gym_session.gym_slot.id}}">Gym Slot</a></li>
+        <li class="active">Gym Session</li>
+    </ol>
+
+
+    <!-- main content -->
+    <div class="container theme-showcase" role="main">
+
+    <div class="page-header">
+        <h1>Gym Slot: {{gym_session.gym_slot.name}}</h1>
+        <h2>
+          Session: {{ gym_session.start_time|date:"SHORT_DATE_FORMAT" }} 
+          {% if user.is_superuser %}
+            <a href="/edit_gym_session/{{gym_session.id}}" class="btn btn-link">Edit</a>
+          {% endif %}
+        </h2>
+    </div>
+              
+<div class="container">
+
+
+  <div class="row">
+        <div class="col-sm-6" id="general-content" >
+        <div class="list-group">
+                  
+          <a href="#" class="list-group-item active " id="general">
+          Players
+          <i><span class="badge badge-pill badge-primary counter"></span></i>
+          </a>
+          <div id="session_players">
+          {% for player in gym_session.players.all %}
+              <a href="/player/{{player.id}}" class="list-group-item text-center player">
+                {{player}}
+              </a>
+          {% endfor %}
+          </div>
+
+       
+
+
+          </div><!-- end list -->
+        </div>
+
+        <div class="col-sm-6" id="general-content" >
+        <div class="list-group" id="list1">
+                  
+          <a href="#" class="list-group-item active " id="general">Session Games</a>
+          {% for game in gym_session.game_set.all %}
+              <a href="/game/{{game.id}}" class="list-group-item text-center">
+                <span class="fa fa-dribbble" aria-hidden="true"></span> 
+                {{game.start_time|time:"H:i"}} - {{game.end_time|time:"H:i"}}
+              </a>
+
+          {% endfor %}
+          </div><!-- end list -->
+        </div>        
+
+  </div>
+
+
+</div>
+
+</div>
+</div>
+
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script>
+
+
+function updateCounter() {
+    var len = $("#session_players a.player").length;
+    if(len>0){$("#general i .counter").text(len + ' total');}else{$("#general i .counter").text('0 total');}
+}
+
+</script>
+
+<script type='text/javascript'>//<![CDATA[
+$(window).load(function(){
+$(function() {
+    $('#general i .counter').text(' ');
+    
+    var generallen = $("#session_players a.player").length;
+    if(generallen>0){$("#general i .counter").text(generallen + ' total');}else{$("#general i .counter").text('0 total');}
+})
+
+
+
+$("#general-content input:checkbox").on("change", function() {
+    updateCounter();
+});
+
+$("#general-content a").click(function(){
+      updateCounter();
+});
+
+
+});//]]> 
+
+</script>
+
+  </body>
+</html>
