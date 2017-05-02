@@ -16,15 +16,16 @@
     <div class="row">
 
         <div class="col-sm-13">
-            <div class="list-group" id="list2">
+           
 
 
-                <div class="panel panel-default">
+                <div class="panel panel-primary">
                     <div class="panel-heading">
-                            <h3 class="panel-title">{{ player }}</h3>
+                      <h3 class="panel-title g-hed">{{ player }}</h3>
                     </div>
 
                     <div class="panel-body" id="{{team}}">
+                        <div class="list-group" id="list2">
                             <div id="player_{{player.id}}" class="list-group-item player">
                                 <strong>First Name: </strong>{{player.first_name}}
                             </div>
@@ -58,6 +59,7 @@
                                     <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> 
                                 {% endif %}
                             </div>
+                          </div>
 
                     </div>
 
@@ -73,57 +75,70 @@
                     </div>
 
                 </div>
-            </div>
+            
         </div>
     </div> <!-- End Row -->
 
 
     <div class="row">
-      <div class="col-sm-12 well" id="win_loss_well">
-        <h5 class="g-hed" id="win_loss_head"></h5>
-        <p class="g-intro" id="win_loss_intro"></p>
-        <div id="win_loss_chart"></div>
+      <div class="col-sm-13 panel panel-primary" id="win_loss_well">
+        <div class="panel-heading">
+            <h3 class="panel-title g-hed" id="win_loss_head"></h3>
+        </div>
+        <div class="panel-body">
+            <p class="g-intro" id="win_loss_intro"></p>
+            <div id="win_loss_chart"></div>
+        </div>
       </div>
     </div>
 
 
     <div class="row">
-      <div class="col-sm-12 well" id="point_differential_well">
-        <h5 class="g-hed" id="point_differential_head"></h5>
-        <p class="g-intro" id="point_differential_intro"></p>
-        <div id="point_differential_chart"></div>
+      <div class="col-sm-13 panel panel-primary" id="point_differential_well">
+        <div class="panel-heading">
+            <h3 class="panel-title g-hed" id="point_differential_head"></h3>
+        </div>
+        <div class="panel-body">
+          <p class="g-intro" id="point_differential_intro"></p>
+          <div id="point_differential_chart"></div>
+        </div>
       </div>
     </div>
 
 
     <div class="row">
 
-      <div class="col-sm-12 well">
-      <h5 class="g-hed">Players Played With</h5>
-        <table data-toggle="table" class="table table-condensed table-striped table table-bordered">
-            <thead>
-              <tr>
-                  <th class="td-name" data-sortable="true">Name</th>
-                  <th class="td-name" data-sortable="true">P</th>
-                  <th class="td-name" data-sortable="true">W</th>
-                  <th class="td-name" data-sortable="true">Win %</th>
-                  <th class="td-name" data-sortable="true">Diff</th>
-                  <th class="td-name" data-sortable="true">MS</th>
-                </tr>
-              </thead>
-          {% for ps in player.player_player_summary.all %}
-              {% if ps.other_player.id != player.id %}
-                <tr>
-                  <td>{{ps.other_player}}</td>
-                  <td>{{ps.played}}</td>
-                  <td>{{ps.won}}</td>
-                  <td>{{ps.win_loss|floatformat:2}}</td>
-                  <td>{{ps.point_differential|floatformat:2}}</td>
-                  <td>{{ps.meta_score|floatformat:2}}</td>
-                </tr>
-              {% endif %}
-          {% endfor %}
-        </table>
+      <div class="panel panel-primary">
+                    <div class="panel-heading">
+                      <h3 class="panel-title g-hed">Players Played With</h3>
+                    </div>
+
+                    <div class="panel-body span3" id="{{team}}">
+                      <table data-toggle="table" class="table table-condensed table-striped table table-bordered">
+                          <thead>
+                            <tr>
+                                <th class="td-name" data-sortable="true">Name</th>
+                                <th class="td-name" data-sortable="true">P</th>
+                                <th class="td-name" data-sortable="true">W</th>
+                                <th class="td-name" data-sortable="true">Win %</th>
+                                <th class="td-name" data-sortable="true">Diff</th>
+                                <th class="td-name" data-sortable="true">MS</th>
+                              </tr>
+                            </thead>
+                        {% for ps in player.player_player_summary.all %}
+                            {% if ps.other_player.id != player.id %}
+                              <tr>
+                                <td>{{ps.other_player}}</td>
+                                <td>{{ps.played}}</td>
+                                <td>{{ps.won}}</td>
+                                <td>{{ps.win_loss|floatformat:2}}</td>
+                                <td>{{ps.point_differential|floatformat:2}}</td>
+                                <td>{{ps.meta_score|floatformat:2}}</td>
+                              </tr>
+                            {% endif %}
+                        {% endfor %}
+                      </table>
+        </div>
       </div>
     </div>
 
@@ -132,7 +147,7 @@
 
 <script>
 //Margin conventions
-var margin = {top: 40, right: 70, bottom: 40, left: 35};
+var margin = {top: 40, right: 90, bottom: 40, left: 55};
 
 //var widther = window.outerWidth;
 
@@ -208,6 +223,10 @@ var line2 = d3.svg.line()
   .x(function(d) { return xScale(d.date); })
   .y(function(d) { return yScale2(d.win_loss); });  
 
+
+
+
+
 //Loads the data
 //d3.csv("linetemplate.csv", ready);
 d3.json("/player_win_loss/{{player.id}}", ready);
@@ -252,19 +271,23 @@ function ready(err, data) {
   //Appends the y axis
   var yAxisGroup = svg.append("g")
     .attr("class", "y axis")
+    .attr("id", "yaxis")
     .call(yAxis);
 
   var yAxisGroup = svg2.append("g")
     .attr("class", "y axis")
+    .attr("id", "yaxis2")
     .call(yAxis2);
 
   //Appends the x axis    
   var xAxisGroup = svg.append("g")
     .attr("class", "x axis")
+    .attr("id", "xaxis")
     .call(xAxis);
 
   var xAxisGroup = svg2.append("g")
     .attr("class", "x axis")
+    .attr("id", "xaxis2")
     .call(xAxis);
 
   //Binds the data to the line
@@ -282,14 +305,34 @@ function ready(err, data) {
     .attr("id", "win_loss_line")
     .attr("d", line2);  
 
-      
+// Add point circles
+
+svg.selectAll("circle.line")
+        .data(data)
+        .enter().append("svg:circle")
+        .attr("class", "line")
+        .style("fill", "#3fb618")
+        .attr("cx", line.x())
+        .attr("cy", line.y())
+        .attr("r", 4.5);
+
+svg2.selectAll("circle.line")
+        .data(data)
+        .enter().append("svg:circle")
+        .attr("class", "line")
+        .style("fill", "#9954bb")
+        .attr("cx", line2.x())
+        .attr("cy", line2.y())
+        .attr("r", 4.5);
+
+
   //RESPONSIVENESS
   d3.select(window).on("resize", resized);
 
   function resized() {
 
     //new margin
-    var newMargin = {top: 10, right: 80, bottom: 20, left: 50};
+    var newMargin = {top: 40, right: 90, bottom: 40, left: 55};
 
     //Get the width of the window
     var w = d3.select("#point_differential_well").node().clientWidth;
@@ -314,7 +357,7 @@ function ready(err, data) {
 
     line2 = d3.svg.line()
       .x(function(d) { return xScale(d.date); })
-      .y(function(d) { return yScale(d.win_loss); }); 
+      .y(function(d) { return yScale2(d.win_loss); }); 
 
     d3.selectAll('#point_differential_line')
       .attr("d", line1);  
@@ -322,10 +365,31 @@ function ready(err, data) {
     d3.selectAll('#win_loss_line')
       .attr("d", line2); 
 
+    svg.selectAll("circle")
+      .attr('cx', function (d) { return xScale(d.date); })
+      .attr('cy', function (d) { return yScale(d.num); })
+      .attr("r", 4.5);
+
+    svg2.selectAll("circle")
+      .attr('cx', function (d) { return xScale(d.date); })
+      .attr('cy', function (d) { return yScale2(d.win_loss); })
+      .attr("r", 4.5);
+
 
     //Updates xAxis
-    xAxisGroup
-      .call(xAxis);   
+
+    var yAxisGroup = d3.select("#yaxis");
+    yAxisGroup.call(yAxis);
+
+    var yAxisGroup2 = d3.select("#yaxis2");
+    yAxisGroup2.call(yAxis2);
+
+
+    var xAxisGroup = d3.select("#xaxis");
+    xAxisGroup.call(xAxis); 
+
+    var xAxisGroup2 = d3.select("#xaxis2");
+    xAxisGroup2.call(xAxis);   
 
     //Updates ticks
     xAxis
@@ -333,7 +397,11 @@ function ready(err, data) {
       .ticks(numTicks(w));
 
     //Updates yAxis  
-    yAxis
+
+   yAxis
+      .tickSize(-w - newMargin.right);
+
+    yAxis2
       .tickSize(-w - newMargin.right)
   };
 
@@ -364,36 +432,9 @@ function numTicks(widther) {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="//cdn.rawgit.com/hilios/jQuery.countdown/2.2.0/dist/jquery.countdown.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
 
-<script type="text/javascript">
 
-    $('#clock').countdown("{{game_end|date:"Y/m/d H:i:s"}}", {elapse: true})
-        .on('update.countdown', function(event) {
-      var $this = $(this);
-      if (event.elapsed) {
-        $this.html(event.strftime('OverTime: <span>%H Hours %M Minutes %S Seconds</span>'));
-      } else {
-        $this.html(event.strftime('Time Remaining: <span>%H Hours %M Minutes %S Seconds</span>'));
-      }
-    });
-
-
-
-  $('#btn-reset').click(function() {
-    $clock.countdown(get15dayFromNow());
-  });
-
-  $('#btn-pause').click(function() {
-    $clock.countdown('pause');
-  });
-
-  $('#btn-resume').click(function() {
-    $clock.countdown('resume');
-  });
-
-</script>
 
   </body>
 </html>

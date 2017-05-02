@@ -96,7 +96,7 @@ tbody td, thead th {
 
 thead {
     background-color: #2780e3;
-    font-size: 12px;
+    font-size: 14px;
     color: #fff;
 
     border-radius: @border-radius-base;
@@ -200,3 +200,8 @@ a.list-group-item-default:hover {
     background-color: #333333;
     color: #FFFFFF;
 }
+
+.span3 {  
+    height: 400px !important;
+    overflow: scroll;
+}​
