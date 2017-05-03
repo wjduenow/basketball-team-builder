@@ -60,6 +60,7 @@ def index(request):
     gym_slots_today = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).filter(day_of_week = today).all()
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
     active_games = Game.objects.filter(end_time = None)
+    active_sessions = GymSession.objects.filter(created_at__date = datetime.now())
 
     ### Leaderboard Stuff
     player_summary = []
@@ -74,7 +75,7 @@ def index(request):
     best_tandem_point_differential = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("-point_differential")[:5]
     best_tandem_win_ratio = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("-win_loss")[:5]
 
-    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential, 'best_tandem_point_differential': best_tandem_point_differential, 'best_tandem_win_ratio': best_tandem_win_ratio})
+    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 'active_sessions': active_sessions, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential, 'best_tandem_point_differential': best_tandem_point_differential, 'best_tandem_win_ratio': best_tandem_win_ratio})
     return HttpResponse(template.render(context, request))
 
 @login_required    
@@ -174,7 +175,8 @@ def view_gym_session(request, gym_session_id=None):
     print gym_session.start_time.date()
     print today
 
-    if gym_session.start_time.date == today:
+    if gym_session.start_time.date() == today:
+        print "This Session is Today"
         template = loader.get_template('team_manager/start_gym_slot_session.html')
     else:
         template = loader.get_template('team_manager/gym_slot_session.html')
