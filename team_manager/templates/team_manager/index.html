@@ -13,20 +13,7 @@
 
 
 
-  <div class="col-sm-6">
-    <div class="list-group">
-      <a href="#" class="list-group-item active">
-        Today
-      </a>
-        {% if gym_slots_today %}
-          {% for gym_slot in gym_slots_today %}
-             <a href="gym_slot/{{gym_slot.id}}" class="list-group-item list-group-item-action"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> {{gym_slot.name}}</a>
-           {% endfor %}
-        {% else %}
-            <a href="" class="list-group-item list-group-item-action">No Gym Slots Scheduled Today</a>
-        {% endif %}
-    </div>
-  </div>
+
 
 
   <div class="col-sm-6">
@@ -46,18 +33,6 @@
 
   <div class="col-sm-6">
     <div class="list-group">
-      <a href="#" class="list-group-item active">
-        Other Days
-      </a>
-      {% for gym_slot in gym_slots_other %}
-         <a href="gym_slot/{{gym_slot.id}}" class="list-group-item list-group-item-action"><span class="fa fa-calendar" aria-hidden="true"></span> {{gym_slot.name}}</a>
-       {% endfor %}
-    </div>
-  </div>
-
-
-  <div class="col-sm-6">
-    <div class="list-group">
       <a href="#" class="list-group-item list-group-item-default">
         Active Sessions
       </a>
@@ -70,6 +45,36 @@
       {% endif %}
     </div>
   </div>
+
+
+  <div class="col-sm-6">
+    <div class="list-group">
+      <a href="#" class="list-group-item active">
+        Today
+      </a>
+        {% if gym_slots_today %}
+          {% for gym_slot in gym_slots_today %}
+             <a href="gym_slot/{{gym_slot.id}}" class="list-group-item list-group-item-action"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> {{gym_slot.name}}</a>
+           {% endfor %}
+        {% else %}
+            <a href="" class="list-group-item list-group-item-action">No Gym Slots Scheduled Today</a>
+        {% endif %}
+    </div>
+  </div>
+
+  <div class="col-sm-6">
+    <div class="list-group">
+      <a href="#" class="list-group-item active">
+        Other Days
+      </a>
+      {% for gym_slot in gym_slots_other %}
+         <a href="gym_slot/{{gym_slot.id}}" class="list-group-item list-group-item-action"><span class="fa fa-calendar" aria-hidden="true"></span> {{gym_slot.name}}</a>
+       {% endfor %}
+    </div>
+  </div>
+
+
+
 
 
 <div class="col-sm-12">
