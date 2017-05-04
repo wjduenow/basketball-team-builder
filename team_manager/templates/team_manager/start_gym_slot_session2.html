@@ -25,7 +25,7 @@
           <div class="list-group" id="list2">
               {% for team,players in teams.items  %}
 
-                <div class="panel panel-default">
+                <div class="panel panel-default z-depth-3">
                     <div class="panel-heading">
                          {% if team == 'team_a' %}
                             <h3 class="panel-title">Team A 
@@ -45,14 +45,14 @@
                             <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
                             <span class="pull-right commands">
                                 <button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action">
-                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 
+                                        <span class="fa fa-remove" aria-hidden="true"></span> 
                                 </button>
                                 <span class="pull-right">&nbsp;</span>
                                 <button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align">
                                     {% if team == 'team_a' %}
-                                        <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                                        <span class="fa fa-arrow-down" aria-hidden="true"></span>
                                     {% else %}
-                                        <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                        <span class="fa fa-arrow-up" aria-hidden="true"></span>
                                     {% endif %}
                                 </button>
                             </span>
@@ -72,7 +72,7 @@
           </div>
           <input type="hidden" name="teams" value="{{ teams_json }}">
           <button class="btn btn-success btn-block" type="submit" name="action">
-                    Start New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
+                    Start New Game <span class="fa fa-forward" aria-hidden="true"></span>
           </button>
 
 
@@ -85,7 +85,7 @@
         <div class="col-sm-6">
             <div class="list-group" id="list2">
 
-                <div class="panel panel-default">
+                <div class="panel panel-default z-depth-3">
                     <div class="panel-heading">
                             <h3 class="panel-title">Available Players</h3>
                     </div>
@@ -95,11 +95,11 @@
                             <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
                             <span class="pull-right commands">
                                 <button class="btn btn-danger add_to_b pull-right btn-sm text-center" type="submit" name="action">
-                                    <span class="glyphicon glyphicon-bold" aria-hidden="true"></span>
+                                    <span class="fa fa-bold" aria-hidden="true"></span>
                                 </button>
                                 <span class="pull-right">&nbsp;</span>
                                 <button class="btn btn-danger add_to_a pull-right btn-sm text-center" type="submit" name="action">
-                                   <span class="glyphicon glyphicon-font" aria-hidden="true"></span>
+                                   <span class="fa fa-font" aria-hidden="true"></span>
                                 </button>
                             </span>
                             </div>
@@ -114,10 +114,11 @@
 
 
   <div class="row">
+  <div class="container">
     <form action="" method="post">
     {% csrf_token %}
         <div class="col-sm-6">
-          <div class="list-group" id="list1">
+          <div class="list-group z-depth-3" id="list1">
           <a href="#" class="list-group-item active" id="general">Select Players <i><span class="badge badge-pill badge-primary counter"></span></i> <input title="toggle all" type="checkbox" class="all pull-right"></a>
           {% for player in players %}
               <a href="#!" class="list-group-item">{{player}}<input type="checkbox" class="pull-right" id="players_group[]-{{player.id}}" name="players_group[]" value="{{player.id}}" {% if player.id in players_group %}checked{% endif %}/></a>
@@ -125,14 +126,14 @@
           </div><!-- end list -->
 
 
-                <button class="btn btn-primary btn-block" type="submit" name="action">Make Teams
-                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                <button class="btn btn-primary btn-block z-depth-3" type="submit" name="action">Make Teams
+                    <span class="fa fa-play" aria-hidden="true"></span>
                 </button>
-                <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#myModal"> Advanced 
-                    <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                <button type="button" class="btn btn-primary btn-block z-depth-3" data-toggle="modal" data-target="#myModal"> Advanced 
+                    <span class="fa fa-triangle-bottom" aria-hidden="true"></span>
                 </button>
 
-            
+    </div>
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
@@ -141,7 +142,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel">Adjust Model Weights</h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body z-depth-3">
                 <div class="row">
                     <div class="col-xs-6">
                         Scoring:
@@ -218,7 +219,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button class="btn btn-primary" type="submit" name="action">Make Teams
-            <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+            <span class="fa fa-play" aria-hidden="true"></span>
         </button>
       </div>
     </div>
@@ -357,7 +358,7 @@ $(function() {
 function remove_player(player) {
 
     var inpt = player.find('input');
-    var new_buttons = $('<span class="pull-right commands"><button class="btn btn-danger add_to_b pull-right btn-sm text-center" type="submit" name="action"><span class="glyphicon glyphicon-bold" aria-hidden="true"></span></button><span class="pull-right">&nbsp;</span><button class="btn btn-danger add_to_a pull-right btn-sm text-center" type="submit" name="action"><span class="glyphicon glyphicon-font" aria-hidden="true"></span></button></span>');
+    var new_buttons = $('<span class="pull-right commands"><button class="btn btn-danger add_to_b pull-right btn-sm text-center" type="submit" name="action"><span class="fa fa-bold" aria-hidden="true"></span></button><span class="pull-right">&nbsp;</span><button class="btn btn-danger add_to_a pull-right btn-sm text-center" type="submit" name="action"><span class="fa fa-font" aria-hidden="true"></span></button></span>');
 
     $( "#available_players" ).append(player);
 
@@ -388,7 +389,7 @@ function remove_player(player) {
 
 function add_to_a(player) {
 
-    var new_a_commands = $('<span class="pull-right commands"><button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </button><span class="pull-right">&nbsp;</span><button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></button></span>');
+    var new_a_commands = $('<span class="pull-right commands"><button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action"><span class="fa fa-remove" aria-hidden="true"></span> </button><span class="pull-right">&nbsp;</span><button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align"><span class="fa fa-arrow-down" aria-hidden="true"></span></button></span>');
 
     var inpt = player.find('input');
 
@@ -418,7 +419,7 @@ function add_to_a(player) {
 
 function add_to_b(player) {
 
-    var new_b_commands = $('<span class="pull-right commands"><button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </button><span class="pull-right">&nbsp;</span><button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span></button></span>');
+    var new_b_commands = $('<span class="pull-right commands"><button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action"><span class="fa fa-remove" aria-hidden="true"></span> </button><span class="pull-right">&nbsp;</span><button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align"><span class="fa fa-arrow-up" aria-hidden="true"></span></button></span>');
 
     var inpt = player.find('input');
     inpt.attr('name', "team_b[]")
@@ -449,8 +450,8 @@ function move_player(player){
     //var old_commands = player.find('span.commands').first();
     //old_commands.remove()
 
-    var btn = player.find('span.glyphicon');
-    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
+    var btn = player.find('span.fa');
+    btn.toggleClass('fa-arrow-up fa-arrow-down');
 
     var team = player.closest('div.panel-body');
     var inpt = player.find('input');

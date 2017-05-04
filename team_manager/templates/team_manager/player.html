@@ -10,7 +10,7 @@
 <div class="container theme-showcase" role="main">
 
   <div class="page-header">
-        <h1>Player: {{player}}</h1>
+        <h4>Player: {{player}}</h4>
   </div>
 
     <div class="row">
@@ -19,7 +19,7 @@
            
 
 
-                <div class="panel panel-primary">
+                <div class="panel panel-primary z-depth-3">
                     <div class="panel-heading">
                       <h3 class="panel-title g-hed">{{ player }}</h3>
                     </div>
@@ -66,10 +66,8 @@
 
                     <div class="panel-footer">
                     {% if user.is_superuser %}
-                      <a href="/edit_player/{{player.id}}">
-                            <button class="btn btn-success btn-sm" type="submit" name="action">Edit
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                            </button>
+                      <a class="btn btn-primary waves-effect" href="/edit_player/{{player.id}}">Edit
+                                <i class="fa fa-edit" aria-hidden="true"></i>
                       </a>
                      {% endif %}
                     </div>
@@ -81,7 +79,7 @@
 
 
     <div class="row">
-      <div class="col-sm-13 panel panel-primary" id="win_loss_well">
+      <div class="col-sm-13 panel panel-primary z-depth-3" id="win_loss_well">
         <div class="panel-heading">
             <h3 class="panel-title g-hed" id="win_loss_head"></h3>
         </div>
@@ -94,7 +92,7 @@
 
 
     <div class="row">
-      <div class="col-sm-13 panel panel-primary" id="point_differential_well">
+      <div class="col-sm-13 panel panel-primary z-depth-3" id="point_differential_well">
         <div class="panel-heading">
             <h3 class="panel-title g-hed" id="point_differential_head"></h3>
         </div>
@@ -108,7 +106,7 @@
 
     <div class="row">
 
-      <div class="panel panel-primary">
+      <div class="col-sm-13 panel panel-primary z-depth-3">
                     <div class="panel-heading">
                       <h3 class="panel-title g-hed">Players Played With</h3>
                     </div>

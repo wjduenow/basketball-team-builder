@@ -12,13 +12,11 @@
 <div class="container theme-showcase" role="main">
 
     <div class="page-header">
-        <h1>Gym Slot: {{game.gym_session.gym_slot.name}}</h1>
-        <h2>
-          Session: {{ game.gym_session.start_time|date:"SHORT_DATE_FORMAT" }}
-          {% if user.is_superuser %}
-            <a href="/edit_game/{{game.id}}" class="btn btn-link">Edit</a>
+        <h4>Gym Slot: {{game.gym_session.gym_slot.name}}</h4>
+        <h5>Session: {{ game.gym_session.start_time|date:"SHORT_DATE_FORMAT" }}</h5>
+        {% if user.is_superuser %}
+            <a href="/edit_game/{{game.id}}" class="btn btn-primary btn-sm">Edit</a>
           {% endif %}
-        </h2>
     </div>
 
     <div class="container">
@@ -30,7 +28,7 @@
             <div class="list-group" id="list2">
 
 
-                <div class="panel panel-default">
+                <div class="panel panel-default z-depth-3">
                     <div class="panel-heading">
                             <h3 class="panel-title">{{ team.name}}
                                 {% if team.won != Null %}
@@ -69,7 +67,7 @@
 
 <div class="starter-template">
     <h1>Game Time</h1>
-    <div class="panel panel-default">
+    <div class="panel panel-default z-depth-3">
       <div class="panel-body">
         <div class="lead">{{ game.game_duration_friendly }}</div>
       </div>
@@ -91,7 +89,7 @@
 {% else %}
 <div class="starter-template">
     <h1>Game Time Remaining</h1>
-    <div class="panel panel-default">
+    <div class="panel panel-default z-depth-3">
       <div class="panel-body">
         <div class="lead" id="clock"></div>
       </div>
@@ -102,7 +100,7 @@
 
 <div class="starter-template">
     <h1>Record Scores</h1>
-    <div class="panel panel-default">
+    <div class="panel panel-default z-depth-3">
         <div class="panel-body">
           <form action="/game/{{game.id}}" method="POST" class="form-inline">
             {% csrf_token %}
@@ -121,7 +119,7 @@
             {% endfor %}
 
             <br /><br />
-            <button type="submit" class="btn btn-success btn-block">End Game</button>
+            <button type="submit" class="btn btn-success btn-block z-depth-3">End Game</button>
         </form>
         </div>
     </div>

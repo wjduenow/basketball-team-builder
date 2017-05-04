@@ -63,9 +63,9 @@ span.badge.pull-right {
 
                              <button type="button" class="btn btn-default btn-circle btn-xs pull-right" aria-label="Left Align">
                                 {% if team == 'team_a' %}
-                                    <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                                    <span class="fa fa-arrow-down" aria-hidden="true"></span>
                                 {% else %}
-                                    <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                    <span class="fa fa-arrow-up" aria-hidden="true"></span>
                                 {% endif %}
                             </button>
 
@@ -84,10 +84,10 @@ span.badge.pull-right {
           </div>
           
           <button class="btn btn-danger" type="submit" name="action" onclick="goBack()"">
-                    <span class="glyphicon glyphicon-backward" aria-hidden="true"></span> Back to Session
+                    <span class="fa fa-backward" aria-hidden="true"></span> Back to Session
           </button>
           <button class="btn btn-success" type="submit" name="action">
-                    Start New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
+                    Start New Game <span class="fa fa-forward" aria-hidden="true"></span>
           </button>
 
 
@@ -118,7 +118,7 @@ $( "button.btn-circle" ).click(function(e) {
     var player = $( this ).closest('div.list-group-item');
 
     var btn = player.next('button.btn');
-    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down');
+    btn.toggleClass('fa-arrow-up fa-arrow-down');
 
      var inpt = player.find('input');
 

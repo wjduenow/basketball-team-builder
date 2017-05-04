@@ -10,9 +10,9 @@
     <!-- main content -->
     <div class="container theme-showcase" role="main">
 
-    <div class="page-header">
-        <h1>Gym Slot: {{gym_session.gym_slot.name}}</h1>
-        <h2>Session: {{ gym_session.start_time|date:"SHORT_DATE_FORMAT" }} ({{gym_session.start_time}})</h2>
+    <div class="col-sm-12">
+        <h4>Gym Slot: {{gym_session.gym_slot.name}}</h4>
+        <h5>Session: {{ gym_session.start_time|date:"SHORT_DATE_FORMAT" }} ({{gym_session.start_time}})</h5>
     </div>
               
 <div class="container">
@@ -21,7 +21,7 @@
 
   <div class="row">
         <div class="col-sm-6" id="general-content" >
-        <div class="list-group">
+        <div class="list-group z-depth-3">
                   
           <a href="#" class="list-group-item active " id="general">
           Players
@@ -29,25 +29,25 @@
           </a>
           <div id="session_players">
           {% for player in gym_session.players.all %}
-              <a href="#!" class="list-group-item text-center player">
+              <div href="#!" class="list-group-item text-center player">
                 {{player}}
-                <button class="btn btn-danger removeplayer pull-right btn-circle text-center" type="submit" name="action">
-                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 
-                </button>
+                <a class="red-text removeplayer">
+                        <i class="fa fa-times fa-lg pull-right" aria-hidden="true"></i> 
+                </a>
                 <input type="hidden" name="player_id" value="{{ player.id}}">
 
-              </a>
+              </div>
           {% endfor %}
           </div>
           <a href="#!" class="list-group-item text-center ">
              <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#myModal"> Add Players 
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    <span class="fa fa-plus fa-lg" aria-hidden="true"></span>
                 </button>
 
 
 
               <button class="btn btn-success btn-block" type="submit" name="action">
-                        Start New Game <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 
+                        Start New Game <span class="fa fa-forward fa-lg" aria-hidden="true"></span> 
               </button>
                 </form>
           </a>
@@ -56,7 +56,7 @@
         </div>
 
         <div class="col-sm-6" id="general-content" >
-        <div class="list-group" id="list1">
+        <div class="list-group z-depth-3" id="list1">
                   
           <a href="#" class="list-group-item active " id="general">Session Games</a>
           {% for game in gym_session.game_set.all %}
@@ -67,9 +67,10 @@
                   <form action="/start_gym_slot_session/{{game.gym_session.id}}" method="POST" class="form-inline">
                     {% csrf_token %}
                     <input type="hidden" name="game_id" value="{{game.id}}">
-                    <button type="submit" class="btn btn-info btn-xs pull-right text-center">
+                    <button type="submit" class="btn btn-info btn-xs pull-right">
                         <span class="fa fa-repeat" aria-hidden="true"></span> Rematch
                     </button>
+
                 </form>
                 </span>
               </a>
@@ -98,22 +99,22 @@
       </div>
       <div class="modal-body">
 
-        <div class="list-group" id="available_players">
+        <div class="list-group z-depth-3" id="available_players">
                   
-          <a href="#" class="list-group-item active " id="general">
+          <div href="#" class="list-group-item active " id="general">
                 Players
-                <button type="button" class="btn btn-default pull-right btn-xs" id="add_all_players_to_session">Add All </button>
-          </a>
+                
+          </div>
 
           {% for player in available_players %}
-              <a href="#!" class="list-group-item text-center player">
+              <div href="#!" class="list-group-item text-center player">
                 {{player}}
-                <button class="btn btn-success addplayer btn-xs pull-right btn-circle text-center" type="submit" name="action">
-                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> 
-                </button>
+                <a class="green-text addplayer pull-right" type="submit" name="action">
+                        <i class="fa fa-plus fa-lg" aria-hidden="true"></i> 
+                </a>
                 <input type="hidden" name="player_id" value="{{ player.id}}">
                 <input type="hidden" name="players_group[]" value="{{ player.id}}">
-              </a>
+              </div>
           {% endfor %}
 
           </div><!-- end list -->
@@ -122,6 +123,7 @@
 
       </div>
       <div class="modal-footer">
+        <a type="button" class="btn btn-default pull-left" id="add_all_players_to_session">Add All </a>
         <a class="btn btn-default" data-dismiss="modal">Close</a>
       </div>
     </div>
@@ -142,18 +144,18 @@
 
 
 <script>
-$( "button.removeplayer" ).click(function(e) {
+$( "a.removeplayer" ).click(function(e) {
     e.preventDefault();
 
-    var player = $( this ).closest('a.list-group-item');
+    var player = $( this ).closest('div.list-group-item');
     remove_player(player);
 
 });
 
-$( "button.addplayer" ).click(function(e) {
+$( "a.addplayer" ).click(function(e) {
     e.preventDefault();
 
-    var player = $( this ).closest('a.list-group-item');
+    var player = $( this ).closest('div.list-group-item');
     add_player(player);
 
 });
@@ -161,7 +163,7 @@ $( "button.addplayer" ).click(function(e) {
 $( "#add_all_players_to_session" ).click(function(e) {
     e.preventDefault();
     var available_players_section = $( "#available_players" );
-    var available_players = available_players_section.find('a.list-group-item.player')
+    var available_players = available_players_section.find('div.list-group-item.player')
 
 
     available_players.each(function( i ) {
@@ -174,13 +176,13 @@ $( "#add_all_players_to_session" ).click(function(e) {
 
 function add_player(player) {
 
-    var btn_ok = player.find('span.glyphicon-ok');
-    btn_ok.toggleClass('glyphicon-ok glyphicon-remove');
+    var btn_ok = player.find('i.fa-plus');
+    btn_ok.toggleClass('fa-plus fa-times');
 
     var player_id = player.find('input').val()
 
-    var btn = player.find('button.btn-success');
-    btn.toggleClass('btn-success btn-danger');
+    var btn = player.find('a.addplayer');
+    btn.toggleClass('green-text red-text');
     btn.toggleClass('addplayer removeplayer');
 
     var team = $("#session_players");
@@ -190,7 +192,7 @@ function add_player(player) {
 
     btn.unbind('click', arguments.callee).click(function(e){
         e.preventDefault();
-        var player = $( this ).closest('a.list-group-item');
+        var player = $( this ).closest('div.list-group-item');
         remove_player(player);
     })
 
@@ -198,13 +200,13 @@ function add_player(player) {
 
 function remove_player(player) {
 
-    var btn_ok = player.find('span.glyphicon-remove');
-    btn_ok.toggleClass('glyphicon-remove glyphicon-ok');
+    var btn_ok = player.find('i.fa-times');
+    btn_ok.toggleClass('fa-times fa-plus');
 
     var player_id = player.find('input').val()
 
-    var btn = player.find('button.btn-danger');
-    btn.toggleClass('btn-success btn-danger');
+    var btn = player.find('a.removeplayer');
+    btn.toggleClass('red-text green-text');
     btn.toggleClass('removeplayer addplayer');
 
     var team = $("#available_players");
@@ -214,7 +216,7 @@ function remove_player(player) {
 
     btn.unbind('click', arguments.callee).click(function(e){
         e.preventDefault();
-        var player = $( this ).closest('a.list-group-item');
+        var player = $( this ).closest('div.list-group-item');
         add_player(player);
     })
 
