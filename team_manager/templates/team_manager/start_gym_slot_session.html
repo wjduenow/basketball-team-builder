@@ -249,7 +249,7 @@ function remove_player_from_session(player) {
 }
 
 function updateCounter() {
-    var len = $("#session_players a.player").length;
+    var len = $("#session_players div.player").length;
     if(len>0){$("#general i .counter").text(len + ' total');}else{$("#general i .counter").text('0 total');}
 }
 
@@ -260,7 +260,7 @@ $(window).load(function(){
 $(function() {
     $('#general i .counter').text(' ');
     
-    var generallen = $("#session_players a.player").length;
+    var generallen = $("#session_players div.player").length;
     if(generallen>0){$("#general i .counter").text(generallen + ' total');}else{$("#general i .counter").text('0 total');}
 })
 

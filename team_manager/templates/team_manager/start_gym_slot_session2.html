@@ -11,17 +11,18 @@
     <div class="container theme-showcase" role="main">
 
     <div class="page-header">
-        <h1>Gym Slot: {{gym_session.gym_slot.name}}</h1>
-        <h2>Session: {{ gym_session.start_time|date:"SHORT_DATE_FORMAT" }} {% if rematch_game_id %}<strong>Rematch</strong>{% endif %}</h2>
+        <h4>Gym Slot: {{gym_session.gym_slot.name}}</h4>
+        <h5>Session: {{ gym_session.start_time|date:"SHORT_DATE_FORMAT" }} {% if rematch_game_id %}<strong>Rematch</strong>{% endif %}</h5>
     </div>
 
 <div class="container">
 
     {% if teams %} 
-    <form action="/new_game/{{gym_session.id}}" method="POST">
-    {% csrf_token %}
+
 
         <div class="col-sm-6">
+          <form action="/new_game/{{gym_session.id}}" method="POST">
+          {% csrf_token %}
           <div class="list-group" id="list2">
               {% for team,players in teams.items  %}
 
@@ -44,17 +45,17 @@
                             <div id="player_{{player.id}}" class="list-group-item player">{{player.first_name}} {{player.last_name}} - {{player.position}}
                             <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
                             <span class="pull-right commands">
-                                <button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action">
-                                        <span class="fa fa-remove" aria-hidden="true"></span> 
-                                </button>
-                                <span class="pull-right">&nbsp;</span>
-                                <button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align">
+                                <a class="red-text removeplayer" type="submit" name="action">
+                                        <i class="fa fa-remove fa-lg"></i> 
+                                </a>
+                                <span>&nbsp;|&nbsp;</span>
+                                <a type="button" class="green-text move_player" aria-label="Left Align">
                                     {% if team == 'team_a' %}
-                                        <span class="fa fa-arrow-down" aria-hidden="true"></span>
+                                        <i class="fa fa-arrow-down fa-lg move"></i>
                                     {% else %}
-                                        <span class="fa fa-arrow-up" aria-hidden="true"></span>
+                                        <i class="fa fa-arrow-up fa-lg move"></i>
                                     {% endif %}
-                                </button>
+                                </a>
                             </span>
 
                             
@@ -71,7 +72,7 @@
 
           </div>
           <input type="hidden" name="teams" value="{{ teams_json }}">
-          <button class="btn btn-success btn-block" type="submit" name="action">
+          <button class="btn btn-success btn-block z-depth-3" type="submit" name="action">
                     Start New Game <span class="fa fa-forward" aria-hidden="true"></span>
           </button>
 
@@ -94,13 +95,14 @@
                             <div id="player_{{player.id}}" class="list-group-item player">{{player.first_name}} {{player.last_name}} - {{player.position}}
                             <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
                             <span class="pull-right commands">
-                                <button class="btn btn-danger add_to_b pull-right btn-sm text-center" type="submit" name="action">
-                                    <span class="fa fa-bold" aria-hidden="true"></span>
-                                </button>
-                                <span class="pull-right">&nbsp;</span>
-                                <button class="btn btn-danger add_to_a pull-right btn-sm text-center" type="submit" name="action">
-                                   <span class="fa fa-font" aria-hidden="true"></span>
-                                </button>
+                                <a class="green-text add_to_a" type="submit" name="action">
+                                   <i class="fa fa-font fg-lg"></i>
+                                </a>
+                                <span>&nbsp;|&nbsp;</span>
+                                <a class="red-text add_to_b" type="submit" name="action">
+                                    <i class="fa fa-bold fg-lg""></i>
+                                </a>
+
                             </span>
                             </div>
 
@@ -358,7 +360,7 @@ $(function() {
 function remove_player(player) {
 
     var inpt = player.find('input');
-    var new_buttons = $('<span class="pull-right commands"><button class="btn btn-danger add_to_b pull-right btn-sm text-center" type="submit" name="action"><span class="fa fa-bold" aria-hidden="true"></span></button><span class="pull-right">&nbsp;</span><button class="btn btn-danger add_to_a pull-right btn-sm text-center" type="submit" name="action"><span class="fa fa-font" aria-hidden="true"></span></button></span>');
+    var new_buttons = $('<span class="pull-right commands"><a class="green-text add_to_a" type="submit" name="action"><i class="fa fa-font fg-lg"></i></a><span>&nbsp;|&nbsp;</span><a class="red-text add_to_b" type="submit" name="action"><i class="fa fa-bold fg-lg"></i></a></span>');
 
     $( "#available_players" ).append(player);
 
@@ -367,8 +369,8 @@ function remove_player(player) {
 
     player.append(new_buttons);
 
-    var btn_a = player.find('button.add_to_a');
-    var btn_b = player.find('button.add_to_b');
+    var btn_a = player.find('a.add_to_a');
+    var btn_b = player.find('a.add_to_b');
 
 
 
@@ -389,7 +391,7 @@ function remove_player(player) {
 
 function add_to_a(player) {
 
-    var new_a_commands = $('<span class="pull-right commands"><button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action"><span class="fa fa-remove" aria-hidden="true"></span> </button><span class="pull-right">&nbsp;</span><button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align"><span class="fa fa-arrow-down" aria-hidden="true"></span></button></span>');
+    var new_a_commands = $('<span class="pull-right commands"><a class="red-text removeplayer"><i class="fa fa-remove"></i> </a><span>&nbsp;|&nbsp;</span><a class="green-text move_player"><i class="fa fa-arrow-down move"></i></a></span>');
 
     var inpt = player.find('input');
 
@@ -400,8 +402,8 @@ function add_to_a(player) {
     old_commands.remove()
     player.append(new_a_commands);
 
-    var btn_a = player.find('button.removeplayer');
-    var btn_b = player.find('button.move_player');
+    var btn_a = player.find('a.removeplayer');
+    var btn_b = player.find('a.move_player');
 
     btn_a.unbind('click', arguments.callee).click(function(e){
         e.preventDefault();
@@ -419,7 +421,7 @@ function add_to_a(player) {
 
 function add_to_b(player) {
 
-    var new_b_commands = $('<span class="pull-right commands"><button class="btn btn-danger removeplayer pull-right btn-sm text-center" type="submit" name="action"><span class="fa fa-remove" aria-hidden="true"></span> </button><span class="pull-right">&nbsp;</span><button type="button" class="btn move_player btn-default btn-sm pull-right" aria-label="Left Align"><span class="fa fa-arrow-up" aria-hidden="true"></span></button></span>');
+    var new_b_commands = $('<span class="pull-right commands"><a class="red-text removeplayer"><i class="fa fa-remove fg-lg"></i> </a><span>&nbsp;|&nbsp;</span><a class="green-text move_player"><i class="fa fa-arrow-up fg-lg move"></i></a></span>');
 
     var inpt = player.find('input');
     inpt.attr('name', "team_b[]")
@@ -429,8 +431,8 @@ function add_to_b(player) {
     old_commands.remove()
     player.append(new_b_commands);
 
-    var btn_a = player.find('button.removeplayer');
-    var btn_b = player.find('button.move_player');
+    var btn_a = player.find('a.removeplayer');
+    var btn_b = player.find('a.move_player');
 
     btn_a.unbind('click', arguments.callee).click(function(e){
         e.preventDefault();
@@ -450,7 +452,7 @@ function move_player(player){
     //var old_commands = player.find('span.commands').first();
     //old_commands.remove()
 
-    var btn = player.find('span.fa');
+    var btn = player.find('i.move');
     btn.toggleClass('fa-arrow-up fa-arrow-down');
 
     var team = player.closest('div.panel-body');
@@ -482,7 +484,7 @@ function move_player(player){
 }
 
 
-$( "button.move_player" ).click(function(e) {
+$( "a.move_player" ).click(function(e) {
     e.preventDefault();
 
     var player = $( this ).closest('div.player');
@@ -490,7 +492,7 @@ $( "button.move_player" ).click(function(e) {
     
 });
 
-$( "button.add_to_a" ).click(function(e) {
+$( "a.add_to_a" ).click(function(e) {
     e.preventDefault();
 
     var player = $( this ).closest('div.player');
@@ -499,7 +501,7 @@ $( "button.add_to_a" ).click(function(e) {
 });
 
 
-$( "button.add_to_b" ).click(function(e) {
+$( "a.add_to_b" ).click(function(e) {
     e.preventDefault();
 
     var player = $( this ).closest('div.player');
@@ -507,7 +509,7 @@ $( "button.add_to_b" ).click(function(e) {
 
 });
 
-$( "button.removeplayer" ).click(function(e) {
+$( "a.removeplayer" ).click(function(e) {
     e.preventDefault();
 
     var player = $( this ).closest('div.player');

@@ -61,13 +61,13 @@ span.badge.pull-right {
                             <div id="player_{{player.id}}" class="list-group-item player">{{player.first_name}} {{player.last_name}} - {{player.position}}
                             
 
-                             <button type="button" class="btn btn-default btn-circle btn-xs pull-right" aria-label="Left Align">
+                             <a class="green-text moveplayer pull-right">
                                 {% if team == 'team_a' %}
-                                    <span class="fa fa-arrow-down" aria-hidden="true"></span>
+                                    <i class="fa fa-arrow-down fa-lg"></i>
                                 {% else %}
-                                    <span class="fa fa-arrow-up" aria-hidden="true"></span>
+                                    <i class="fa fa-arrow-up fa-lg"></i>
                                 {% endif %}
-                            </button>
+                            </a>
 
                             <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
 
@@ -112,12 +112,12 @@ span.badge.pull-right {
 
 
 <script>
-$( "button.btn-circle" ).click(function(e) {
+$( "a.moveplayer" ).click(function(e) {
     e.preventDefault();
 
     var player = $( this ).closest('div.list-group-item');
 
-    var btn = player.next('button.btn');
+    var btn = player.next('a.fa');
     btn.toggleClass('fa-arrow-up fa-arrow-down');
 
      var inpt = player.find('input');

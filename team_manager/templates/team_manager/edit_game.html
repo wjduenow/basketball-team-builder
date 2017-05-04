@@ -16,16 +16,15 @@
         <h5>Session: {{ game.gym_session.start_time|date:"SHORT_DATE_FORMAT" }}</h5>
     </div>
 
-    <div class="container">
 
     {% if game.teams.all %} 
+    <div class="row">
     {% for team in game.teams.all  %}
 
         <div class="col-sm-6">
-            <div class="list-group" id="list2">
 
 
-                <div class="panel panel-default z-depth-3">
+                <div class="panel panel-primary z-depth-3">
                     <div class="panel-heading">
                             <h3 class="panel-title">{{ team.name}}
                                 {% if team.won != Null %}
@@ -62,25 +61,22 @@
                         </div>
                     </div>
                 </div>
-
-
-
-
-            </div>
         </div>
 
+
+
+
+
     {% endfor %}
+    </div>
     {% endif %}
 
 
-
-    </div>
-
-
-
-<div class="starter-template">
-    <h1>Game Time</h1>
-    <div class="panel panel-default z-depth-3">
+<div class="col-sm-13">
+    <div class="panel panel-primary z-depth-3">
+      <div class="panel-heading">
+          <h4 class="panel-title">Game Time</h4>
+        </div>
       <div class="panel-body">
         <div class="lead">{{ game.game_duration_friendly }}</div>
       </div>
@@ -94,9 +90,12 @@
 
 
 
-<div class="starter-template">
-    <h1>Record Scores</h1>
-    <div class="panel panel-default z-depth-3">
+<div class="col-sm-13">
+    <div class="panel panel-primary z-depth-3">
+
+        <div class="panel-heading">
+          <h4 class="panel-title">Record Scores</h4>
+        </div>
         <div class="panel-body">
           <form action="/edit_game/{{game.id}}" method="POST" class="form-inline">
             {% csrf_token %}
@@ -114,7 +113,7 @@
 
             {% endfor %}
 
-            <br /><br />
+            <br />
             <button type="submit" class="btn btn-success btn-block z-depth-3">Update Game Scores</button>
         </form>
         </div>
@@ -140,7 +139,7 @@
 
           {% for player in available_players %}
               <div class="list-group-item text-center player">
-                {{player}}
+                {{player}} - {{player.position}}
                 <!--<button class="btn btn-success addplayer btn-xs pull-right btn-circle text-center" type="submit" name="action">
                         <span class="fa fa-plus" aria-hidden="true"></span> 
                 </button>-->

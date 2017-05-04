@@ -1,30 +1,5 @@
 {% include 'team_manager/partial-user-menu.html' %}
 
-<script>
-
-
-function change_team(player) {
-    var team = player.closest('div.panel-body');
-    if (team.attr('id') == 'team_a') {
-        //var team_name = 'team_b[]'
-        //var inpu = player.closest("button.btn")
-        //( "input" ).find(".player_checkbox").val();
-        //alert(inpu.attr('class'));
-        //var btn = player.closest("button.btn")
-        //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
-        $( "#team_b" ).append(player);
-    } else {
-        $( "#team_a" ).append(player);
-    }
-
-    var btn = player.closest("button.btn")
-    btn.toggleClass('fa-arrow-up fa-arrow-down')
-
-}
-
-</script>
-
-
 
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
@@ -34,10 +9,11 @@ function change_team(player) {
     <!-- main content -->
     <div class="container theme-showcase" role="main">
 
+<div class="row">
     <div class="page-header col-sm-10">
         <h4>Gym Slot: {{gym_slot.name}}</h4>
     </div>
-
+</div>
 
     
 

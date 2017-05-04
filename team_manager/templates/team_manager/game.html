@@ -19,16 +19,17 @@
           {% endif %}
     </div>
 
-    <div class="container">
+
 
     {% if game.teams.all %} 
+    <div class="row">
     {% for team in game.teams.all  %}
 
         <div class="col-sm-6">
-            <div class="list-group" id="list2">
 
 
-                <div class="panel panel-default z-depth-3">
+
+                <div class="panel panel-primary z-depth-3">
                     <div class="panel-heading">
                             <h3 class="panel-title">{{ team.name}}
                                 {% if team.won != Null %}
@@ -53,21 +54,24 @@
 
 
 
-            </div>
+
         </div>
 
     {% endfor %}
+    </div>
     {% endif %}
 
 
 
-    </div>
+
 
 {% if game.end_time %}
 
-<div class="starter-template">
-    <h1>Game Time</h1>
-    <div class="panel panel-default z-depth-3">
+<div class="col-sm-13">
+    <div class="panel panel-primary z-depth-3">
+      <div class="panel-heading">
+        <h4 class="panel-title">Game Duration</h4>
+      </div>
       <div class="panel-body">
         <div class="lead">{{ game.game_duration_friendly }}</div>
       </div>
@@ -76,6 +80,7 @@
 
 
 {% if user.is_superuser or today == game.end_time %}
+
   <form action="/start_gym_slot_session/{{game.gym_session.id}}" method="POST" class="form-inline">
       {% csrf_token %}
       <input type="hidden" name="game_id" value="{{game.id}}">
@@ -84,12 +89,15 @@
       </button>
 
   </form>
+
 {% endif %}
 
 {% else %}
-<div class="starter-template">
-    <h1>Game Time Remaining</h1>
-    <div class="panel panel-default z-depth-3">
+<div class="col-sm-6">
+    <div class="panel panel-primary z-depth-3">
+      <div class="panel-heading">
+        <h4 class="panel-title">Game Time Remaining</h4>
+      </div>
       <div class="panel-body">
         <div class="lead" id="clock"></div>
       </div>
@@ -98,9 +106,11 @@
 </div>
 
 
-<div class="starter-template">
-    <h1>Record Scores</h1>
-    <div class="panel panel-default z-depth-3">
+<div class="col-sm-6">
+    <div class="panel panel-primary z-depth-3">
+        <div class="panel-heading">
+          <h4 class="panel-title">Record Scores</h4>
+        </div>
         <div class="panel-body">
           <form action="/game/{{game.id}}" method="POST" class="form-inline">
             {% csrf_token %}
