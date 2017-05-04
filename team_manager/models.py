@@ -156,6 +156,7 @@ class GymSlot(models.Model):
     name = models.CharField(max_length=200)
     players = models.ManyToManyField(Player)
     status = models.CharField(max_length=200, blank=True, null=True)
+    location = models.CharField(max_length=400, blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
     start_time = models.TimeField()
@@ -172,6 +173,26 @@ class GymSlot(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def location_parsed(self):
+        new_location_list = self.location.split(",")
+        new_location = {}
+        new_location['name'] = new_location_list[0]
+        new_location['street'] = new_location_list[1]
+        new_location['city'] = new_location_list[2]
+        new_location['state'] = new_location_list[3].split()[0]
+        new_location['zipcode'] = new_location_list[3].split()[1]
+
+        return new_location
+
+
+    @property
+    def black_out_dates_parsed(self):
+        if self.black_out_dates == '':
+            return "None"
+        else:
+            return self.black_out_dates
 
 
 class GymSession(models.Model):
