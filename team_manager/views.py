@@ -70,12 +70,18 @@ def index(request):
         p['player'] = Player.objects.get(id = p['player_id'])
 
     ps_win_ratio = sorted(ps, key=itemgetter('win_ratio'), reverse=True)[:5]
+    ps_win_ratio_bad = sorted(ps, key=itemgetter('win_ratio'), reverse=False)[:5]
     ps_point_differential = sorted(ps, key=itemgetter('point_differential__avg'), reverse=True)[:5]
+    ps_point_differential_bad = sorted(ps, key=itemgetter('point_differential__avg'), reverse=False)[:5]
 
     best_tandem_point_differential = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("-point_differential")[:5]
     best_tandem_win_ratio = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("-win_loss")[:5]
 
-    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 'active_sessions': active_sessions, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential, 'best_tandem_point_differential': best_tandem_point_differential, 'best_tandem_win_ratio': best_tandem_win_ratio})
+    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 
+                'active_sessions': active_sessions, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential, 
+                'best_tandem_point_differential': best_tandem_point_differential, 'best_tandem_win_ratio': best_tandem_win_ratio, 
+                'ps_win_ratio_bad': ps_win_ratio_bad, 'ps_point_differential_bad': ps_point_differential_bad})
+    
     return HttpResponse(template.render(context, request))
 
 @login_required    

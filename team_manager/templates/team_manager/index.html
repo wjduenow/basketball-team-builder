@@ -101,7 +101,7 @@
     <div class="col-sm-6">
       <div class="list-group z-depth-3">
         <a href="#" class="list-group-item list-group-item-danger">
-          <span class="fa fa-star-o fa-lg" aria-hidden="true"></span> <strong>Individual:</strong> Point Differential
+          <span class="fa fa-fire fa-lg" aria-hidden="true"></span> <strong>Individual:</strong> Point Differential
         </a>
         {% if ps_point_differential %}
           {% for ps in ps_point_differential %}
@@ -142,6 +142,37 @@
         {% endif %}
       </div>
     </div>
+
+    <div class="col-sm-6">
+      <div class="list-group z-depth-3">
+        <a href="#" class="list-group-item list-group-item-info">
+          <span class="fa fa-frown-o fa-lg" aria-hidden="true"></span> <strong>Individual:</strong> Worst Win Ratio
+        </a>
+        {% if ps_win_ratio_bad %}
+          {% for ps in ps_win_ratio_bad %}
+             <a href="/player/{{ps.player_id}}" class="list-group-item list-group-item-action"><span class="fa fa-user" aria-hidden="true"></span> {{ps.player}} ({{ps.win_ratio|floatformat:2}})</a>
+           {% endfor %}
+        {% else %}
+            <a href="" class="list-group-item list-group-item-action">No Active Games</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-sm-6">
+      <div class="list-group z-depth-3">
+        <a href="#" class="list-group-item list-group-item-danger">
+          <span class="fa fa-fire-extinguisher fa-lg" aria-hidden="true"></span> <strong>Individual:</strong> Point Differential
+        </a>
+        {% if ps_point_differential_bad %}
+          {% for ps in ps_point_differential_bad %}
+             <a href="/player/{{ps.player_id}}" class="list-group-item list-group-item-action"><span class="fa fa-user" aria-hidden="true"></span> {{ps.player}} ({{ps.point_differential__avg|floatformat:2}})</a>
+           {% endfor %}
+        {% else %}
+            <a href="" class="list-group-item list-group-item-action">No Active Games</a>
+        {% endif %}
+      </div>
+    </div>
+
 
 </div>
 
