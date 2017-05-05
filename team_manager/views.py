@@ -118,7 +118,12 @@ def view_gym_slot(request, gym_slot_id=None):
 def view_player(request, player_id=None):
     template = loader.get_template('team_manager/player.html')
     player = Player.objects.get(id = player_id)
+
+    ps = PlayerSummary.objects.filter(player = player).values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential'))
     #pps = PlayerPlayerSummary.objects.filter(player = player_id).exclude(other_player = player_id).all()
+    if ps:
+        ps[0]['win_ratio'] = (ps[0]['won__sum'] / ps[0]['played__sum']) * 100
+        player.player_summary = ps[0]
 
     context = ({'player': player}) #, 'pps': pps})
     return HttpResponse(template.render(context, request))
