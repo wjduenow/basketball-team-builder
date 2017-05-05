@@ -79,7 +79,7 @@
 
 <div class="page-header col-sm-12">
   <h5> <i class="fa fa-trophy fa-lg" aria-hidden="true"></i>
-           Leaderboards
+           Leaders
   </h5>
 </div>
 
@@ -131,7 +131,7 @@
     <div class="col-sm-6">
       <div class="list-group z-depth-3">
         <a href="#" class="list-group-item list-group-item-success">
-          <span class="fa fa-hand-peace-o fa-lg" aria-hidden="true"></span> <strong>Tandem:</strong> Point Differential
+          <span class="fa fa-thumbs-up fa-lg" aria-hidden="true"></span> <strong>Tandem:</strong> Point Differential
         </a>
         {% if best_tandem_point_differential %}
           {% for ps in best_tandem_point_differential %}
@@ -142,6 +142,16 @@
         {% endif %}
       </div>
     </div>
+
+
+<div class="page-header col-sm-12">
+  <h5> <span class="fa-stack fa-lg">
+        <i class="fa fa-trophy fa-stack-1x"></i>
+        <i class="fa fa-ban fa-stack-2x text-danger"></i>
+      </span>
+           Laggers
+  </h5>
+</div>
 
     <div class="col-sm-6">
       <div class="list-group z-depth-3">
@@ -161,7 +171,7 @@
     <div class="col-sm-6">
       <div class="list-group z-depth-3">
         <a href="#" class="list-group-item list-group-item-danger">
-          <span class="fa fa-fire-extinguisher fa-lg" aria-hidden="true"></span> <strong>Individual:</strong> Point Differential
+          <span class="fa fa-fire-extinguisher fa-lg" aria-hidden="true"></span> <strong>Individual:</strong> Worst Point Differential
         </a>
         {% if ps_point_differential_bad %}
           {% for ps in ps_point_differential_bad %}
@@ -173,6 +183,37 @@
       </div>
     </div>
 
+
+
+    <div class="col-sm-6">
+      <div class="list-group z-depth-3">
+        <a href="#" class="list-group-item list-group-item-warning">
+          <span class="fa fa-hand-stop-o fa-lg" aria-hidden="true"></span> <strong>Tandem:</strong> Win Percentage
+        </a>
+        {% if best_tandem_win_ratio_bad %}
+          {% for ps in best_tandem_win_ratio_bad %}
+             <a href="/player/{{ps.player_id}}" class="list-group-item list-group-item-action"><span class="fa fa-user" aria-hidden="true"></span> {{ps.player}}/{{ps.other_player}} ({{ps.win_loss|floatformat:2}})</a>
+           {% endfor %}
+        {% else %}
+            <a href="" class="list-group-item list-group-item-action">No Active Games</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-sm-6">
+      <div class="list-group z-depth-3">
+        <a href="#" class="list-group-item list-group-item-success">
+          <span class="fa fa-thumbs-down fa-lg" aria-hidden="true"></span> <strong>Tandem:</strong> Point Differential
+        </a>
+        {% if best_tandem_point_differential_bad %}
+          {% for ps in best_tandem_point_differential_bad %}
+             <a href="/player/{{ps.player_id}}" class="list-group-item list-group-item-action"><span class="fa fa-user" aria-hidden="true"></span> {{ps.player}}/{{ps.other_player}} ({{ps.point_differential|floatformat:2}})</a>
+           {% endfor %}
+        {% else %}
+            <a href="" class="list-group-item list-group-item-action">No Active Games</a>
+        {% endif %}
+      </div>
+    </div>
 
 </div>
 

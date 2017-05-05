@@ -77,11 +77,16 @@ def index(request):
     best_tandem_point_differential = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("-point_differential")[:5]
     best_tandem_win_ratio = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("-win_loss")[:5]
 
+    best_tandem_point_differential_bad = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("point_differential")[:5]
+    best_tandem_win_ratio_bad = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("win_loss")[:5]
+
     context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 
                 'active_sessions': active_sessions, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential, 
                 'best_tandem_point_differential': best_tandem_point_differential, 'best_tandem_win_ratio': best_tandem_win_ratio, 
-                'ps_win_ratio_bad': ps_win_ratio_bad, 'ps_point_differential_bad': ps_point_differential_bad})
-    
+                'ps_win_ratio_bad': ps_win_ratio_bad, 'ps_point_differential_bad': ps_point_differential_bad, 
+                'best_tandem_point_differential_bad': best_tandem_point_differential_bad,
+                'best_tandem_win_ratio_bad': best_tandem_win_ratio_bad})
+
     return HttpResponse(template.render(context, request))
 
 @login_required    
