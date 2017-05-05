@@ -54,7 +54,7 @@
           {% for game in gym_session.game_set.all %}
               <a href="/game/{{game.id}}" class="list-group-item text-center">
                 <span class="fa fa-dribbble" aria-hidden="true"></span> 
-                {{game.start_time|time:"H:i"}} - {{game.end_time|time:"H:i"}}
+                {{game.start_time|time:"H:i"}} - {{game.updated_at|time:"H:i"}} ({{game.game_duration_minutes}} Mins)
               </a>
 
           {% endfor %}

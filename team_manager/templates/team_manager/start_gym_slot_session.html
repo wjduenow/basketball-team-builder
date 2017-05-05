@@ -1,5 +1,6 @@
 {% include 'team_manager/partial-user-menu.html' %}
 
+<!-- {{ session_start_time }} -->
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
         <li><a href="/gym_slot/{{gym_session.gym_slot.id}}">Gym Slot</a></li>
@@ -62,7 +63,7 @@
           {% for game in gym_session.game_set.all %}
               <a href="/game/{{game.id}}" class="list-group-item text-center">
                 <span class="fa fa-dribbble" aria-hidden="true"></span> 
-                {{game.start_time|time:"H:i"}} - {{game.end_time|time:"H:i"}}
+                {{game.start_time|time:"H:i"}} - {{game.end_time|time:"H:i"}} ({{game.game_duration_minutes}} Mins)
                 <span class="pull-right">
                   <form action="/start_gym_slot_session/{{game.gym_session.id}}" method="POST" class="form-inline">
                     {% csrf_token %}

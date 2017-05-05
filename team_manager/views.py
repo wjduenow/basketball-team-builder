@@ -55,7 +55,7 @@ def logout(request):
 def index(request):
     #return HttpResponse("Hello, world. You're at the team manager index.")
     template = loader.get_template('team_manager/index.html')
-    today = (datetime.now() - timedelta(hours=7)).strftime("%A")
+    today = (datetime.now() + timedelta(hours=7)).strftime("%A")
 
     gym_slots_today = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).filter(day_of_week = today).all()
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
@@ -177,10 +177,10 @@ def view_gym_session(request, gym_session_id=None):
     today =  datetime.now().date()
     gym_session = GymSession.objects.get(id = gym_session_id)
 
-    print gym_session.start_time.date()
+    session_start_time = "Session DB Start: %s - Today: %s" % ((gym_session.start_time - timedelta(hours=7)).date(), today)
     print today
 
-    if gym_session.start_time.date() == today:
+    if (gym_session.start_time - timedelta(hours=7)).date() == today:
         print "This Session is Today"
         template = loader.get_template('team_manager/start_gym_slot_session.html')
     else:
@@ -189,7 +189,7 @@ def view_gym_session(request, gym_session_id=None):
 
     available_players = Player.objects.exclude(pk__in=gym_session.players.values_list('id', flat=True)).filter(pk__in=gym_session.gym_slot.players.values_list('id', flat=True))
 
-    context = ({'gym_session': gym_session, 'available_players': available_players})
+    context = ({'session_start_time': session_start_time, 'gym_session': gym_session, 'available_players': available_players})
     return HttpResponse(template.render(context, request))
 
 @login_required    
@@ -246,6 +246,7 @@ def view_game(request, game_id=None):
 def edit_game(request, game_id=None):
     template = loader.get_template('team_manager/edit_game.html')
     game = Game.objects.get(id = game_id)
+    print game.start_time.strftime("%Y-%m-%d %H:%M")
 
     players = []
     for team in game.teams.all():
@@ -276,6 +277,13 @@ def edit_game(request, game_id=None):
             game.end_game()
             game = Game.objects.get(id = game_id) # For Some Reason Game Length is being nulled on save
             Player.update_player_game_stats()
+
+        if request.POST['start_time']:
+            game.start_time = datetime.strptime(request.POST['start_time'], "%Y-%m-%d %H:%M")
+            game.end_time = datetime.strptime(request.POST['end_time'], "%Y-%m-%d %H:%M")
+            game.save()
+
+        messages.success(request, 'The Game has been updated')
 
 
     scores = range(0, 21)

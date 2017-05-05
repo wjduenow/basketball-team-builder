@@ -389,7 +389,7 @@ class Game(models.Model):
         return "%s: %s (%s)"  % (self.name, self.start_time, self.game_duration_friendly)
 
     def end_game(self):
-        self.end_time = datetime.now()
+        self.end_time = datetime.now() + timedelta(hours=7)
         self.save()
 
     @property
@@ -403,6 +403,13 @@ class Game(models.Model):
     def game_duration_friendly(self):
         min_secs = divmod(self.game_duration.days * 86400 + self.game_duration.seconds, 60)
         return "%s Minutes and %s Seconds" % (min_secs[0], min_secs[1])
+
+    @property
+    def game_duration_minutes(self):
+        min_secs = divmod(self.game_duration.days * 86400 + self.game_duration.seconds, 60)
+        return min_secs[0]
+
+
 
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)

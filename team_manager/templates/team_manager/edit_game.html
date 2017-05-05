@@ -99,19 +99,25 @@
         <div class="panel-body">
           <form action="/edit_game/{{game.id}}" method="POST" class="form-inline">
             {% csrf_token %}
-
+            <div class="form-group">
             {% for team in game.teams.all %}
 
-                <div class="form-group">
+
                     <label for="exampleInputName2">{{ team.name}} Score:</label>
                     <select class="form-control" name="{{ team.id }}">
                       {% for score in scores %}
                         <option value="{{ score }}" {% if score == team.score %}SELECTED{% endif %}>{{score}}</option>
                       {% endfor %}
                     </select>
-                </div>
+
+
 
             {% endfor %}
+            <label for="start_time">Start Time:</label>
+            <input class="form-control" name="start_time" value='{{game.start_time|date:"Y-m-d H:i"}}'>
+            <label for="end_time">End Time:</label>
+            <input class="form-control" name="end_time" value='{{game.end_time|date:"Y-m-d H:i"}}'>
+            </div>       
 
             <br />
             <button type="submit" class="btn btn-success btn-block z-depth-3">Update Game Scores</button>
