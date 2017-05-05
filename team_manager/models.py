@@ -35,6 +35,9 @@ class Player(models.Model):
     ball_handler = models.BooleanField(default=False)
     last_game_date = models.DateTimeField(null=True)
     last_game_id = models.IntegerField(blank=True, null=True)
+    ninety_day_games_played = models.FloatField(default=2)
+    ninety_day_plus_minus = models.FloatField(default=2)
+    ninety_day_win_percentage = models.FloatField(default=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -55,7 +55,7 @@ def logout(request):
 def index(request):
     #return HttpResponse("Hello, world. You're at the team manager index.")
     template = loader.get_template('team_manager/index.html')
-    today = (datetime.now() - timedelta(hours=8)).strftime("%A")
+    today = (datetime.now() - timedelta(hours=7)).strftime("%A")
 
     gym_slots_today = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).filter(day_of_week = today).all()
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
@@ -435,11 +435,21 @@ def players(request):
     for stat in stats:
         stats_dict[stat.player_id] = stat
 
+    player_game_summary_dict = {}
+    ps = PlayerSummary.objects.values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential'))
+    for p in ps:
+        p['win_ratio'] = p['won__sum'] / p['played__sum']
+        player_game_summary_dict[p['player_id']] = p
+
     #for player in players:
     for player in players:
         if player.id in stats_dict:
             player.stats = stats_dict[int(player.id)]
             player.player_score = round(player.stats.player_score, 2)
+
+        if player.id in player_game_summary_dict:
+            player.game_summary = player_game_summary_dict[int(player.id)]
+
 
     context = ({'players': players, 'player_ids': player_ids})
     return HttpResponse(template.render(context, request))
