@@ -30,11 +30,14 @@ class Player(models.Model):
     nick_name = models.CharField(max_length=200, blank=True, null=True)
     referred_by = models.ForeignKey('self', blank=True, null=True, related_name='referred')
     status = models.CharField(max_length=200, blank=True, null=True, choices=[('Active', 'Active'), ('Inactive', 'Inactive')])
-    size = models.IntegerField(blank=True, null=True, choices=[(1, 'Small'), (2, 'Medium'), (3, 'Large')])
+    size = models.IntegerField(blank=True, default=2, choices=[(1, 'Small'), (2, 'Medium'), (3, 'Large')])
     position = models.CharField(max_length=200, blank=True, null=True, choices=[('Guard', 'Guard'), ('Forward', 'Forward')])
     ball_handler = models.BooleanField(default=False)
     last_game_date = models.DateTimeField(null=True)
     last_game_id = models.IntegerField(blank=True, null=True)
+    ninety_day_games_played = models.FloatField(default=2)
+    ninety_day_plus_minus = models.FloatField(default=2)
+    ninety_day_win_percentage = models.FloatField(default=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -156,6 +159,7 @@ class GymSlot(models.Model):
     name = models.CharField(max_length=200)
     players = models.ManyToManyField(Player)
     status = models.CharField(max_length=200, blank=True, null=True)
+    location = models.CharField(max_length=400, blank=True, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
     start_time = models.TimeField()
@@ -172,6 +176,29 @@ class GymSlot(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def location_parsed(self):
+        if self.location != None:
+            new_location_list = self.location.split(",")
+            new_location = {}
+            new_location['name'] = new_location_list[0]
+            new_location['street'] = new_location_list[1]
+            new_location['city'] = new_location_list[2]
+            new_location['state'] = new_location_list[3].split()[0]
+            new_location['zipcode'] = new_location_list[3].split()[1]
+
+            return new_location
+        else:
+            return self.location
+
+
+    @property
+    def black_out_dates_parsed(self):
+        if self.black_out_dates == '':
+            return "None"
+        else:
+            return self.black_out_dates
 
 
 class GymSession(models.Model):
@@ -362,7 +389,7 @@ class Game(models.Model):
         return "%s: %s (%s)"  % (self.name, self.start_time, self.game_duration_friendly)
 
     def end_game(self):
-        self.end_time = datetime.now()
+        self.end_time = datetime.now() + timedelta(hours=7)
         self.save()
 
     @property
@@ -376,6 +403,13 @@ class Game(models.Model):
     def game_duration_friendly(self):
         min_secs = divmod(self.game_duration.days * 86400 + self.game_duration.seconds, 60)
         return "%s Minutes and %s Seconds" % (min_secs[0], min_secs[1])
+
+    @property
+    def game_duration_minutes(self):
+        min_secs = divmod(self.game_duration.days * 86400 + self.game_duration.seconds, 60)
+        return min_secs[0]
+
+
 
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)

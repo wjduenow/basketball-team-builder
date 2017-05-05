@@ -205,3 +205,16 @@ a.list-group-item-default:hover {
     height: 400px !important;
     overflow: scroll;
 }​
+
+button.removeplayer {
+
+outline: none;
+border: none;
+color: #ffffff;
+
+}
+
+
+.removeplayer:focus {
+    outline: none;
+}

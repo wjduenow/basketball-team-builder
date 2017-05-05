@@ -1,5 +1,31 @@
 {% include 'team_manager/partial-user-menu.html' %}
 
+<style type="text/css">
+#power-gauge g.arc {
+    fill: steelblue;
+  }
+
+  #power-gauge g.pointer {
+    fill: #e85116;
+    stroke: #b64011;
+  }
+  
+  #power-gauge g.label text {
+    text-anchor: middle;
+    font-size: 14px;
+    font-weight: bold;
+    fill: #666;
+  }
+
+  .stats {
+    text-anchor: middle;
+    font-size: 20px;
+    font-weight: bold;
+    fill: #666;
+  }
+
+</style>
+
 <ol class="breadcrumb">
     <li><a href="/">Home</a></li>
     <li><a href="/players">Players</a></li>
@@ -10,16 +36,16 @@
 <div class="container theme-showcase" role="main">
 
   <div class="page-header">
-        <h1>Player: {{player}}</h1>
+        <h4>Player: {{player}}</h4>
   </div>
 
     <div class="row">
 
-        <div class="col-sm-13">
+        <div class="col-sm-6">
            
 
 
-                <div class="panel panel-primary">
+                <div class="panel panel-primary z-depth-3">
                     <div class="panel-heading">
                       <h3 class="panel-title g-hed">{{ player }}</h3>
                     </div>
@@ -42,6 +68,9 @@
                                 <strong>Status: </strong> {{player.status}}
                             </div>
                             <div id="player_{{player.id}}" class="list-group-item player">
+                                <strong>Referred By: </strong>{{player.referred_by}}
+                            </div>
+                            <div id="player_{{player.id}}" class="list-group-item player">
                                 <strong>Size: </strong>
                                 {% if player.size == 1 %}
                                     Small
@@ -54,9 +83,9 @@
                             <div id="player_{{player.id}}" class="list-group-item player">
                                 <strong>Ball Handler: </strong>
                                 {% if player.ball_handler %}
-                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span> 
+                                    <span class="fa fa-check fa-lg" aria-hidden="true"></span> 
                                 {% else %}
-                                    <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> 
+                                    <span class="fa fa-ban fa-lg" aria-hidden="true"></span> 
                                 {% endif %}
                             </div>
                           </div>
@@ -66,10 +95,8 @@
 
                     <div class="panel-footer">
                     {% if user.is_superuser %}
-                      <a href="/edit_player/{{player.id}}">
-                            <button class="btn btn-success btn-sm" type="submit" name="action">Edit
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                            </button>
+                      <a class="btn btn-primary waves-effect" href="/edit_player/{{player.id}}">Edit
+                                <i class="fa fa-edit" aria-hidden="true"></i>
                       </a>
                      {% endif %}
                     </div>
@@ -77,11 +104,62 @@
                 </div>
             
         </div>
+
+      <div class="col-sm-6">
+
+
+
+          <div class="col-sm-6">
+            <div class="panel z-depth-3">
+              <div class="panel-heading success-color-dark text-center">
+                <h3 class="panel-title g-hed white-text">Games Played</h3>
+              </div>
+              <div class="panel-body text-center stats">
+                {{ player.player_summary.played__sum}} Games
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="panel panel-success z-depth-3">
+              <div class="panel-heading success-color-dark text-center">
+                <h3 class="panel-title g-hed white-text">Point +/-</h3>
+              </div>
+              <div class="panel-body text-center stats">
+                {{ player.player_summary.point_differential__avg|floatformat:2}} Points
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-12">
+            <div class="panel panel-success z-depth-3">
+              <div class="panel-heading success-color-dark text-center">
+                <h3 class="panel-title g-hed white-text">Win %</h3>
+              </div>
+              <div class="panel-body text-center">
+                <div id="power-gauge"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-12">
+            <div class="panel panel-success z-depth-3">
+              <div class="panel-heading success-color-dark text-center">
+                <h3 class="panel-title g-hed white-text">Last Game Date</h3>
+              </div>
+              <div class="panel-body text-center stats" style="min-height: 75; max-height: 75;">
+                {{ player.last_game_date|date:"SHORT_DATE_FORMAT"}}
+              </div>
+            </div>
+          </div>
+
+
+      </div>
     </div> <!-- End Row -->
 
 
     <div class="row">
-      <div class="col-sm-13 panel panel-primary" id="win_loss_well">
+      <div class="col-sm-13 panel panel-primary z-depth-3" id="win_loss_well">
         <div class="panel-heading">
             <h3 class="panel-title g-hed" id="win_loss_head"></h3>
         </div>
@@ -94,7 +172,7 @@
 
 
     <div class="row">
-      <div class="col-sm-13 panel panel-primary" id="point_differential_well">
+      <div class="col-sm-13 panel panel-primary z-depth-3" id="point_differential_well">
         <div class="panel-heading">
             <h3 class="panel-title g-hed" id="point_differential_head"></h3>
         </div>
@@ -108,7 +186,7 @@
 
     <div class="row">
 
-      <div class="panel panel-primary">
+      <div class="col-sm-13 panel panel-primary z-depth-3">
                     <div class="panel-heading">
                       <h3 class="panel-title g-hed">Players Played With</h3>
                     </div>
@@ -434,7 +512,208 @@ function numTicks(widther) {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
 
+<script type="text/javascript">
 
+var gauge = function(container, configuration) {
+  var that = {};
+  var config = {
+    size            : 200,
+    clipWidth         : 200,
+    clipHeight          : 110,
+    ringInset         : 20,
+    ringWidth         : 20,
+    
+    pointerWidth        : 10,
+    pointerTailLength     : 5,
+    pointerHeadLengthPercent  : 0.9,
+    
+    minValue          : 0,
+    maxValue          : 10,
+    
+    minAngle          : -90,
+    maxAngle          : 90,
+    
+    transitionMs        : 750,
+    
+    majorTicks          : 5,
+    labelFormat         : d3.format(',g'),
+    labelInset          : 10,
+    
+    arcColorFn          : d3.interpolateHsl(d3.rgb('#e8e2ca'), d3.rgb('#3e6c0a'))
+  };
+  var range = undefined;
+  var r = undefined;
+  var pointerHeadLength = undefined;
+  var value = 0;
+  
+  var svg = undefined;
+  var arc = undefined;
+  var scale = undefined;
+  var ticks = undefined;
+  var tickData = undefined;
+  var pointer = undefined;
+
+  var donut = d3.layout.pie();
+  
+  function deg2rad(deg) {
+    return deg * Math.PI / 180;
+  }
+  
+  function newAngle(d) {
+    var ratio = scale(d);
+    var newAngle = config.minAngle + (ratio * range);
+    return newAngle;
+  }
+  
+  function configure(configuration) {
+    var prop = undefined;
+    for ( prop in configuration ) {
+      config[prop] = configuration[prop];
+    }
+    
+    range = config.maxAngle - config.minAngle;
+    r = config.size / 2;
+    pointerHeadLength = Math.round(r * config.pointerHeadLengthPercent);
+
+    // a linear scale that maps domain values to a percent from 0..1
+    scale = d3.scale.linear()
+      .range([0,1])
+      .domain([config.minValue, config.maxValue]);
+      
+    ticks = scale.ticks(config.majorTicks);
+    tickData = d3.range(config.majorTicks).map(function() {return 1/config.majorTicks;});
+    
+    arc = d3.svg.arc()
+      .innerRadius(r - config.ringWidth - config.ringInset)
+      .outerRadius(r - config.ringInset)
+      .startAngle(function(d, i) {
+        var ratio = d * i;
+        return deg2rad(config.minAngle + (ratio * range));
+      })
+      .endAngle(function(d, i) {
+        var ratio = d * (i+1);
+        return deg2rad(config.minAngle + (ratio * range));
+      });
+  }
+  that.configure = configure;
+  
+  function centerTranslation() {
+    return 'translate('+r +','+ r +')';
+  }
+  
+  function isRendered() {
+    return (svg !== undefined);
+  }
+  that.isRendered = isRendered;
+  
+  function render(newValue) {
+    svg = d3.select(container)
+      .append('svg:svg')
+        .attr('class', 'gauge')
+        .attr('width', config.clipWidth)
+        .attr('height', config.clipHeight);
+    
+    var centerTx = centerTranslation();
+    
+    var arcs = svg.append('g')
+        .attr('class', 'arc')
+        .attr('transform', centerTx);
+    
+    arcs.selectAll('path')
+        .data(tickData)
+      .enter().append('path')
+        .attr('fill', function(d, i) {
+          return config.arcColorFn(d * i);
+        })
+        .attr('d', arc);
+    
+    var lg = svg.append('g')
+        .attr('class', 'label')
+        .attr('transform', centerTx);
+    lg.selectAll('text')
+        .data(ticks)
+      .enter().append('text')
+        .attr('transform', function(d) {
+          var ratio = scale(d);
+          var newAngle = config.minAngle + (ratio * range);
+          return 'rotate(' +newAngle +') translate(0,' +(config.labelInset - r) +')';
+        })
+        .text(config.labelFormat);
+
+    var lineData = [ [config.pointerWidth / 2, 0], 
+            [0, -pointerHeadLength],
+            [-(config.pointerWidth / 2), 0],
+            [0, config.pointerTailLength],
+            [config.pointerWidth / 2, 0] ];
+    var pointerLine = d3.svg.line().interpolate('monotone');
+    var pg = svg.append('g').data([lineData])
+        .attr('class', 'pointer')
+        .attr('transform', centerTx);
+        
+    pointer = pg.append('path')
+      .attr('d', pointerLine/*function(d) { return pointerLine(d) +'Z';}*/ )
+      .attr('transform', 'rotate(' +config.minAngle +')');
+      
+    update(newValue === undefined ? 0 : newValue);
+  }
+  that.render = render;
+  
+  function update(newValue, newConfiguration) {
+    if ( newConfiguration  !== undefined) {
+      configure(newConfiguration);
+    }
+    var ratio = scale(newValue);
+    var newAngle = config.minAngle + (ratio * range);
+    pointer.transition()
+      .duration(config.transitionMs)
+      .ease('elastic')
+      .attr('transform', 'rotate(' +newAngle +')');
+  }
+  that.update = update;
+
+  configure(configuration);
+  
+  return that;
+};
+</script>
+
+<script>
+
+//{{ player.player_summary.win_ratio}}
+function onDocumentReady() {
+  var powerGauge = gauge('#power-gauge', {
+    size: 275,
+    clipWidth: 275,
+    clipHeight: 160,
+    ringWidth: 60,
+    maxValue: 100,
+    transitionMs: 4000,
+  });
+  powerGauge.render();
+  
+  function updateReadings() {
+    // just pump in random data here...
+    powerGauge.update({{ player.player_summary.win_ratio|floatformat:0}});
+  }
+  
+  // every few seconds update reading values
+  updateReadings();
+  setInterval(function() {
+    updateReadings();
+  }, 5 * 1000);
+}
+
+if ( !window.isLoaded ) {
+  window.addEventListener("load", function() {
+    onDocumentReady();
+  }, false);
+} else {
+  onDocumentReady();
+}
+
+
+
+</script>
 
   </body>
 </html>

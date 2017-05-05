@@ -55,7 +55,7 @@ def logout(request):
 def index(request):
     #return HttpResponse("Hello, world. You're at the team manager index.")
     template = loader.get_template('team_manager/index.html')
-    today = (datetime.now() - timedelta(hours=8)).strftime("%A")
+    today = (datetime.now()).strftime("%A")
 
     gym_slots_today = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).filter(day_of_week = today).all()
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
@@ -70,12 +70,23 @@ def index(request):
         p['player'] = Player.objects.get(id = p['player_id'])
 
     ps_win_ratio = sorted(ps, key=itemgetter('win_ratio'), reverse=True)[:5]
+    ps_win_ratio_bad = sorted(ps, key=itemgetter('win_ratio'), reverse=False)[:5]
     ps_point_differential = sorted(ps, key=itemgetter('point_differential__avg'), reverse=True)[:5]
+    ps_point_differential_bad = sorted(ps, key=itemgetter('point_differential__avg'), reverse=False)[:5]
 
     best_tandem_point_differential = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("-point_differential")[:5]
     best_tandem_win_ratio = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("-win_loss")[:5]
 
-    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 'active_sessions': active_sessions, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential, 'best_tandem_point_differential': best_tandem_point_differential, 'best_tandem_win_ratio': best_tandem_win_ratio})
+    best_tandem_point_differential_bad = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("point_differential")[:5]
+    best_tandem_win_ratio_bad = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("win_loss")[:5]
+
+    context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 
+                'active_sessions': active_sessions, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential, 
+                'best_tandem_point_differential': best_tandem_point_differential, 'best_tandem_win_ratio': best_tandem_win_ratio, 
+                'ps_win_ratio_bad': ps_win_ratio_bad, 'ps_point_differential_bad': ps_point_differential_bad, 
+                'best_tandem_point_differential_bad': best_tandem_point_differential_bad,
+                'best_tandem_win_ratio_bad': best_tandem_win_ratio_bad})
+
     return HttpResponse(template.render(context, request))
 
 @login_required    
@@ -118,7 +129,12 @@ def view_gym_slot(request, gym_slot_id=None):
 def view_player(request, player_id=None):
     template = loader.get_template('team_manager/player.html')
     player = Player.objects.get(id = player_id)
+
+    ps = PlayerSummary.objects.filter(player = player).values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential'))
     #pps = PlayerPlayerSummary.objects.filter(player = player_id).exclude(other_player = player_id).all()
+    if ps:
+        ps[0]['win_ratio'] = (ps[0]['won__sum'] / ps[0]['played__sum']) * 100
+        player.player_summary = ps[0]
 
     context = ({'player': player}) #, 'pps': pps})
     return HttpResponse(template.render(context, request))
@@ -172,10 +188,10 @@ def view_gym_session(request, gym_session_id=None):
     today =  datetime.now().date()
     gym_session = GymSession.objects.get(id = gym_session_id)
 
-    print gym_session.start_time.date()
+    session_start_time = "Session DB Start: %s - Today: %s" % ((gym_session.start_time - timedelta(hours=7)).date(), today)
     print today
 
-    if gym_session.start_time.date() == today:
+    if (gym_session.start_time - timedelta(hours=7)).date() == today:
         print "This Session is Today"
         template = loader.get_template('team_manager/start_gym_slot_session.html')
     else:
@@ -184,7 +200,7 @@ def view_gym_session(request, gym_session_id=None):
 
     available_players = Player.objects.exclude(pk__in=gym_session.players.values_list('id', flat=True)).filter(pk__in=gym_session.gym_slot.players.values_list('id', flat=True))
 
-    context = ({'gym_session': gym_session, 'available_players': available_players})
+    context = ({'session_start_time': session_start_time, 'gym_session': gym_session, 'available_players': available_players})
     return HttpResponse(template.render(context, request))
 
 @login_required    
@@ -241,6 +257,7 @@ def view_game(request, game_id=None):
 def edit_game(request, game_id=None):
     template = loader.get_template('team_manager/edit_game.html')
     game = Game.objects.get(id = game_id)
+    print game.start_time.strftime("%Y-%m-%d %H:%M")
 
     players = []
     for team in game.teams.all():
@@ -271,6 +288,13 @@ def edit_game(request, game_id=None):
             game.end_game()
             game = Game.objects.get(id = game_id) # For Some Reason Game Length is being nulled on save
             Player.update_player_game_stats()
+
+        if request.POST['start_time']:
+            game.start_time = datetime.strptime(request.POST['start_time'], "%Y-%m-%d %H:%M")
+            game.end_time = datetime.strptime(request.POST['end_time'], "%Y-%m-%d %H:%M")
+            game.save()
+
+        messages.success(request, 'The Game has been updated')
 
 
     scores = range(0, 21)
@@ -435,11 +459,21 @@ def players(request):
     for stat in stats:
         stats_dict[stat.player_id] = stat
 
+    player_game_summary_dict = {}
+    ps = PlayerSummary.objects.values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential'))
+    for p in ps:
+        p['win_ratio'] = p['won__sum'] / p['played__sum']
+        player_game_summary_dict[p['player_id']] = p
+
     #for player in players:
     for player in players:
         if player.id in stats_dict:
             player.stats = stats_dict[int(player.id)]
             player.player_score = round(player.stats.player_score, 2)
+
+        if player.id in player_game_summary_dict:
+            player.game_summary = player_game_summary_dict[int(player.id)]
+
 
     context = ({'players': players, 'player_ids': player_ids})
     return HttpResponse(template.render(context, request))

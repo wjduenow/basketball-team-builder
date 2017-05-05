@@ -6,13 +6,16 @@
     </ol>
 
 <!-- main content -->
-<div class="container">
+<div class="container theme-showcase" role="main">
+
+      <h4>Player Stats</h4>
+
     <div class="row">
 
 
-        <div class="col">
+        <div class="col-sm-13 z-depth-3">
             <br />
-            <h3>Players</h3>
+
 
             <div class="divider"></div>
             <form action="/update_player_stats" method="post">
@@ -145,10 +148,10 @@
             <br />
 
              {% if user.is_superuser %}
-            <button class="btn btn-primary btn-sm" type="submit" name="action">Update Stats <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> 
+            <button class="btn btn-primary btn-lg" type="submit" name="action">Update Stats <span class="fa fa-floppy-disk" aria-hidden="true"></span> 
             </button>
-                <a href="/new_player" class="btn btn-primary btn-sm">
-                    Add Player <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
+                <a href="/new_player" class="btn btn-primary btn-lg">
+                    Add Player <span class="fa fa-plus" aria-hidden="true"></span> 
 
                 </a>
 

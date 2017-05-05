@@ -1,30 +1,5 @@
 {% include 'team_manager/partial-user-menu.html' %}
 
-<script>
-
-
-function change_team(player) {
-    var team = player.closest('div.panel-body');
-    if (team.attr('id') == 'team_a') {
-        //var team_name = 'team_b[]'
-        //var inpu = player.closest("button.btn")
-        //( "input" ).find(".player_checkbox").val();
-        //alert(inpu.attr('class'));
-        //var btn = player.closest("button.btn")
-        //btn.addClass('glyphicon-arrow-up').removeClass('glyphicon-arrow-down');
-        $( "#team_b" ).append(player);
-    } else {
-        $( "#team_a" ).append(player);
-    }
-
-    var btn = player.closest("button.btn")
-    btn.toggleClass('glyphicon-arrow-up glyphicon-arrow-down')
-
-}
-
-</script>
-
-
 
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
@@ -34,19 +9,41 @@ function change_team(player) {
     <!-- main content -->
     <div class="container theme-showcase" role="main">
 
-    <div class="page-header col-sm-10">
-        <h1>Gym Slot: {{gym_slot.name}}</h1>
+<div class="row">
+    <div class="page-header col-sm-12">
+        <h4>Gym Slot: {{gym_slot.name}}</h4>
     </div>
-
-
-    
+</div>
 
 <div class="container">
+  <div class="row">
 
+  <div class="col-sm-12">
+    <div class="card z-depth-3">
+      <div class="card-image">
+        <iframe src="https://www.google.com/maps/embed/v1/place?key=AIzaSyABgTZGG4hjQt8C45Hjg83QhXYSkV51PiY&q={{gym_slot.location}}" width="100%" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+      </div>
+      <div class="card-content">
+          <div class="col-sm-6">
+            <h6>Location:</h6> 
+               {{gym_slot.location_parsed.name}}<br/>
+               {{gym_slot.location_parsed.street}}<br/>
+               {{gym_slot.location_parsed.city}}, {{gym_slot.location_parsed.state}} {{gym_slot.location_parsed.zipcode}}
+               <br/><br/>
+          </div>
+          <div class="col-sm-6">
+            <h6>Time:</h6>{{gym_slot.start_time}} - {{gym_slot.end_time}}
+            <h6>Blackout Dates:</h6>{{gym_slot.black_out_dates_parsed}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
+<br/>
   <div class="row">
         <div class="col-sm-6" id="general-content" >
-          <div class="list-group" id="list1">
+          <div class="list-group z-depth-3" id="list1">
                   
           <a href="#" class="list-group-item active " id="general">Past Sessions</a>
           {% for session in gym_slot.gymsession_set.all %}
@@ -55,8 +52,8 @@ function change_team(player) {
           {% endfor %}
           <a href="#!" class="list-group-item text-center ">
               <form action="create_gym_session" method="POST">
-              <button class="btn btn-success btn-block" type="submit" name="action">
-                        Start New Session <span class="glyphicon glyphicon-forward" aria-hidden="true"></span> 
+              <button class="btn btn-success btn-block z-depth-3" type="submit" name="action">
+                        Start New Session <span class="fa fa-forward" aria-hidden="true"></span> 
               </button>
               {% csrf_token %}
               <input name="gym_slot_id" value="{{ gym_slot.id }}" type="hidden">
@@ -69,10 +66,10 @@ function change_team(player) {
 
 
         <div class="col-sm-6" id="general-content" >
-          <div class="list-group" id="list1">
+          <div class="list-group z-depth-3" id="list1">
           <a href="#" class="list-group-item active" id="general">Players</a>
           {% for player in gym_slot.players.all %}
-              <a href="#!" class="list-group-item">{{player}}</a>
+              <a href="/player/{{player.id}}" class="list-group-item">{{player}}</a>
             {% endfor %}
           </div><!-- end list -->
 

@@ -5,16 +5,14 @@
 
      <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
-        {% if user.is_superuser %}
-          <li><a href="/players">Players</a></li>
-        {% endif %}
+        <li><a href="/players">Players</a></li>
         <li class="active">Player</li>
     </ol>
     
 <div class="container theme-showcase" role="main">
 
     <div class="page-header">
-        <h1>Player: {{player}}</h1>
+        <h4>Player: {{player}}</h4>
     </div>
 
     <div class="container">
@@ -43,8 +41,8 @@
                     </div>
 
                     <div class="panel-footer">
-                            <button class="btn btn-success btn-sm" type="submit" name="action">Save
-                                <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+                            <button class="btn btn-success" type="submit" name="action">Save
+                                <span class="fa fa-save" aria-hidden="true"></span>
                             </button>
                     </div>
                 </div>
@@ -69,35 +67,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="//cdn.rawgit.com/hilios/jQuery.countdown/2.2.0/dist/jquery.countdown.min.js"></script>
 
-<script type="text/javascript">
-
-    $('#clock').countdown("{{game_end|date:"Y/m/d H:i:s"}}", {elapse: true})
-        .on('update.countdown', function(event) {
-      var $this = $(this);
-      if (event.elapsed) {
-        $this.html(event.strftime('OverTime: <span>%H Hours %M Minutes %S Seconds</span>'));
-      } else {
-        $this.html(event.strftime('Time Remaining: <span>%H Hours %M Minutes %S Seconds</span>'));
-      }
-    });
-
-
-
-  $('#btn-reset').click(function() {
-    $clock.countdown(get15dayFromNow());
-  });
-
-  $('#btn-pause').click(function() {
-    $clock.countdown('pause');
-  });
-
-  $('#btn-resume').click(function() {
-    $clock.countdown('resume');
-  });
-
-</script>
 
   </body>
 </html>
