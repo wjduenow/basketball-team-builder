@@ -30,7 +30,7 @@ class Player(models.Model):
     nick_name = models.CharField(max_length=200, blank=True, null=True)
     referred_by = models.ForeignKey('self', blank=True, null=True, related_name='referred')
     status = models.CharField(max_length=200, blank=True, null=True, choices=[('Active', 'Active'), ('Inactive', 'Inactive')])
-    size = models.IntegerField(blank=True, null=True, choices=[(1, 'Small'), (2, 'Medium'), (3, 'Large')])
+    size = models.IntegerField(blank=True, default=2, choices=[(1, 'Small'), (2, 'Medium'), (3, 'Large')])
     position = models.CharField(max_length=200, blank=True, null=True, choices=[('Guard', 'Guard'), ('Forward', 'Forward')])
     ball_handler = models.BooleanField(default=False)
     last_game_date = models.DateTimeField(null=True)
