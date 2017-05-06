@@ -6,7 +6,7 @@
   }
 
   #power-gauge g.pointer {
-    fill: #e85116;
+    fill: #ff4444;
     stroke: #b64011;
   }
   
@@ -122,14 +122,16 @@
 
           <div class="col-sm-6">
             <div class="panel panel-success z-depth-3">
-              <div class="panel-heading success-color-dark text-center">
-                <h3 class="panel-title g-hed white-text">Point +/-</h3>
+          <div class="panel-heading success-color-dark text-center">
+                <h3 class="panel-title g-hed white-text">Last Game</h3>
               </div>
               <div class="panel-body text-center stats">
-                {{ player.player_summary.point_differential__avg|floatformat:2}} Points
+                {{ player.last_game_date|date:"SHORT_DATE_FORMAT"}}
               </div>
             </div>
           </div>
+
+
 
           <div class="col-sm-12">
             <div class="panel panel-success z-depth-3">
@@ -141,7 +143,7 @@
               </div>
             </div>
           </div>
-
+<!--
           <div class="col-sm-12">
             <div class="panel panel-success z-depth-3">
               <div class="panel-heading success-color-dark text-center">
@@ -152,6 +154,21 @@
               </div>
             </div>
           </div>
+-->
+
+          <div class="col-sm-12">
+            <div class="panel panel-success z-depth-3">
+              <div class="panel-heading success-color-dark text-center">
+                <h3 class="panel-title g-hed white-text">Point +/- (Differential)</h3>
+              </div>
+              <div class="panel-body text-center stats">
+                <div id="paired-bar-chart">
+              </div>
+            </div>
+          </div>
+          </div>
+
+
 
 
       </div>
@@ -222,6 +239,82 @@
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+
+
+
+<script type="text/javascript">
+<!-- Data for bar chart: Two time-series, alternating to form a single series. Bar Color will switch back & forth -->
+var data = d3.range(10).map(Math.random);
+var data = [{{ player.player_summary.point_differential__avg}}, {{ps_all.point_differential__avg}}];
+var colorlist = ["#3fb618", "#9954bb"];
+var labellist = ["{{player}}", "Group Average"];
+
+var w = 280,
+    h = 50,
+    labelpad = 10,
+    x = d3.scale.linear().domain([-16, 16]).range([0, w]),
+    y = d3.scale.ordinal().domain(d3.range(data.length)).rangeBands([0, h], .2);
+
+var vis = d3.select("#paired-bar-chart")
+  .append("svg:svg")
+    .attr("width", w + 40)
+    .attr("height", h + 30)
+    .append("svg:g")
+    .attr("transform", "translate(20,0)");
+
+var bars = vis.selectAll("g.bar")
+    .data(data)
+  .enter().append("svg:g")
+    .attr("class", "bar")
+    .attr("transform", function(d, i) { return "translate(" + labelpad + "," + y(i) + ")"; });
+
+bars.append("svg:rect")
+    .attr("fill", function(d, i) { return colorlist[i % 2]; } )   //Alternate colors
+    .attr("width", x)
+    .attr("height", y.rangeBand());
+
+bars.append("svg:text")
+    .attr("x", 10)
+    .attr("y", 0 + y.rangeBand() / 2)
+    .attr("dx", -6)
+    .attr("dy", ".35em")
+    .style("fill", '#ffffff')
+    .attr("font-size", ".5em")
+    .attr("text-anchor", "start")
+    .text(function(d, i) { return labellist[i]; });
+
+
+var rules = vis.selectAll("g.rule")
+    .data(x.ticks(10))
+  .enter().append("svg:g")
+    .attr("class", "rule")
+    .attr("transform", function(d) { return "translate(" + x(d) + ", 0)"; });
+
+rules.append("svg:line")
+    .attr("y1", h)
+    .attr("y2", h + 6)
+    .attr("x1", labelpad)
+    .attr("x2", labelpad)
+    .attr("stroke", "black");
+
+rules.append("svg:line")
+    .attr("y1", 0)
+    .attr("y2", h)
+    .attr("x1", labelpad)
+    .attr("x2", labelpad)
+    .attr("stroke", "white")
+    .attr("stroke-opacity", .3);
+
+
+rules.append("svg:text")
+    .attr("y", h + 8)
+    .attr("x", labelpad)
+    .attr("dy", ".71em")
+    .attr("text-anchor", "middle")
+    .attr("font-size", "14px")
+    .text(x.tickFormat(10));
+
+</script>
 
 <script>
 //Margin conventions
@@ -344,7 +437,8 @@ function ready(err, data) {
 
   //Defines the yScale max
   yScale.domain(d3.extent(data, function(d) { return d.num; }));
-  yScale2.domain(d3.extent(data, function(d) { return d.win_loss; }));
+  //yScale2.domain(d3.extent(data, function(d) { return d.win_loss; }));
+  yScale2.domain([-1,1]);
 
   //Appends the y axis
   var yAxisGroup = svg.append("g")

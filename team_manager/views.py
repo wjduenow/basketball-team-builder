@@ -55,7 +55,7 @@ def logout(request):
 def index(request):
     #return HttpResponse("Hello, world. You're at the team manager index.")
     template = loader.get_template('team_manager/index.html')
-    today = (datetime.now()).strftime("%A")
+    today = (datetime.now() - timedelta(hours=7)).strftime("%A")
 
     gym_slots_today = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).filter(day_of_week = today).all()
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
@@ -131,12 +131,14 @@ def view_player(request, player_id=None):
     player = Player.objects.get(id = player_id)
 
     ps = PlayerSummary.objects.filter(player = player).values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential'))
+
+    ps_all = PlayerSummary.objects.all().aggregate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential'))
     #pps = PlayerPlayerSummary.objects.filter(player = player_id).exclude(other_player = player_id).all()
     if ps:
         ps[0]['win_ratio'] = (ps[0]['won__sum'] / ps[0]['played__sum']) * 100
         player.player_summary = ps[0]
 
-    context = ({'player': player}) #, 'pps': pps})
+    context = ({'player': player, 'ps_all': ps_all}) #, 'pps': pps})
     return HttpResponse(template.render(context, request))
 
 
