@@ -134,6 +134,7 @@ def view_player(request, player_id=None):
 
     ps_all = PlayerSummary.objects.all().aggregate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential'))
     #pps = PlayerPlayerSummary.objects.filter(player = player_id).exclude(other_player = player_id).all()
+
     if ps:
         ps[0]['win_ratio'] = (ps[0]['won__sum'] / ps[0]['played__sum']) * 100
         player.player_summary = ps[0]

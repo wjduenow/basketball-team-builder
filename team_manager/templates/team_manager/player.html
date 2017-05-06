@@ -1,4 +1,5 @@
 {% include 'team_manager/partial-user-menu.html' %}
+{% load mathfilters %}
 
 <style type="text/css">
 #power-gauge g.arc {
@@ -23,6 +24,13 @@
     font-weight: bold;
     fill: #666;
   }
+
+.tablecol {
+  padding-top:0px;
+  padding-left:0px;
+  padding-right:0px
+}
+
 
 </style>
 
@@ -162,10 +170,9 @@
                 <h3 class="panel-title g-hed white-text">Point +/- (Differential)</h3>
               </div>
               <div class="panel-body text-center stats">
-                <div id="paired-bar-chart">
+                <div id="paired-bar-chart"></div>
               </div>
             </div>
-          </div>
           </div>
 
 
@@ -203,13 +210,14 @@
 
     <div class="row">
 
-      <div class="col-sm-13 panel panel-primary z-depth-3">
-                    <div class="panel-heading">
-                      <h3 class="panel-title g-hed">Players Played With</h3>
-                    </div>
+      <div class="col-sm-6">
+      <div class="panel panel-primary z-depth-3">
+          <div class="panel-heading">
+            <h3 class="panel-title g-hed">Players Played With</h3>
+          </div>
+           <div class="panel-body tablecol">
 
-                    <div class="panel-body span3" id="{{team}}">
-                      <table data-toggle="table" class="table table-condensed table-striped table table-bordered">
+                      <table class="table table-striped table-condensed table-bordered">
                           <thead>
                             <tr>
                                 <th class="td-name" data-sortable="true">Name</th>
@@ -233,10 +241,40 @@
                             {% endif %}
                         {% endfor %}
                       </table>
+          </div>
+      </div>
+      </div>
+      <div class="col-sm-6">
+      <div class="panel panel-primary z-depth-3">
+        <div class="panel-heading">
+          <h3 class="panel-title g-hed">Recent Games</h3>
+        </div>
+         <div class="panel-body tablecol">
+          <table class="table table-striped table-bordered table-condensed">
+            <thead>
+              <tr>
+                <th class="td-name" data-sortable="true">Game</th>
+                <th class="td-name" data-sortable="true">Team</th>
+                <th class="td-name" data-sortable="true">Won?</th>
+                <th class="td-name" data-sortable="true">Team Score</th>
+                <th class="td-name" data-sortable="true">Opp Score</th>
+              </tr>
+            </thead>
+            {% for team in player.team_set.all|slice:":10" %}    
+              <tr>
+                <td><a href="/game/{{team.game_set.first.id}}">{{team.game_set.first.start_time|date:"SHORT_DATE_FORMAT"}}</a></td>
+                <td>{{team}}</td>
+                <td>{{team.won}}</td>
+                <td>{{team.score}}</td>
+                <td>{{team.score|sub:team.point_differential}}</td>
+              </tr>
+            {% endfor %}
+          </table>
         </div>
       </div>
+      </div>
     </div>
-
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
 
