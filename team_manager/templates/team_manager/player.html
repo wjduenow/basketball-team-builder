@@ -264,7 +264,7 @@
               <tr>
                 <td><a href="/game/{{team.game_set.first.id}}">{{team.game_set.first.start_time|date:"SHORT_DATE_FORMAT"}}</a></td>
                 <td>{{team}}</td>
-                <td>{{team.won}}</td>
+                <td>{{team.won|yesno:"Yes,No"}}</td>
                 <td>{{team.score}}</td>
                 <td>{{team.score|sub:team.point_differential}}</td>
               </tr>

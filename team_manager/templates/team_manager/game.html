@@ -45,7 +45,7 @@
                     <div class="panel-body" id="{{team}}">
                         {% for player in team.players.all %} 
                             <div id="player_{{player.id}}" class="list-group-item player">
-                                {{player.first_name}} {{player.last_name}} - {{player.position}}
+                                <a href="/player/{{player.id}}" style="color: #555">{{player.first_name}} {{player.last_name}} - {{player.position}}</a>
                             </div>
                         {% endfor %}
                     </div>
