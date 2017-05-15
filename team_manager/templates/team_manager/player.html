@@ -7,7 +7,7 @@
   }
 
   #power-gauge g.pointer {
-    fill: #ff4444;
+    fill: #c00;
     stroke: #b64011;
   }
   
@@ -87,7 +87,7 @@
                                 <h6><strong>Status: </strong> {{player.status}}
                             </div>
                             <div id="player_{{player.id}}" class="list-group-item player">
-                                <strong>Referred By: </strong>{{player.referred_by}}</h6>
+                                <strong>Referred By: </strong>{% if player.referred_by %}<a href="/player/{{player.referred_by.id}}">{{player.referred_by}}</a>{% endif %}</h6>
                             </div>
                             <div id="player_{{player.id}}" class="list-group-item player">
                                 <h6><strong>Size: </strong>
@@ -242,7 +242,7 @@
                         {% for ps in player.player_player_summary.all %}
                             {% if ps.other_player.id != player.id %}
                               <tr>
-                                <td>{{ps.other_player}}</td>
+                                <td><a href="/player/{{ps.other_player.id}}">{{ps.other_player}}</a></td>
                                 <td>{{ps.played}}</td>
                                 <td>{{ps.won}}</td>
                                 <td>{{ps.win_loss|floatformat:2}}</td>
@@ -843,9 +843,10 @@ var gauge = function(container, configuration) {
     var lg = svg.append('g')
         .attr('class', 'label')
         .attr('transform', centerTx);
+    
     lg.selectAll('text')
         .data(ticks)
-      .enter().append('text')
+        .enter().append('text')
         .attr('transform', function(d) {
           var ratio = scale(d);
           var newAngle = config.minAngle + (ratio * range);
