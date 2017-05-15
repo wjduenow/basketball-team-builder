@@ -379,16 +379,6 @@ rules.append("svg:text")
     .text(x.tickFormat(10));
 
 
-/*vis.append("svg:text")
-    .attr("x", 10)
-    .attr("y", h + y.rangeBand() / 2)
-    .attr("dx", -15)
-    .attr("dy", ".35em")
-    .style("fill", '#000000')
-    .attr("font-size", ".5em")
-    .attr("text-anchor", "start")
-    .text(function(d, i) { return labellist[i] + " (" + d3.format(".2n")(d) + ")"; });*/
-
 var legend_item_width = 120;
 
 var legend = vis.selectAll(".legend")
@@ -472,7 +462,8 @@ var yAxis2 = d3.svg.axis()
   .scale(yScale2)
   .tickSize(-width)
   .tickPadding(8)
-  .orient("left");
+  .orient("left")
+  .tickFormat(d3.format(",%")); 
 
 //Defines the y axis styles
 var xAxis = d3.svg.axis()
@@ -493,6 +484,9 @@ var line2 = d3.svg.line()
   .y(function(d) { return yScale2(d.win_loss); });  
 
 
+var line2_50 = d3.svg.line()
+  .x(function(d) { return xScale(d.date); })
+  .y(function(d) { return yScale2(.5); });  
 
 
 
@@ -536,7 +530,7 @@ function ready(err, data) {
   //Defines the yScale max
   yScale.domain(d3.extent(data, function(d) { return d.num; }));
   //yScale2.domain(d3.extent(data, function(d) { return d.win_loss; }));
-  yScale2.domain([-1,1]);
+  yScale2.domain([0,1]);
 
   //Appends the y axis
   var yAxisGroup = svg.append("g")
@@ -568,12 +562,20 @@ function ready(err, data) {
     .attr("id", "point_differential_line")
     .attr("d", line); 
 
+  //Binds the data to the line
   var drawline = svg2.append("path")
     .datum(data)
     .attr("class", "line")
     .style("stroke", "#9954bb")
     .attr("id", "win_loss_line")
     .attr("d", line2);  
+
+  var draw_50_line = svg2.append("path")
+    .datum(data)
+    .attr("class", "line")  
+    .style("stroke", "#000")
+    .attr("id", "win_loss_line_50")
+    .attr("d", line2_50); 
 
 // Add point circles
 
@@ -634,11 +636,20 @@ svg2.selectAll("circle.line")
       .x(function(d) { return xScale(d.date); })
       .y(function(d) { return yScale2(d.win_loss); }); 
 
+
+    line2_50 = d3.svg.line()
+      .x(function(d) { return xScale(d.date); })
+      .y(function(d) { return yScale2(.5); });  
+
+
     d3.selectAll('#point_differential_line')
       .attr("d", line1);  
 
     d3.selectAll('#win_loss_line')
       .attr("d", line2); 
+
+    d3.selectAll('#win_loss_line_50')
+      .attr("d", line2_50); 
 
     svg.selectAll("circle")
       .attr('cx', function (d) { return xScale(d.date); })
