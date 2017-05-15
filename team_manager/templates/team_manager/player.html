@@ -296,7 +296,7 @@
 var data = d3.range(10).map(Math.random);
 var data = [{{ player.player_summary.point_differential__avg}}, {{ps_all.point_differential__avg}}];
 var colorlist = ["{% if player.player_summary.point_differential__avg > 0 %} #3fb618 {% else %} #C00 {% endif %}", "#9954bb"];
-var labellist = ["PLYR", "AVG"];
+var labellist = ["{{ player.first_name}}", "Average"];
 
 var element = d3.select('#paired-bar-chart').node();
 var widther = element.getBoundingClientRect().width;
@@ -379,7 +379,7 @@ rules.append("svg:text")
     .text(x.tickFormat(10));
 
 
-var legend_item_width = 120;
+var legend_item_width = 150;
 
 var legend = vis.selectAll(".legend")
     .data(data)
