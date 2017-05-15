@@ -45,11 +45,11 @@
                             <div id="player_{{player.id}}" class="list-group-item player">{{player.first_name}} {{player.last_name}} - {{player.position}}
                             <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
                             <span class="pull-right commands">
-                                <a class="red-text removeplayer" type="submit" name="action">
+                                <a class="red-text removeplayer">
                                         <i class="fa fa-remove fa-lg"></i> 
                                 </a>
                                 <span>&nbsp;|&nbsp;</span>
-                                <a type="button" class="green-text move_player" aria-label="Left Align">
+                                <a class="green-text move_player" aria-label="Left Align">
                                     {% if team == 'team_a' %}
                                         <i class="fa fa-arrow-down fa-lg move"></i>
                                     {% else %}
@@ -95,11 +95,11 @@
                             <div id="player_{{player.id}}" class="list-group-item player">{{player.first_name}} {{player.last_name}} - {{player.position}}
                             <input type="hidden" class="player_checkbox" name="{{team}}[]" value="{{ player.id }}">
                             <span class="pull-right commands">
-                                <a class="green-text add_to_a" type="submit" name="action">
+                                <a class="green-text add_to_a">
                                    <i class="fa fa-font fg-lg"></i>
                                 </a>
                                 <span>&nbsp;|&nbsp;</span>
-                                <a class="red-text add_to_b" type="submit" name="action">
+                                <a class="red-text add_to_b">
                                     <i class="fa fa-bold fg-lg""></i>
                                 </a>
 
@@ -360,7 +360,7 @@ $(function() {
 function remove_player(player) {
 
     var inpt = player.find('input');
-    var new_buttons = $('<span class="pull-right commands"><a class="green-text add_to_a" type="submit" name="action"><i class="fa fa-font fg-lg"></i></a><span>&nbsp;|&nbsp;</span><a class="red-text add_to_b" type="submit" name="action"><i class="fa fa-bold fg-lg"></i></a></span>');
+    var new_buttons = $('<span class="pull-right commands"><a class="green-text add_to_a"><i class="fa fa-font fg-lg"></i></a><span>&nbsp;|&nbsp;</span><a class="red-text add_to_b"><i class="fa fa-bold fg-lg"></i></a></span>');
 
     $( "#available_players" ).append(player);
 
@@ -391,7 +391,7 @@ function remove_player(player) {
 
 function add_to_a(player) {
 
-    var new_a_commands = $('<span class="pull-right commands"><a class="red-text removeplayer"><i class="fa fa-remove"></i> </a><span>&nbsp;|&nbsp;</span><a class="green-text move_player"><i class="fa fa-arrow-down move"></i></a></span>');
+    var new_a_commands = $('<span class="pull-right commands"><a class="red-text removeplayer fa-lg"><i class="fa fa-remove"></i> </a><span>&nbsp;|&nbsp;</span><a class="green-text move_player"><i class="fa fa-arrow-down move fa-lg"></i></a></span>');
 
     var inpt = player.find('input');
 
@@ -421,7 +421,7 @@ function add_to_a(player) {
 
 function add_to_b(player) {
 
-    var new_b_commands = $('<span class="pull-right commands"><a class="red-text removeplayer"><i class="fa fa-remove fg-lg"></i> </a><span>&nbsp;|&nbsp;</span><a class="green-text move_player"><i class="fa fa-arrow-up fg-lg move"></i></a></span>');
+    var new_b_commands = $('<span class="pull-right commands"><a class="red-text removeplayer fa-lg"><i class="fa fa-remove fg-lg"></i> </a><span>&nbsp;|&nbsp;</span><a class="green-text move_player"><i class="fa fa-arrow-up move fa-lg"></i></a></span>');
 
     var inpt = player.find('input');
     inpt.attr('name', "team_b[]")

@@ -32,6 +32,17 @@
 }
 
 
+.bullet { font: 10px sans-serif; }
+.bullet .marker { stroke: #000; stroke-width: 2px; }
+.bullet .tick line { stroke: #666; stroke-width: .5px; }
+.bullet .range.s0 { fill: #eee; }
+.bullet .range.s1 { fill: #ddd; }
+.bullet .range.s2 { fill: #ccc; }
+.bullet .measure.s0 { fill: lightsteelblue; }
+.bullet .measure.s1 { fill: steelblue; }
+.bullet .title { font-size: 14px; font-weight: bold; }
+.bullet .subtitle { fill: #999; }
+
 </style>
 
 <ol class="breadcrumb">
@@ -61,40 +72,40 @@
                     <div class="panel-body" id="{{team}}">
                         <div class="list-group" id="list2">
                             <div id="player_{{player.id}}" class="list-group-item player">
-                                <strong>First Name: </strong>{{player.first_name}}
+                                <h6><strong>First Name: </strong>{{player.first_name}}</h6>
                             </div>
                             <div id="player_{{player.id}}" class="list-group-item player">
-                                <strong>Last Name: </strong>{{player.last_name}}
+                                <h6><strong>Last Name: </strong>{{player.last_name}}</h6>
                             </div>
                             <div id="player_{{player.id}}" class="list-group-item player">
-                                <strong>Nickname: </strong>{{player.nick_name}}
+                                <h6><strong>Nickname: </strong>{{player.nick_name}}</h6>
                             </div>
                             <div id="player_{{player.id}}" class="list-group-item player">
-                                <strong>Position: </strong>{{player.position}}
+                               <h6><strong>Position: </strong>{{player.position}}</h6>
                             </div>
                             <div id="player_{{player.id}}" class="list-group-item player">
-                                <strong>Status: </strong> {{player.status}}
+                                <h6><strong>Status: </strong> {{player.status}}
                             </div>
                             <div id="player_{{player.id}}" class="list-group-item player">
-                                <strong>Referred By: </strong>{{player.referred_by}}
+                                <strong>Referred By: </strong>{{player.referred_by}}</h6>
                             </div>
                             <div id="player_{{player.id}}" class="list-group-item player">
-                                <strong>Size: </strong>
+                                <h6><strong>Size: </strong>
                                 {% if player.size == 1 %}
                                     Small
                                 {% elif player.size == 2 %}
                                     Medium
                                 {% else %}
                                     Large
-                                {% endif %}
+                                {% endif %}</h6>
                             </div>
                             <div id="player_{{player.id}}" class="list-group-item player">
-                                <strong>Ball Handler: </strong>
+                                <h6><strong>Ball Handler: </strong>
                                 {% if player.ball_handler %}
                                     <span class="fa fa-check fa-lg" aria-hidden="true"></span> 
                                 {% else %}
                                     <span class="fa fa-ban fa-lg" aria-hidden="true"></span> 
-                                {% endif %}
+                                {% endif %}</h6>
                             </div>
                           </div>
 
@@ -284,47 +295,58 @@
 <!-- Data for bar chart: Two time-series, alternating to form a single series. Bar Color will switch back & forth -->
 var data = d3.range(10).map(Math.random);
 var data = [{{ player.player_summary.point_differential__avg}}, {{ps_all.point_differential__avg}}];
-var colorlist = ["#3fb618", "#9954bb"];
-var labellist = ["{{player}}", "Group Average"];
+var colorlist = ["{% if player.player_summary.point_differential__avg > 0 %} #3fb618 {% else %} #C00 {% endif %}", "#9954bb"];
+var labellist = ["PLYR", "AVG"];
 
-var w = 280,
-    h = 50,
-    labelpad = 10,
-    x = d3.scale.linear().domain([-16, 16]).range([0, w]),
+var element = d3.select('#paired-bar-chart').node();
+var widther = element.getBoundingClientRect().width;
+
+var w = widther - 30,
+    h = 60,
+    labelpad = 20,
+    x = d3.scale.linear().domain([-7, 7]).range([0, w]),
     y = d3.scale.ordinal().domain(d3.range(data.length)).rangeBands([0, h], .2);
 
 var vis = d3.select("#paired-bar-chart")
-  .append("svg:svg")
+    .append("svg:svg")
     .attr("width", w + 40)
-    .attr("height", h + 30)
+    .attr("height", h + 30 + 20)
+    .attr("id", "p_d_bar_svg")
     .append("svg:g")
-    .attr("transform", "translate(20,0)");
+    .attr("transform", "translate(0,0)");
+
+vis.append("rect")
+    .attr("width", "100%")
+    .attr("height", h + 25)
+    .attr("fill", "white")
+    .attr("stroke", "black")
+    .attr("transform", "translate(0,0)");
+
+
+vis.append("rect")
+    .attr("width", "100%")
+    .attr("height", h + 25)
+    .attr("fill", "grey")
+    .attr("fill-opacity", .2)
+    .attr("transform", "translate(0,0)");
+
 
 var bars = vis.selectAll("g.bar")
     .data(data)
-  .enter().append("svg:g")
+    .enter().append("svg:g")
     .attr("class", "bar")
-    .attr("transform", function(d, i) { return "translate(" + labelpad + "," + y(i) + ")"; });
+    .attr("transform", function(d, i) { return "translate(" + labelpad + "," + (y(i) + 10) + ")"; });
 
 bars.append("svg:rect")
     .attr("fill", function(d, i) { return colorlist[i % 2]; } )   //Alternate colors
-    .attr("width", x)
+    .attr("x", function(d) { return x(Math.min(0, d)); })
+    .attr("width", function(d) { return Math.abs(x(d) - x(0)); })
     .attr("height", y.rangeBand());
-
-bars.append("svg:text")
-    .attr("x", 10)
-    .attr("y", 0 + y.rangeBand() / 2)
-    .attr("dx", -6)
-    .attr("dy", ".35em")
-    .style("fill", '#ffffff')
-    .attr("font-size", ".5em")
-    .attr("text-anchor", "start")
-    .text(function(d, i) { return labellist[i]; });
 
 
 var rules = vis.selectAll("g.rule")
     .data(x.ticks(10))
-  .enter().append("svg:g")
+    .enter().append("svg:g")
     .attr("class", "rule")
     .attr("transform", function(d) { return "translate(" + x(d) + ", 0)"; });
 
@@ -333,15 +355,17 @@ rules.append("svg:line")
     .attr("y2", h + 6)
     .attr("x1", labelpad)
     .attr("x2", labelpad)
-    .attr("stroke", "black");
+    .attr("stroke", "black")
+    .attr("stroke-opacity", .7);
 
 rules.append("svg:line")
     .attr("y1", 0)
-    .attr("y2", h)
+    .attr("y2", h - 10)
     .attr("x1", labelpad)
     .attr("x2", labelpad)
-    .attr("stroke", "white")
-    .attr("stroke-opacity", .3);
+    .attr("stroke", "black")
+    .attr("stroke-opacity", .7)
+    .attr("transform", "translate(0,10)");
 
 
 rules.append("svg:text")
@@ -349,8 +373,44 @@ rules.append("svg:text")
     .attr("x", labelpad)
     .attr("dy", ".71em")
     .attr("text-anchor", "middle")
+    .style("fill", 'black')
+    .attr("fill-opacity", .7)
     .attr("font-size", "14px")
     .text(x.tickFormat(10));
+
+
+/*vis.append("svg:text")
+    .attr("x", 10)
+    .attr("y", h + y.rangeBand() / 2)
+    .attr("dx", -15)
+    .attr("dy", ".35em")
+    .style("fill", '#000000')
+    .attr("font-size", ".5em")
+    .attr("text-anchor", "start")
+    .text(function(d, i) { return labellist[i] + " (" + d3.format(".2n")(d) + ")"; });*/
+
+var legend_item_width = 120;
+
+var legend = vis.selectAll(".legend")
+    .data(data)
+    .enter().append("g")
+    .attr("class", "legend")
+    .attr("transform", function(d, i) { return "translate(" + ((i * legend_item_width) - (w / 2)) + "," + (h + 30) + ")"; });
+
+legend.append("rect")
+    .attr("x", w - 18)
+    .attr("width", 18)
+    .attr("height", 18)
+    .style("fill", function(d, i) { return colorlist[i % 2]; });
+
+legend.append("text")
+    .attr("x", w - 24)
+    .attr("y", 9)
+    .attr("dy", ".35em")
+    .attr("font-size", ".75em")
+    .style("fill", '#000000')
+    .style("text-anchor", "end")
+    .text(function(d, i) { return labellist[i] + " (" + d3.format(".2n")(d) + ")"; });
 
 </script>
 
@@ -448,7 +508,7 @@ function ready(err, data) {
     d3.select("#point_differential_well").remove();
     d3.select("#win_loss_well").remove();
   }
-  console.log("hello");
+  //console.log("hello");
 
   //FORMAT data
   data.forEach(function(d) {
@@ -458,7 +518,7 @@ function ready(err, data) {
   });
 
   //d3.select("#point_differential_well").remove();
-  console.log(data);
+  //console.log(data);
 
   //Appends chart headline
   d3.select("#point_differential_head").text("Game Point Differential");
@@ -555,6 +615,11 @@ svg2.selectAll("circle.line")
     d3.select("svg#win_loss_svg")
       .attr("width", w);
 
+    p_d_bar_width = d3.select('#paired-bar-chart').node().clientWidth;
+
+    d3.select("svg#p_d_bar_svg")
+      .attr("width", p_d_bar_width);
+
     //Change the xScale
     xScale
       .range([0, w - newMargin.right]);
@@ -635,6 +700,8 @@ function numTicks(widther) {
 
 
 </div>
+
+
 
 
     <!-- Latest compiled and minified JavaScript -->
@@ -758,6 +825,20 @@ var gauge = function(container, configuration) {
           return config.arcColorFn(d * i);
         })
         .attr('d', arc);
+
+
+    var legend_value = svg.append("g")
+    .attr("class", "value")
+    .attr("transform", "translate(" + (r + 5) + "," + (r + 5) + ")");
+
+    legend_value.append("text")
+        .attr("x", 10)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .attr("font-size", ".85em")
+        .style("fill", '#000000')
+        .style("text-anchor", "end")
+        .text("{{ player.player_summary.win_ratio|floatformat:0}}%");
     
     var lg = svg.append('g')
         .attr('class', 'label')
