@@ -1,0 +1,190 @@
+import os
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.sys.path.insert(0,parentdir) 
+
+from bbtb_site.settings import DATABASES
+import mysql.connector as sql
+import numpy as np
+import pandas as pd
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import train_test_split
+
+import tensorflow as tf
+
+db_connection = sql.connect(host=DATABASES['default']['HOST'], database=DATABASES['default']['NAME'], user=DATABASES['default']['USER'])
+#db_connection = sql.connect(host='127.0.0.1', database='polls', user='root')
+
+#dataset = pd.read_sql('SELECT CAST(p.first_name as CHAR(50)) as player_id, t.point_differential FROM team_manager_team t INNER JOIN team_manager_team_players tp on t.id = tp.team_id INNER JOIN team_manager_player p on tp.player_id = p.id', con=db_connection)
+players_won = pd.read_sql("SELECT CAST(p.first_name as CHAR(50)) as player_id, t.id as team_id, gt.game_id, t.won as won FROM team_manager_team t INNER JOIN team_manager_team_players tp on t.id = tp.team_id INNER JOIN team_manager_player p on tp.player_id = p.id INNER JOIN team_manager_game_teams gt on gt.team_id = t.id WHERE t.name = 'Team A'", con=db_connection)
+players_lost= pd.read_sql("SELECT CAST(p.first_name as CHAR(50)) as player_id, t.id as team_id, gt.game_id, t.won as won FROM team_manager_team t INNER JOIN team_manager_team_players tp on t.id = tp.team_id INNER JOIN team_manager_player p on tp.player_id = p.id INNER JOIN team_manager_game_teams gt on gt.team_id = t.id WHERE t.name = 'Team A'", con=db_connection)
+team_a_results = pd.read_sql("SELECT t.won, t.point_differential, gt.game_id  from team_manager_team t INNER JOIN team_manager_game_teams gt ON t.id = gt.team_id WHERE t.name = 'Team A'", con=db_connection)
+
+players_won["value"] = 1
+players_won =  pd.pivot_table(players_won, values="value", index=["game_id"], columns="player_id", fill_value=0)
+
+players_lost["value"] = 1
+players_lost =  pd.pivot_table(players_lost, values="value", index=["game_id"], columns="player_id", fill_value=0)
+
+
+dataset = players_won.join(players_lost, lsuffix='_team_a', rsuffix='_team_b')
+dataset  =  dataset.join(team_a_results.set_index('game_id'))
+
+print dataset
+
+x = dataset.drop('point_differential', axis=1)
+x = x.drop('won', axis=1)
+y = dataset['won']
+
+#print results
+print 'Logistic Regression accuracy:', np.mean(cross_val_score(LogisticRegression(), x, y, scoring='accuracy', cv = 2))
+print 'MultinominalNB accuracy:', np.mean(cross_val_score(MultinomialNB(), x, y, scoring='accuracy', cv = 2))
+
+
+dataset, validation = train_test_split(dataset, test_size = 0.1)
+train, test = train_test_split(dataset, test_size = 0.1)
+print 'train:', train.shape, 'validation:', validation.shape, 'test:', test.shape
+
+sess = tf.InteractiveSession()
+
+#input/output placeholders
+x_dire    = tf.placeholder("float", shape=[None, 18], name='x_dire')
+x_radiant = tf.placeholder("float", shape=[None, 18], name='x_radiant')
+y_        = tf.placeholder("float", shape=[None, 2], name='y_true')
+
+#we'll use dropout layers for regularisation which need a keep probability
+keep_prob1 = tf.placeholder("float", name='keep_prob1')
+keep_prob2 = tf.placeholder("float", name='keep_prob2')
+
+#there doesn't seem to be any other way to differenciate train and validation summaries for TensorBoard
+loss_name     = tf.placeholder("string", name='loss_name')
+accuracy_name = tf.placeholder("string", name='accuracy_name')
+
+def fc_weight_bias(in_size, out_size):
+	initial_weight = tf.truncated_normal([in_size, out_size], stddev=0.2, mean=0.0)
+	initial_bias = tf.constant(0.1, shape=[out_size])
+	return tf.Variable(initial_weight), tf.Variable(initial_bias)
+
+#first hero layer
+with tf.name_scope("hero_layers_1") as scope:
+	W_hero1, b_hero1 = fc_weight_bias(18,80)
+	#note that dire layer and radiant layer use the same weights and biases
+	dire_layer1 = tf.nn.relu(tf.matmul(x_dire, W_hero1) + b_hero1)
+	radiant_layer1 = tf.nn.relu(tf.matmul(x_radiant, W_hero1) + b_hero1)
+
+#second hero layer
+with tf.name_scope("hero_layers_2") as scope:    
+	W_hero2, b_hero2 = fc_weight_bias(80,80)    
+	#again, dire and radiant use the same weights and biases
+	dire_layer2 = tf.nn.relu(tf.matmul(dire_layer1, W_hero2) + b_hero2)
+	radiant_layer2 = tf.nn.relu(tf.matmul(radiant_layer1, W_hero2) + b_hero2)
+
+#now concatenate the dire and radiant team outputs
+with tf.name_scope("hero_layers_concat") as scope:
+	dire_radiant_concat = tf.concat([dire_layer2, radiant_layer2], 1)
+	dire_radiant_drop = tf.nn.dropout(dire_radiant_concat, keep_prob1)
+	h_drop1 = tf.nn.dropout(dire_radiant_drop, keep_prob1)
+    
+with tf.name_scope("hidden_layer_1") as scope:
+	W_hidden1, b_hidden1 = fc_weight_bias(160,120)    
+	h_hidden1 = tf.nn.relu(tf.matmul(h_drop1, W_hidden1) + b_hidden1)
+	h_drop2 = tf.nn.dropout(h_hidden1, keep_prob2)
+
+with tf.name_scope("hidden_layer_2") as scope:
+	W_hidden2, b_hidden2 = fc_weight_bias(120,75)    
+	h_hidden2 = tf.nn.relu(tf.matmul(h_drop2, W_hidden2) + b_hidden2)
+
+with tf.name_scope("hidden_layer_3") as scope:
+	W_hidden3, b_hidden3 = fc_weight_bias(75,25)    
+	h_hidden3 = tf.nn.relu(tf.matmul(h_hidden2, W_hidden3) + b_hidden3)
+
+
+with tf.name_scope("output_layer") as scope:
+	W_hidden4, b_hidden4 = fc_weight_bias(25,2)    
+	y = tf.nn.softmax(tf.matmul(h_hidden3, W_hidden4) + b_hidden4)
+
+with tf.name_scope("loss_calculations") as scope:
+	cross_entropy = -tf.reduce_sum(y_ * tf.log(y + 1e-8))
+	weights_sum   = tf.add_n([tf.nn.l2_loss(variable) for variable in tf.global_variables()])
+	loss          = cross_entropy + weights_sum
+	mean_loss     = tf.reduce_mean(loss)
+
+with tf.name_scope("trainer") as scope:
+	train_step    = tf.train.AdamOptimizer(0.0001).minimize(loss)
+
+with tf.name_scope("accuracy_calculations") as scope:
+	correct  = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+	accuracy = tf.reduce_mean(tf.cast(correct, "float"))
+
+#summarize the accuracy and loss 
+accuracy_summary = tf.summary.scalar("accuracy_name", accuracy)
+mean_loss_summary = tf.summary.scalar("loss_name", mean_loss)
+
+#summarize the distribution of output values
+y_hist = tf.summary.histogram("y", y)
+
+#gather all summaries
+merged = tf.summary.merge_all()
+
+writer = tf.summary.FileWriter("logdir", sess.graph)
+
+sess.run(tf.global_variables_initializer())
+
+def get_data_feed(dataset, kp1=1.0, kp2=1.0, loss_str='loss', accuracy_str='accuracy'):
+	radiant_data, dire_data = dataset.ix[:,:18], dataset.ix[:,18:36]
+	winners = pd.get_dummies(dataset['won'])
+	return {
+		x_radiant: radiant_data,
+		x_dire: dire_data,
+		y_: winners,
+		loss_name: loss_str,
+		accuracy_name: accuracy_str,
+		keep_prob1: kp1,
+		keep_prob2: kp2
+	} 
+
+train_feed      = get_data_feed(train,      loss_str = 'loss_train',      accuracy_str = 'accuracy_train')
+validation_feed = get_data_feed(validation, loss_str = 'loss_validation', accuracy_str = 'accuracy_validation')
+test_feed       = get_data_feed(test,       loss_str = 'loss_test',       accuracy_str = 'accuracy_test')
+
+def get_batches(dataset, batch_size=512):
+	#randomise before every epoch
+	dataset = dataset.take(np.random.permutation(len(dataset)))
+
+	i = 0
+	while i < len(dataset):
+		yield dataset[i : i + batch_size]
+		i = i + batch_size   
+
+
+for i in range(100):    
+	for mini_batch in get_batches(train):
+		mini_batch_feed = get_data_feed(mini_batch, 0.5, 0.5)   
+		train_step.run(feed_dict = mini_batch_feed)
+
+	#log every epoch
+	train_loss          = loss.eval(feed_dict = train_feed)
+	validation_loss     = loss.eval(feed_dict = validation_feed)
+
+	train_accuracy      = accuracy.eval(feed_dict = train_feed)
+	validation_accuracy = accuracy.eval(feed_dict = validation_feed)
+
+	train_summary_str      = merged.eval(feed_dict = train_feed)
+	validation_summary_str = merged.eval(feed_dict = validation_feed)                
+
+	writer.add_summary(train_summary_str, i)
+	writer.add_summary(validation_summary_str, i)
+	print("epoch %d, loss: %g, train: %g, validation: %g"% (i, train_loss, train_accuracy, validation_accuracy)) 
+
+writer.close()
+
+accuracy.eval(feed_dict=test_feed)
+
+
+
+
+
+
+
+

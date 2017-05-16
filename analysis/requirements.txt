@@ -1,0 +1,4 @@
+pandas
+sklearn
+matplotlib
+mysql-connector==2.1.4

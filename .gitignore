@@ -1,6 +1,9 @@
 */settings.py
 */.DS_Store
 .DS_Store
+polls.back.mysql
+analysis/logdir/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
