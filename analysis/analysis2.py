@@ -14,13 +14,15 @@ from sklearn.decomposition import PCA
 from sklearn import metrics
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
 
 
 db_connection = sql.connect(host=DATABASES['default']['HOST'], database=DATABASES['default']['NAME'], user=DATABASES['default']['USER'])
 
 
 players_won = pd.read_sql("SELECT CAST(p.first_name as CHAR(50)) as player_id, t.id as team_id, gt.game_id, t.won as won FROM team_manager_team t INNER JOIN team_manager_team_players tp on t.id = tp.team_id INNER JOIN team_manager_player p on tp.player_id = p.id INNER JOIN team_manager_game_teams gt on gt.team_id = t.id WHERE t.name = 'Team A'", con=db_connection)
-players_lost= pd.read_sql("SELECT CAST(p.first_name as CHAR(50)) as player_id, t.id as team_id, gt.game_id, t.won as won FROM team_manager_team t INNER JOIN team_manager_team_players tp on t.id = tp.team_id INNER JOIN team_manager_player p on tp.player_id = p.id INNER JOIN team_manager_game_teams gt on gt.team_id = t.id WHERE t.name = 'Team A'", con=db_connection)
+players_lost= pd.read_sql("SELECT CAST(p.first_name as CHAR(50)) as player_id, t.id as team_id, gt.game_id, t.won as won FROM team_manager_team t INNER JOIN team_manager_team_players tp on t.id = tp.team_id INNER JOIN team_manager_player p on tp.player_id = p.id INNER JOIN team_manager_game_teams gt on gt.team_id = t.id WHERE t.name = 'Team B'", con=db_connection)
 team_a_results = pd.read_sql("SELECT t.won, t.point_differential, gt.game_id  from team_manager_team t INNER JOIN team_manager_game_teams gt ON t.id = gt.team_id WHERE t.name = 'Team A'", con=db_connection)
 
 players_won["value"] = 1
@@ -78,28 +80,30 @@ train = dataset.sample(frac=0.8, random_state=1)
 #### Select anything not in the training set and put it in the testing set.
 test = dataset.loc[~dataset.index.isin(train.index)]
 
-### Print the shapes of both sets.
-#print(train.shape)
-#print(test.shape)
 
-# Import the linearregression model.
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import LogisticRegression
+print("\n\n##############################################################")
+print("### Print the shapes of both sets.")
+print("##############################################################")
+print("train: %s" % (','.join(map(str, train.shape))))
+print("test: %s" % (','.join(map(str, test.shape))))
 
 
-# Initialize the model class.
-#model = LinearRegression()
-model = LogisticRegression()
 
 print("\n\n##############################################################")
 print("### Fit the model to the training data.")
 print("##############################################################")
+# Initialize the model class.
+model = LogisticRegression()
 model.fit(train[columns], train[target])
+print(model)
 
 print("\n\n##############################################################")
 print("### predict class labels for the test set")
 print("##############################################################")
 predicted = model.predict(test[columns])
+print "Actual"
+print test[target]
+print "Predicted"
 print predicted
 
 print("\n\n##############################################################")
