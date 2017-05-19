@@ -1,47 +1,30 @@
-import os
-parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-os.sys.path.insert(0,parentdir) 
-
-from bbtb_site.settings import DATABASES
-import mysql.connector as sql
 import numpy as np
 import pandas as pd
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
-
 import tensorflow as tf
 
-db_connection = sql.connect(host=DATABASES['default']['HOST'], database=DATABASES['default']['NAME'], user=DATABASES['default']['USER'])
-#db_connection = sql.connect(host='127.0.0.1', database='polls', user='root')
 
-#dataset = pd.read_sql('SELECT CAST(p.first_name as CHAR(50)) as player_id, t.point_differential FROM team_manager_team t INNER JOIN team_manager_team_players tp on t.id = tp.team_id INNER JOIN team_manager_player p on tp.player_id = p.id', con=db_connection)
-players_won = pd.read_sql("SELECT CAST(p.first_name as CHAR(50)) as player_id, t.id as team_id, gt.game_id, t.won as won FROM team_manager_team t INNER JOIN team_manager_team_players tp on t.id = tp.team_id INNER JOIN team_manager_player p on tp.player_id = p.id INNER JOIN team_manager_game_teams gt on gt.team_id = t.id WHERE t.name = 'Team A'", con=db_connection)
-players_lost= pd.read_sql("SELECT CAST(p.first_name as CHAR(50)) as player_id, t.id as team_id, gt.game_id, t.won as won FROM team_manager_team t INNER JOIN team_manager_team_players tp on t.id = tp.team_id INNER JOIN team_manager_player p on tp.player_id = p.id INNER JOIN team_manager_game_teams gt on gt.team_id = t.id WHERE t.name = 'Team A'", con=db_connection)
-team_a_results = pd.read_sql("SELECT t.won, t.point_differential, gt.game_id  from team_manager_team t INNER JOIN team_manager_game_teams gt ON t.id = gt.team_id WHERE t.name = 'Team A'", con=db_connection)
+NUM_HEROES=27
 
-players_won["value"] = 1
-players_won =  pd.pivot_table(players_won, values="value", index=["game_id"], columns="player_id", fill_value=0)
+print("\n\n##############################################################")
+print("### Load In Data")
+print("##############################################################")
+print("Loading Data")
+dataset = np.load('full_rolm.npz')
+x = dataset['X']
+y = dataset['Y_WON']
 
-players_lost["value"] = 1
-players_lost =  pd.pivot_table(players_lost, values="value", index=["game_id"], columns="player_id", fill_value=0)
-
-
-dataset = players_won.join(players_lost, lsuffix='_team_a', rsuffix='_team_b')
-dataset  =  dataset.join(team_a_results.set_index('game_id'))
-
-print dataset
-
-x = dataset.drop('point_differential', axis=1)
-x = x.drop('won', axis=1)
-y = dataset['won']
 
 #print results
 print 'Logistic Regression accuracy:', np.mean(cross_val_score(LogisticRegression(), x, y, scoring='accuracy', cv = 2))
 print 'MultinominalNB accuracy:', np.mean(cross_val_score(MultinomialNB(), x, y, scoring='accuracy', cv = 2))
 
 
+
+dataset = pd.read_csv('full_rolm.csv', index_col = 0)
 dataset, validation = train_test_split(dataset, test_size = 0.1)
 train, test = train_test_split(dataset, test_size = 0.1)
 print 'train:', train.shape, 'validation:', validation.shape, 'test:', test.shape
@@ -49,8 +32,8 @@ print 'train:', train.shape, 'validation:', validation.shape, 'test:', test.shap
 sess = tf.InteractiveSession()
 
 #input/output placeholders
-x_dire    = tf.placeholder("float", shape=[None, 18], name='x_dire')
-x_radiant = tf.placeholder("float", shape=[None, 18], name='x_radiant')
+x_dire    = tf.placeholder("float", shape=[None, NUM_HEROES], name='x_dire')
+x_radiant = tf.placeholder("float", shape=[None, NUM_HEROES], name='x_radiant')
 y_        = tf.placeholder("float", shape=[None, 2], name='y_true')
 
 #we'll use dropout layers for regularisation which need a keep probability
@@ -68,7 +51,7 @@ def fc_weight_bias(in_size, out_size):
 
 #first hero layer
 with tf.name_scope("hero_layers_1") as scope:
-	W_hero1, b_hero1 = fc_weight_bias(18,80)
+	W_hero1, b_hero1 = fc_weight_bias(NUM_HEROES,80)
 	#note that dire layer and radiant layer use the same weights and biases
 	dire_layer1 = tf.nn.relu(tf.matmul(x_dire, W_hero1) + b_hero1)
 	radiant_layer1 = tf.nn.relu(tf.matmul(x_radiant, W_hero1) + b_hero1)
@@ -132,8 +115,8 @@ writer = tf.summary.FileWriter("logdir", sess.graph)
 sess.run(tf.global_variables_initializer())
 
 def get_data_feed(dataset, kp1=1.0, kp2=1.0, loss_str='loss', accuracy_str='accuracy'):
-	radiant_data, dire_data = dataset.ix[:,:18], dataset.ix[:,18:36]
-	winners = pd.get_dummies(dataset['won'])
+	radiant_data, dire_data = dataset.ix[:,:NUM_HEROES], dataset.ix[:,NUM_HEROES:54]
+	winners = pd.get_dummies(dataset['Won'])
 	return {
 		x_radiant: radiant_data,
 		x_dire: dire_data,
@@ -148,7 +131,7 @@ train_feed      = get_data_feed(train,      loss_str = 'loss_train',      accura
 validation_feed = get_data_feed(validation, loss_str = 'loss_validation', accuracy_str = 'accuracy_validation')
 test_feed       = get_data_feed(test,       loss_str = 'loss_test',       accuracy_str = 'accuracy_test')
 
-def get_batches(dataset, batch_size=512):
+def get_batches(dataset, batch_size=4):
 	#randomise before every epoch
 	dataset = dataset.take(np.random.permutation(len(dataset)))
 

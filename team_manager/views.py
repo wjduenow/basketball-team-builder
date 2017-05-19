@@ -194,11 +194,11 @@ def view_gym_session(request, gym_session_id=None):
     session_start_time = "Session DB Start: %s - Today: %s" % ((gym_session.start_time - timedelta(hours=7)).date(), today)
     print today
 
-    if (gym_session.start_time - timedelta(hours=7)).date() == today:
-        print "This Session is Today"
-        template = loader.get_template('team_manager/start_gym_slot_session.html')
-    else:
-        template = loader.get_template('team_manager/gym_slot_session.html')
+    #if (gym_session.start_time - timedelta(hours=7)).date() == today:
+    #    print "This Session is Today"
+    template = loader.get_template('team_manager/start_gym_slot_session.html')
+    #else:
+    #template = loader.get_template('team_manager/gym_slot_session.html')
     
 
     available_players = Player.objects.exclude(pk__in=gym_session.players.values_list('id', flat=True)).filter(pk__in=gym_session.gym_slot.players.values_list('id', flat=True))

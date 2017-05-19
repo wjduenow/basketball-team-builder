@@ -6,6 +6,9 @@ from bbtb_site.settings import DATABASES
 import mysql.connector as sql
 import numpy as np
 import json
+from scipy import sparse
+import collections
+
 
 
 
@@ -62,9 +65,14 @@ print "NUM_FEATURES=%s" % (num_features)
 X = np.zeros((num_games, num_features), dtype=np.int8)
 
 # Initialize training label vector
-Y_WON = np.zeros(num_games, dtype=np.int8)
-Y_PD = np.zeros(num_games, dtype=np.int8)
+Y_WON = np.zeros((num_games, 1), dtype=np.int8)
+Y_PD = np.zeros((num_games, 1), dtype=np.int8)
+INDEX = np.zeros((num_games, 1), dtype=np.int8)
 
+i = 1
+while i < num_games:
+    INDEX[i] = i - 1
+    i+= 1
 
 #Set Win/Loss Values
 i = 0
@@ -103,10 +111,7 @@ X_train = X[train_indices]
 Y_train_won = Y_WON[train_indices]
 Y_train_pd = Y_PD[train_indices]
 
-print "Saving output file now..."
-np.savez_compressed('test_rolm.npz', X=X_test, Y_WON=Y_test_won,  Y_PD=Y_test_pd)
-np.savez_compressed('train_rolm.npz', X=X_train, Y_WON=Y_train_won,  Y_PD=Y_train_pd)
-
+print "Saving output files now..."
 columns = {}
 for k,player in dict_players.items():
     columns[k] = "Team_A_%s" % (player)
@@ -116,6 +121,20 @@ for k,player in dict_players.items():
 
 with open('columns.json', 'w') as fout:
     json.dump(columns, fout)
+
+
+arr_columns = list(item for k,item in collections.OrderedDict(sorted(columns.items())).items())
+arr_columns.append("Won")
+
+
+output = np.hstack((X,Y_WON)) 
+output = np.hstack((INDEX, output))
+np.savetxt('full_rolm.csv', output, delimiter=',', header = (",").join(arr_columns))
+#np.savez_compressed('full_rolm.npz', X=X, Y_WON=Y_WON,  Y_PD=Y_PD)
+#np.savez_compressed('test_rolm.npz', X=X_test, Y_WON=Y_test_won,  Y_PD=Y_test_pd)
+#np.savez_compressed('train_rolm.npz', X=X_train, Y_WON=Y_train_won,  Y_PD=Y_train_pd)
+
+
 
 
 
