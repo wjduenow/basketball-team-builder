@@ -3,3 +3,6 @@ Django==1.10.6
 yml
 sqlparse
 django-mathfilters
+pandas
+sklearn
+scipy

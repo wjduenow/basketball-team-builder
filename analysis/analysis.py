@@ -12,6 +12,9 @@ from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import mean_squared_error
 import json
+from collections import OrderedDict
+
+
 
 
 print("\n\n##############################################################")
@@ -98,9 +101,19 @@ print("### print player coefficients")
 print("##############################################################")
 #for entry in list(zip(train[columns], np.transpose(model.coef_))):
 i = 0
+player_scores = {}
 for entry in np.transpose(model.coef_):
-    print "%-30s %-4.2f" % (model_columns[str(i)], entry)
+    column_name = model_columns[str(i)]
+    player_key = unicode.replace(column_name, 'Team_A_', '')
+    player_key = unicode.replace(player_key, 'Team_B_', '')
+    player_scores[player_key] = entry[0]
     i += 1
+
+player_scores = OrderedDict(sorted(player_scores.items(), key=lambda kv: kv[1], reverse=True))
+
+for k,v in player_scores.items():
+#collections.OrderedDict(sorted(player_scores.items())).items():
+    print "%-30s %-4.2f" % (k, v)
 
 print("\n\n##############################################################")
 print("### Compute error between our test predictions and the actual values")
@@ -109,5 +122,5 @@ print("##############################################################")
 predictions = model.predict(X_test)
 
 # Compute error between our test predictions and the actual values.
-print(mean_squared_error(predictions, Y_test_won))
+print(mean_squared_error(predictions, Y_test))
 

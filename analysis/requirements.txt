@@ -1,4 +1,5 @@
 pandas
 sklearn
 matplotlib
+scipy
 mysql-connector==2.1.4

@@ -13,10 +13,9 @@ print("\n\n##############################################################")
 print("### Load In Data")
 print("##############################################################")
 print("Loading Data")
-dataset = np.load('full_rolm.npz')
-x = dataset['X']
-y = dataset['Y_WON']
-
+dataset = pd.read_csv('full_rolm.csv', index_col = 0)
+x = dataset.drop('Won', axis=1)
+y = dataset['Won']
 
 #print results
 print 'Logistic Regression accuracy:', np.mean(cross_val_score(LogisticRegression(), x, y, scoring='accuracy', cv = 2))
@@ -24,7 +23,7 @@ print 'MultinominalNB accuracy:', np.mean(cross_val_score(MultinomialNB(), x, y,
 
 
 
-dataset = pd.read_csv('full_rolm.csv', index_col = 0)
+
 dataset, validation = train_test_split(dataset, test_size = 0.1)
 train, test = train_test_split(dataset, test_size = 0.1)
 print 'train:', train.shape, 'validation:', validation.shape, 'test:', test.shape
@@ -131,7 +130,7 @@ train_feed      = get_data_feed(train,      loss_str = 'loss_train',      accura
 validation_feed = get_data_feed(validation, loss_str = 'loss_validation', accuracy_str = 'accuracy_validation')
 test_feed       = get_data_feed(test,       loss_str = 'loss_test',       accuracy_str = 'accuracy_test')
 
-def get_batches(dataset, batch_size=4):
+def get_batches(dataset, batch_size=64):
 	#randomise before every epoch
 	dataset = dataset.take(np.random.permutation(len(dataset)))
 
@@ -141,7 +140,7 @@ def get_batches(dataset, batch_size=4):
 		i = i + batch_size   
 
 
-for i in range(100):    
+for i in range(50):    
 	for mini_batch in get_batches(train):
 		mini_batch_feed = get_data_feed(mini_batch, 0.5, 0.5)   
 		train_step.run(feed_dict = mini_batch_feed)
@@ -162,7 +161,7 @@ for i in range(100):
 
 writer.close()
 
-accuracy.eval(feed_dict=test_feed)
+print accuracy.eval(feed_dict=test_feed)
 
 
 

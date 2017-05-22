@@ -62,17 +62,12 @@ num_players = len(dict_players)
 num_features = num_players * 2
 print "NUM_HEROES=%s" % (num_players)
 print "NUM_FEATURES=%s" % (num_features)
-X = np.zeros((num_games, num_features), dtype=np.int8)
+X = np.zeros((num_games, num_features), dtype=np.int32)
 
 # Initialize training label vector
-Y_WON = np.zeros((num_games, 1), dtype=np.int8)
-Y_PD = np.zeros((num_games, 1), dtype=np.int8)
-INDEX = np.zeros((num_games, 1), dtype=np.int8)
+Y_WON = np.zeros((num_games, 1), dtype=np.int32)
+Y_PD = np.zeros((num_games, 1), dtype=np.int32)
 
-i = 1
-while i < num_games:
-    INDEX[i] = i - 1
-    i+= 1
 
 #Set Win/Loss Values
 i = 0
@@ -125,14 +120,31 @@ with open('columns.json', 'w') as fout:
 
 arr_columns = list(item for k,item in collections.OrderedDict(sorted(columns.items())).items())
 arr_columns.append("Won")
+arr_columns.insert(0, '')
 
 
 output = np.hstack((X,Y_WON)) 
-output = np.hstack((INDEX, output))
-np.savetxt('full_rolm.csv', output, delimiter=',', header = (",").join(arr_columns))
-#np.savez_compressed('full_rolm.npz', X=X, Y_WON=Y_WON,  Y_PD=Y_PD)
-#np.savez_compressed('test_rolm.npz', X=X_test, Y_WON=Y_test_won,  Y_PD=Y_test_pd)
-#np.savez_compressed('train_rolm.npz', X=X_train, Y_WON=Y_train_won,  Y_PD=Y_train_pd)
+output_big = output
+
+i = 1
+total_rows  = 0
+while i < 10:
+    output_big = np.vstack((output, output_big)) 
+    total_rows = total_rows + output.shape[0]
+    print "total rows: %s" % (total_rows)
+    print "Appending %s iteration for %s total rows" % (i, output_big.shape)
+    i+= 1
+
+print len(output_big)
+id = [i for i in xrange(1,len(output_big)+1)]
+
+output_big = np.insert(output_big, 0, id, axis=1)
+
+
+np.savetxt('full_rolm.csv', output_big, fmt='%d', delimiter=',', header = (",").join(arr_columns))
+np.savez_compressed('full_rolm.npz', X=X, Y_WON=Y_WON,  Y_PD=Y_PD)
+np.savez_compressed('test_rolm.npz', X=X_test, Y_WON=Y_test_won,  Y_PD=Y_test_pd)
+np.savez_compressed('train_rolm.npz', X=X_train, Y_WON=Y_train_won,  Y_PD=Y_train_pd)
 
 
 
