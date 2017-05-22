@@ -62,9 +62,14 @@ def index(request):
     active_games = Game.objects.filter(end_time = None)
     active_sessions = GymSession.objects.filter(created_at__date = datetime.now())
 
+
+    total_games = Game.objects.all().aggregate(played=Count('id'))
+    leader_qualified_games = int(total_games['played'] * .25)
+    tandem_qualified_games = int(total_games['played'] * .10)
+
     ### Leaderboard Stuff
     player_summary = []
-    ps = PlayerSummary.objects.values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential')).filter(played__sum__gt=2)
+    ps = PlayerSummary.objects.values('player_id').annotate(played__sum=Sum('played'), won__sum = Sum('won'), point_differential__avg = Avg('point_differential')).filter(played__sum__gt=leader_qualified_games)
     for p in ps:
         p['win_ratio'] = p['won__sum'] / p['played__sum']
         p['player'] = Player.objects.get(id = p['player_id'])
@@ -74,11 +79,11 @@ def index(request):
     ps_point_differential = sorted(ps, key=itemgetter('point_differential__avg'), reverse=True)[:5]
     ps_point_differential_bad = sorted(ps, key=itemgetter('point_differential__avg'), reverse=False)[:5]
 
-    best_tandem_point_differential = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("-point_differential")[:5]
-    best_tandem_win_ratio = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("-win_loss")[:5]
+    best_tandem_point_differential = PlayerPlayerSummary.objects.filter(played__gt=tandem_qualified_games).order_by("-point_differential")[:5]
+    best_tandem_win_ratio = PlayerPlayerSummary.objects.filter(played__gt=tandem_qualified_games).order_by("-win_loss")[:5]
 
-    best_tandem_point_differential_bad = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("point_differential")[:5]
-    best_tandem_win_ratio_bad = PlayerPlayerSummary.objects.filter(played__gt=4).order_by("win_loss")[:5]
+    best_tandem_point_differential_bad = PlayerPlayerSummary.objects.filter(played__gt=tandem_qualified_games).order_by("point_differential")[:5]
+    best_tandem_win_ratio_bad = PlayerPlayerSummary.objects.filter(played__gt=tandem_qualified_games).order_by("win_loss")[:5]
 
     context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 
                 'active_sessions': active_sessions, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential, 

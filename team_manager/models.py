@@ -143,6 +143,7 @@ class PlayerPlayerSummary(models.Model):
         players1 = Player.objects.all()
         players2 = Player.objects.all()
 
+        computed_pairs = []
         with connection.cursor() as cursor:
             cursor.execute("TRUNCATE player_player_stats;")
 
@@ -150,8 +151,14 @@ class PlayerPlayerSummary(models.Model):
                 for other_player in players2:
                     str_sql = summary_sql.replace("PLAYER1", str(player.id)).replace("PLAYER2", str(other_player.id))
 
+                    pair_key1 = "%s-%s" % (player.id, other_player.id)
+                    pair_key2 = "%s-%s" % (other_player.id, player.id)
+
+                    #if (pair_key1 not in computed_pairs) and (pair_key2 not in computed_pairs):
                     print str_sql
                     cursor.execute(str_sql)
+                    #    computed_pairs.append(pair_key1)
+                    #    computed_pairs.append(pair_key2)
 
 class GymSlot(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
