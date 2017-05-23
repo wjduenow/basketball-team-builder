@@ -4,6 +4,15 @@
 polls.back.mysql
 analysis/logdir/
 
+# Analysis Datasets
+analysis/full_rolm.csv
+analysis/full_rolm.npz
+columns.json
+full_rolm.csv
+full_rolm.npz
+test_rolm.npz
+train_rolm.npz
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

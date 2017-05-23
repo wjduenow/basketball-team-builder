@@ -36,6 +36,8 @@ class Player(models.Model):
     last_game_id = models.IntegerField(blank=True, null=True)
     ninety_day_games_played = models.FloatField(default=2)
     ninety_day_plus_minus = models.FloatField(default=2)
+    win_contribution = models.FloatField(default=0)
+    score_contribution = models.FloatField(default=0)
     ninety_day_win_percentage = models.FloatField(default=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

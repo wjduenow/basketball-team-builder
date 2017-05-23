@@ -2,7 +2,6 @@
 # http://nbviewer.jupyter.org/gist/justmarkham/6d5c061ca5aee67c4316471f8c2ae976
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn import metrics
@@ -13,7 +12,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import mean_squared_error
 import json
 from collections import OrderedDict
-
 
 
 
@@ -37,10 +35,7 @@ print("Loading Columns")
 with open('columns.json') as data_file:    
     model_columns = json.load(data_file)
 
-# Make a histogram of all the ratings in the average_rating column.
-#plt.hist(Y_train)
-# Show the plot.
-#plt.show()
+
 
 print("\n\n##############################################################")
 print("### Print the shapes of both sets.")
