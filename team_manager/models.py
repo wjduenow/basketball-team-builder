@@ -128,7 +128,7 @@ class PlayerPlayerSummary(models.Model):
 
     @classmethod
     def update(cls):
-        summary_sql = """   INSERT INTO player_player_stats (SELECT UUID() as id, my_teams.player_id as my_player_id, their_teams.player_id as their_player_id, sum(1) as played, SUM(won) as won, (sum(won)/Sum(1)) as win_loss, AVG(t.point_differential) as point_differential, "WITH" as relationship
+        summary_sql_with = """   INSERT INTO player_player_stats (SELECT UUID() as id, my_teams.player_id as my_player_id, their_teams.player_id as their_player_id, sum(1) as played, SUM(won) as won, (sum(won)/Sum(1)) as win_loss, AVG(t.point_differential) as point_differential, "WITH" as relationship
                     FROM team_manager_team_players my_teams 
                     INNER JOIN team_manager_team_players their_teams on my_teams.team_id = their_teams.team_id
                     INNER JOIN team_manager_team t ON my_teams.team_id = t.id
@@ -142,6 +142,28 @@ class PlayerPlayerSummary(models.Model):
                     AND gs.created_at > DATE_SUB(NOW(), INTERVAL 180 DAY) 
                     GROUP BY 1,2);"""
 
+        summary_sql_against = """   INSERT INTO player_player_stats (SELECT 
+                                     UUID() as id, 
+                                     me.player_id as my_player_id, 
+                                     them.player_id as their_player_id, 
+                                     sum(1) as played,
+                                     SUM(won) as won, (sum(won)/Sum(1)) as win_loss, AVG(point_differential) as point_differential, "OPP"
+                                FROM 
+                                (SELECT gt.game_id, my_teams.team_id, my_teams.player_id, t.won, t.point_differential
+                                FROM team_manager_team_players my_teams 
+                                INNER JOIN team_manager_team t ON my_teams.team_id = t.id
+                                INNER JOIN team_manager_game_teams gt ON gt.team_id = t.id 
+                                WHERE my_teams.player_id=PLAYER1) me
+                                INNER JOIN 
+                                (SELECT gt.game_id, their_teams.team_id, their_teams.player_id
+                                FROM team_manager_team_players their_teams 
+                                INNER JOIN team_manager_team t ON their_teams.team_id = t.id
+                                INNER JOIN team_manager_game_teams gt ON gt.team_id = t.id 
+                                WHERE their_teams.player_id=PLAYER2) them
+                                ON me.game_id = them.game_id
+                                WHERE me.team_id <> them.team_id
+                                GROUP BY 1,2);"""
+
         players1 = Player.objects.all()
         players2 = Player.objects.all()
 
@@ -151,14 +173,19 @@ class PlayerPlayerSummary(models.Model):
 
             for player in players1:
                 for other_player in players2:
-                    str_sql = summary_sql.replace("PLAYER1", str(player.id)).replace("PLAYER2", str(other_player.id))
+                    str_sql_w = summary_sql_with.replace("PLAYER1", str(player.id)).replace("PLAYER2", str(other_player.id))
+                    str_sql_a = summary_sql_against.replace("PLAYER1", str(player.id)).replace("PLAYER2", str(other_player.id))
 
                     pair_key1 = "%s-%s" % (player.id, other_player.id)
                     pair_key2 = "%s-%s" % (other_player.id, player.id)
 
                     #if (pair_key1 not in computed_pairs) and (pair_key2 not in computed_pairs):
-                    print str_sql
-                    cursor.execute(str_sql)
+                    print str_sql_w
+                    cursor.execute(str_sql_w)
+
+                    print str_sql_a
+                    cursor.execute(str_sql_a)
+
                     #    computed_pairs.append(pair_key1)
                     #    computed_pairs.append(pair_key2)
 
