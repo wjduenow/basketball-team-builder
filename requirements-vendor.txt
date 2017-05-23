@@ -4,3 +4,4 @@ django-mathfilters
 pandas
 sklearn
 scipy
+numpy

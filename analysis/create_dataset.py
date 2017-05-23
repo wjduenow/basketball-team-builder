@@ -12,6 +12,8 @@ import collections
 
 def create():
 
+    print DATABASES
+
     db_connection = sql.connect(host=DATABASES['default']['HOST'], database=DATABASES['default']['NAME'], user=DATABASES['default']['USER'])
     cursor = db_connection.cursor()
 
