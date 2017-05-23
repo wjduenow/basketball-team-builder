@@ -20,7 +20,7 @@ from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats,
 from django.db.models import Count, Avg, Sum, Min, Max
 from operator import itemgetter
 from collections import defaultdict
-from analysis import analysis2, create_dataset
+from analysis import analysis2, create_dataset, analysis
 
 #from google.appengine.api.taskqueue import taskqueue
 
@@ -554,6 +554,12 @@ def update_game_stats(request):
     for id, value in win_contributions.items():
             player = Player.objects.get(id = id)
             player.win_contribution = value
+            player.save()
+
+    score_contributions = analysis.score_factors()
+    for id, value in score_contributions.items():
+            player = Player.objects.get(id = id)
+            player.score_contribution = value
             player.save()
 
     return HttpResponseRedirect('/')

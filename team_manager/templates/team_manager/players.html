@@ -27,6 +27,8 @@
                         <th class="td-name" data-sortable="true">Games Played</th>
                         <th class="td-name" data-sortable="true">Win %</th>
                         <th class="td-name" data-sortable="true">+/-</th>
+                        <th class="td-name" data-sortable="true">Win Factor-</th>
+                        <th class="td-name" data-sortable="true">Score Factor-</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,6 +49,8 @@
                          <td class="td-name">{{player.game_summary.played__sum}}</td>
                          <td class="td-name">{{player.game_summary.win_ratio|floatformat:2}}</td>
                          <td class="td-name">{{player.game_summary.point_differential__avg|floatformat:2}}</td>
+                         <td class="td-name">{{player.win_contribution|floatformat:2}}</td>
+                         <td class="td-name">{{player.score_contribution|floatformat:2}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
