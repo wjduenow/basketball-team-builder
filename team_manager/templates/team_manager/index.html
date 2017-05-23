@@ -1,6 +1,19 @@
 {% include 'team_manager/partial-user-menu.html' %}
 
+<style>
 
+.list-group-item-pink {
+  background: pink;
+  color: #FFFFFF; 
+}
+
+.list-group-item-purple {
+  background: purple;
+  color: #FFFFFF; 
+}
+
+
+</style>
 
 <!-- main content -->
 
@@ -145,8 +158,12 @@
 
     <div class="col-sm-6">
       <div class="list-group z-depth-3">
-        <a href="#" class="list-group-item list-group-item-warning">
-          <span class="fa fa-handshake-o fa-lg" aria-hidden="true"></span> <strong>Opponent:</strong> Win Percentage
+        <a href="#" class="list-group-item list-group-item-pink white-text">
+        <span class="fa-stack">
+          <i class="fa fa-handshake-o fa-stack-1x"></i>
+          <i class="fa fa-ban fa-stack-2x text-danger"></i>
+        </span>
+        <strong>Opponent:</strong> Win Percentage
         </a>
         {% if best_opponent_win_ratio %}
           {% for ps in best_opponent_win_ratio %}
@@ -160,8 +177,12 @@
 
     <div class="col-sm-6">
       <div class="list-group z-depth-3">
-        <a href="#" class="list-group-item list-group-item-success">
-          <span class="fa fa-thumbs-up fa-lg" aria-hidden="true"></span> <strong>Opponent:</strong> Point Differential
+        <a href="#" class="list-group-item list-group-item-purple white-text">
+        <span class="fa-stack">
+          <i class="fa fa-thumbs-up fa-stack-1x"></i>
+          <i class="fa fa-ban fa-stack-2x text-danger"></i>
+        </span>
+           <strong>Opponent:</strong> Point Differential
         </a>
         {% if best_opponent_point_differential %}
           {% for ps in best_opponent_point_differential %}
@@ -247,8 +268,12 @@
 
     <div class="col-sm-6">
       <div class="list-group z-depth-3">
-        <a href="#" class="list-group-item list-group-item-warning">
-          <span class="fa fa-hand-stop-o fa-lg" aria-hidden="true"></span> <strong>Opponent:</strong> Worst Win Percentage
+        <a href="#" class="list-group-item list-group-item-pink white-text">
+        <span class="fa-stack">
+          <i class="fa fa-hand-stop-o fa-stack-1x"></i>
+          <i class="fa fa-ban fa-stack-2x text-danger"></i>
+        </span>
+          <strong>Opponent:</strong> Worst Win Percentage
         </a>
         {% if best_opponent_win_ratio_bad %}
           {% for ps in best_opponent_win_ratio_bad %}
@@ -262,8 +287,12 @@
 
     <div class="col-sm-6">
       <div class="list-group z-depth-3">
-        <a href="#" class="list-group-item list-group-item-success">
-          <span class="fa fa-thumbs-down fa-lg" aria-hidden="true"></span> <strong>Opponent:</strong> Worst Point Differential
+        <a href="#" class="list-group-item list-group-item-purple white-text">
+        <span class="fa-stack">
+          <i class="fa fa-thumbs-down fa-stack-1x"></i>
+          <i class="fa fa-ban fa-stack-2x text-danger"></i>
+        </span>
+          <strong>Opponent:</strong> Worst Point Differential
         </a>
         {% if best_opponent_point_differential_bad %}
           {% for ps in best_opponent_point_differential_bad %}
