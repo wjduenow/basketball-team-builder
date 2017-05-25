@@ -82,7 +82,7 @@ path.line
 }
 
 .table-condensed{
-    font-size: 11px;
+    font-size: 12px;
 }
 
 
@@ -95,8 +95,8 @@ tbody td, thead th {
 }
 
 thead {
-    background-color: #2780e3;
-    font-size: 14px;
+    background-color: #19227c;
+    font-size: 13px;
     color: #fff;
 
     border-radius: @border-radius-base;
