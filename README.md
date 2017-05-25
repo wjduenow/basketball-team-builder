@@ -8,3 +8,7 @@ example app to deploy.
 
 # Tutorial
 See our [Running Django in the App Engine Standard Environment](https://cloud.google.com/python/django/appengine) tutorial for instructions for setting up and deploying this sample application.
+
+
+# Color Scheme
+https://material.io/color/#!/?view.left=0&view.right=0&primary.color=19227c&secondary.color=d81b60

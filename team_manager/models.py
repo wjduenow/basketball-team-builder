@@ -424,7 +424,7 @@ class Game(models.Model):
         return "%s: %s (%s)"  % (self.name, self.start_time, self.game_duration_friendly)
 
     def end_game(self):
-        self.end_time = datetime.now() + timedelta(hours=7)
+        self.end_time = datetime.now() - timedelta(hours=7)
         self.save()
 
     @property
