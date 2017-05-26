@@ -215,13 +215,16 @@ class GymSlot(models.Model):
     @property
     def location_parsed(self):
         if self.location != None:
-            new_location_list = self.location.split(",")
-            new_location = {}
-            new_location['name'] = new_location_list[0]
-            new_location['street'] = new_location_list[1]
-            new_location['city'] = new_location_list[2]
-            new_location['state'] = new_location_list[3].split()[0]
-            new_location['zipcode'] = new_location_list[3].split()[1]
+            try:
+                new_location_list = self.location.split(",")
+                new_location = {}
+                new_location['name'] = new_location_list[0]
+                new_location['street'] = new_location_list[1]
+                new_location['city'] = new_location_list[2]
+                new_location['state'] = new_location_list[3].split()[0]
+                new_location['zipcode'] = new_location_list[3].split()[1]
+            except:
+                new_location = self.location
 
             return new_location
         else:

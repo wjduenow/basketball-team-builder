@@ -48,6 +48,13 @@
             <h6>Blackout Dates:</h6>{{gym_slot.black_out_dates_parsed}}
           </div>
         </div>
+        <div class="card-footer">
+        {% if user.is_superuser %}
+          <a class="btn btn-success waves-effect pull-right" href="/edit_gym_slot/{{gym_slot.id}}">Edit
+                    <i class="fa fa-edit" aria-hidden="true"></i>
+          </a>
+         {% endif %}
+        </div>
       </div>
       <br/>
 

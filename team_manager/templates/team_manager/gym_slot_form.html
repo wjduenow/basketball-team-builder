@@ -1,0 +1,223 @@
+{% include 'team_manager/partial-user-menu.html' %}
+
+
+ <!-- main content -->
+
+     <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li><a href="/gym_slots">Gym Slots</a></li>
+        <li class="active">Add/Edit Gym Slot</li>
+    </ol>
+    
+<div class="container theme-showcase" role="main">
+
+    <div class="page-header">
+        <h4>Gym Slot: {{gym_slot}}</h4>
+    </div>
+
+    <div class="container">
+
+
+<form action="/add_update_gym_slot" method="POST">
+
+{% csrf_token %}
+        <div class="col-sm-6">
+            <div class="list-group" id="list2">
+
+
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                            <h3 class="panel-title">{{ gym_slot }}</h3>
+                    </div>
+
+                    <div class="panel-body" id="{{team}}">
+                            {{ form.as_p }}
+                            {% if gym_slot.id %}
+                              <input type="hidden" name="gym_slot_id" value="{{gym_slot.id}}">
+                            {% endif %}
+
+                    </div>
+
+                    <div class="panel-footer">
+                            <button class="btn btn-success" type="submit" name="action">Save
+                                <span class="fa fa-save" aria-hidden="true"></span>
+                            </button>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+
+
+        <div class="col-sm-6" id="general-content" >
+          <div class="list-group z-depth-3" id="list1">
+                <div class="list-group-item active" id="players">Players</div>
+                {% for player in gym_slot.players.all %}
+                    <div id="player_{{player.id}}" class="list-group-item player">
+                        {{player.first_name}} {{player.last_name}} - {{player.position}}                        
+                        <a class="red-text removeplayer pull-right"><i class="fa fa-times fa-lg"></i></a>
+                        <input type="hidden" name="player_id" value="{{ player.id }}">
+                    </div>
+                {% endfor %}
+
+                    <div class="list-group-item">
+                      <button type="button" class="btn btn-primary show_players btn-block z-depth-3" data-toggle="modal" data-target="#myModal"> Add Players 
+                          <span class="fa fa-plus" aria-hidden="true"></span>
+                      </button>
+                    </div>
+          </div><!-- end list -->
+        </div><!-- end col -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add Players to Team</h4>
+
+      </div>
+      <div class="modal-body">
+
+        <div class="list-group" id="available_players">
+                  
+
+
+          {% for player in available_players %}
+              <div class="list-group-item player">
+                {{player}} - {{player.position}}
+                 <a class="green-text addplayer pull-right"><i class="fa fa-plus fa-lg"></i></a>
+                <input type="hidden" name="player_id" value="{{ player.id }}">
+              </div>
+          {% endfor %}
+
+          </div><!-- end list -->
+
+
+
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-default" data-dismiss="modal">Close</a>
+      </div>
+    </div>
+  </div>
+<!-- End Modal -->
+
+    </div>
+
+
+</div>
+
+
+    <!-- Latest compiled and minified JavaScript -->
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+<script type="text/javascript">
+
+$( "button.show_players" ).click(function(e) {
+    team_to_add_to = $( this ).find('input[name="team"]').val();
+});
+    
+$( "a.removeplayer" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.player');
+    remove_player(player);
+
+});
+
+$( "a.addplayer" ).click(function(e) {
+    e.preventDefault();
+
+    var player = $( this ).closest('div.player');
+    add_player(player);
+
+});
+
+function add_player(player) {
+
+    var btn_ok = player.find('i.fa');
+    btn_ok.toggleClass('fa-plus fa-remove');
+
+    var player_id = player.find('input[name="player_id"]').val();
+
+    var btn = player.find('a.addplayer');
+    btn.toggleClass('green-text red-text');
+    btn.toggleClass('addplayer removeplayer');
+
+    var team_div = $('#players');
+    add_player_to_gym_slot(player_id, {{gym_slot.id}});
+    team_div.append(player);
+
+    btn.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        remove_player(player);
+    })
+
+}
+
+function remove_player(player) {
+
+    var btn_ok = player.find('i.fa');
+    btn_ok.toggleClass('fa-times fa-plus');
+
+    var player_id = player.find('input[name="player_id"]').val();
+
+    var btn = player.find('a.removeplayer');
+    btn.toggleClass('green-text red-text');
+    btn.toggleClass('removeplayer addplayer');
+
+    var available_players = $("#available_players");
+    
+    remove_player_from_gym_slot(player_id, {{gym_slot.id}});
+    available_players.append(player);
+
+    btn.unbind('click', arguments.callee).click(function(e){
+        e.preventDefault();
+        add_player(player);
+    })
+
+}
+
+function add_player_to_gym_slot(player, gym_slot) {
+    $.ajax({
+        url: "/add_player_to_gym_slot",
+        type: "POST",
+        dataType: 'json',
+        data: {
+          'csrfmiddlewaretoken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+          'player_id': player, 
+          'gym_slot_id': gym_slot
+        }
+        
+    });
+}
+
+function remove_player_from_gym_slot(player, gym_slot) {
+    $.ajax({
+        url: "/remove_player_from_gym_slot",
+        type: "POST",
+        dataType: 'json',
+        data: {
+            'csrfmiddlewaretoken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            'player_id': player, 
+            'gym_slot_id': gym_slot
+        }
+       
+    });
+}
+
+</script>
+
+  </body>
+</html>

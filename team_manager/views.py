@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 import json
 import operator
 from django.http import JsonResponse
-from .forms import PlayerForm
+from .forms import PlayerForm, GymSlotForm
 from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats, PlayerSummary, PlayerPlayerSummary
 from django.db.models import Count, Avg, Sum, Min, Max
 from operator import itemgetter
@@ -194,6 +194,62 @@ def add_update_player(request):
 
     context = ({'player': player, 'form': form})
     return HttpResponse(template.render(context, request))
+
+@login_required 
+def gym_slots(request):
+    template = loader.get_template('team_manager/gym_slots.html')
+    gym_slots = GymSlot.objects.all
+
+    context = ({'gym_slots': gym_slots})
+    return HttpResponse(template.render(context, request))
+
+@login_required    
+def new_gym_slot(request):
+    template = loader.get_template('team_manager/gym_slot_form.html')
+    gym_slot = "Add Gym Slot"
+    form = GymSlotForm()
+
+    context = ({'gym_slot': gym_slot, 'form': form})
+    return HttpResponse(template.render(context, request))
+
+@login_required    
+def edit_gym_slot(request, gym_slot_id=None):
+    template = loader.get_template('team_manager/gym_slot_form.html')
+    gym_slot = GymSlot.objects.get(id = gym_slot_id)
+    available_players = Player.objects.exclude(pk__in=gym_slot.players.values_list('id', flat=True))
+
+    form = GymSlotForm(instance=gym_slot)
+
+    context = ({'gym_slot': gym_slot, 'form': form, 'available_players': available_players})
+    return HttpResponse(template.render(context, request))
+
+@login_required    
+def add_update_gym_slot(request):
+    #print request.POST.dict
+    print request.POST.getlist('gym_slot*')
+    template = loader.get_template('team_manager/gym_slot_form.html')
+    available_players = ''
+    
+
+    if request.method == "POST":
+        if 'gym_slot_id' in request.POST:
+            gym_slot = GymSlot.objects.get(id = request.POST['gym_slot_id'])
+            form = GymSlotForm(request.POST, instance=gym_slot)
+            available_players = Player.objects.exclude(pk__in=gym_slot.players.values_list('id', flat=True))
+
+        else: 
+            form = GymSlotForm(request.POST)
+
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.save()
+            return redirect('/')
+    else:
+        form = PostForm()
+
+    context = ({'gym_slot': gym_slot, 'form': form, 'available_players': available_players})
+    return HttpResponse(template.render(context, request))
+
 
 @login_required    
 def edit_player(request, player_id=None):
@@ -623,6 +679,30 @@ def remove_player_from_team(request):
     team = Team.objects.get(id = request.POST['team_id'])
     player = Player.objects.get(id = request.POST['player_id'])
     team.players.remove(player)
+
+    data = {'success': True}
+
+    return JsonResponse(data)
+
+@login_required    
+@require_http_methods(["POST"])
+def add_player_to_gym_slot(request):
+    print request.POST.dict
+    gym_slot = GymSlot.objects.get(id = request.POST['gym_slot_id'])
+    player = Player.objects.get(id = request.POST['player_id'])
+    gym_slot.players.add(player)
+
+    data = {'success': True}
+
+    return JsonResponse(data)
+
+@login_required    
+@require_http_methods(["POST"])
+def remove_player_from_gym_slot(request):
+    print request.POST.dict
+    gym_slot = GymSlot.objects.get(id = request.POST['gym_slot_id'])
+    player = Player.objects.get(id = request.POST['player_id'])
+    gym_slot.players.remove(player)
 
     data = {'success': True}
 
