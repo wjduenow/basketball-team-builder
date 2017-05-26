@@ -236,7 +236,7 @@
                 <th class="td-name" data-sortable="true">Opp Score</th>
               </tr>
             </thead>
-            {% for team in player.team_set.all|slice:":10" %}    
+            {% for team in player.team_set.all|order_by:"-id"|slice:":10" %}    
               <tr>
                 <td><a href="/game/{{team.game_set.first.id}}">{{team.game_set.first.start_time|date:"SHORT_DATE_FORMAT"}}</a></td>
                 <td>
