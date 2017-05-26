@@ -111,6 +111,11 @@
                 </div>
 
             </div>
+
+
+            <button type="button" class="btn btn-primary btn-block z-depth-3" data-toggle="modal" data-target="#myModal"> ReScore Teams 
+                <span class="fa fa-triangle-bottom" aria-hidden="true"></span>
+            </button>
         </div>
     {% else %}
 
@@ -136,6 +141,9 @@
                 </button>
 
     </div>
+
+{% endif %}
+
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
@@ -145,6 +153,9 @@
         <h4 class="modal-title" id="myModalLabel">Adjust Model Weights</h4>
       </div>
       <div class="modal-body z-depth-3">
+            {% if teams %} 
+              <form action="" method="post">
+            {% endif %}
                 <div class="row">
                     <div class="col-xs-6">
                         Scoring:
@@ -217,8 +228,33 @@
                         <input size="3" type="text" name="size" value="{% firstof model_weights.size 2 %}">
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        Use Win Contribution:
+                    </div>
+                    <div class="col-xs-3">
+                        <input type="checkbox" name="win_contribution" value="1" {% if model_weights.win_contribution %}checked{% endif %}>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        Use Score Contribution:
+                    </div>
+                    <div class="col-xs-3">
+                        <input type="checkbox" name="score_contribution" value="1" {% if model_weights.score_contribution %}checked{% endif %}>
+                    </div>
+                </div>
       </div>
       <div class="modal-footer">
+        {% if teams %} 
+          {% csrf_token %}
+          {% for team,players in teams.items  %}
+             {% for player in players %} 
+                    <input type="hidden" id="players_group[]-{{player.id}}" name="players_group[]" value="{{player.id}}">
+              {% endfor %}
+          {% endfor %}
+        {% endif %}
+
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button class="btn btn-success" style="margin-top: 0px" type="submit" name="action">Make Teams
             <span class="fa fa-play" aria-hidden="true"></span>
@@ -233,10 +269,7 @@
     </form>
 
 
-</div>
-{% endif %}
-
-
+</div>  <!-- End Model -->
 
 
         </div>

@@ -311,9 +311,16 @@ class Team(models.Model):
                 player['defend_fast'] = stats_dict[int(player['id'])].defend_fast
                 player['movement'] = stats_dict[int(player['id'])].movement
                 player['awareness'] = stats_dict[int(player['id'])].awareness
+                player['win_contribution'] = player['win_contribution']
+                player['score_contribution'] = player['score_contribution']
                 
 
-                ## Add in Weights
+                ## Collect the Score and Win Contribution Model Weights
+                score_contribution = model_weights['score_contribution']
+                win_contribution = model_weights['win_contribution']
+                #del ['score_contribution']
+                #del ['win_contribution']
+                
                 #print model_weights
                 for k,v in model_weights.items():
                     #print v
@@ -322,6 +329,16 @@ class Team(models.Model):
                         player[k] = float(player[k]) * float(v)
 
                 player['player_score'] = mean([player['scoring'], player['outside_shooting'], player['passing'], player['rebounding'], player['defend_large'], player['defend_fast'], player['movement'], player['awareness'], player['size']])
+
+                if win_contribution:
+                    player['player_score'] = player['player_score'] * (player['win_contribution'] + 1)
+
+
+                if score_contribution:
+                    player['player_score'] = player['player_score'] * player['score_contribution']
+
+                print "%s: %s" % (player['id'], player['player_score'])
+
 
             else:
                 print("DID NOT FIND STATS FOR %s" % (player['id']))
@@ -339,7 +356,7 @@ class Team(models.Model):
 
 
 
-        ### Scoring Existing Teams for OutSide Shooting and Assign Best Shooter to Worst Team
+        ### Scoring Existing Teams for player_score and Assign Best Player Score to Worst Team
         sl = sorted(sl, key=itemgetter('player_score'), reverse=True)
 
         sorted_team = Team.sort_team_on_metric(teams, 'player_score')
@@ -353,8 +370,8 @@ class Team(models.Model):
         if group_size < 6:
             return teams
 
-        ### Scoring Existing Teams for player_score and Assign Best Movement to Worst Team
-        sl = sorted(sl, key=itemgetter('outside_shooting'), reverse=True)
+        ### Scoring Existing Teams for OutSide Shooting and Assign Best Shooter to Worst Team
+        sl = sorted(sl, key=itemgetter('player_score'), reverse=True)
 
         sorted_team = sort_team_on_metric_size(teams, 'player_score')
         if sorted_team['team_a'] < sorted_team['team_b']:
@@ -367,7 +384,7 @@ class Team(models.Model):
         if group_size < 8:
             return teams
 
-        ### Scoring Existing Teams for player_score and Assign Best big player_score to Worst Team
+        ### Scoring Existing Teams for player_score and Assign Best  player_score to Worst Team
         sl = sorted(sl, key=itemgetter('player_score'), reverse=True)
 
         sorted_team = sort_team_on_metric_size(teams, 'player_score')
@@ -392,8 +409,8 @@ class Team(models.Model):
         ### Calculate Team Scores
         sorted_team = Team.sort_team_on_metric(teams, 'player_score')
         team_score = {'team_a': sorted_team['team_a'], 'team_b': sorted_team['team_b']}
-        #if abs(sorted_team['team_a'] - sorted_team['team_b']) > 2:
-        #    print("Model Error: The Teams are Mismatched")
+        if abs(sorted_team['team_a'] - sorted_team['team_b']) > 2:
+            print("Model Error: The Teams are Mismatched: %s" % (team_score))
 
         return teams
 

@@ -446,8 +446,10 @@ def start_gym_slot_session(request, gym_session_id=None):
                      'defend_large': request.POST.get("defend_large", '1'),  
                      'defend_fast': request.POST.get("defend_fast", '1'), 
                      'movement': request.POST.get("movement", '1'), 
-                     'awareness': request.POST.get("awareness", '1'), 
-                     'size': request.POST.get("size", '2')}
+                     'awareness': request.POST.get("awareness", '1'),
+                     'size': request.POST.get("size", '2'),
+                     'win_contribution': request.POST.get("win_contribution", False), 
+                     'score_contribution': request.POST.get("score_contribution", False)}
 
     if players_group:
         print "Using Team Maker"
