@@ -2,6 +2,7 @@ from __future__ import division
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
@@ -162,7 +163,7 @@ def view_player(request, player_id=None):
     return HttpResponse(template.render(context, request))
 
 
-@login_required    
+@staff_member_required    
 def new_player(request):
     template = loader.get_template('team_manager/player_form.html')
     player = "Add Player"
@@ -171,7 +172,7 @@ def new_player(request):
     context = ({'player': player, 'form': form})
     return HttpResponse(template.render(context, request))
 
-@login_required    
+@staff_member_required    
 def add_update_player(request):
     #print request.POST.dict
     print request.POST.getlist('player*')
@@ -203,7 +204,7 @@ def gym_slots(request):
     context = ({'gym_slots': gym_slots})
     return HttpResponse(template.render(context, request))
 
-@login_required    
+@staff_member_required    
 def new_gym_slot(request):
     template = loader.get_template('team_manager/gym_slot_form.html')
     gym_slot = "Add Gym Slot"
@@ -212,7 +213,7 @@ def new_gym_slot(request):
     context = ({'gym_slot': gym_slot, 'form': form})
     return HttpResponse(template.render(context, request))
 
-@login_required    
+@staff_member_required    
 def edit_gym_slot(request, gym_slot_id=None):
     template = loader.get_template('team_manager/gym_slot_form.html')
     gym_slot = GymSlot.objects.get(id = gym_slot_id)
@@ -223,7 +224,7 @@ def edit_gym_slot(request, gym_slot_id=None):
     context = ({'gym_slot': gym_slot, 'form': form, 'available_players': available_players})
     return HttpResponse(template.render(context, request))
 
-@login_required    
+@staff_member_required    
 def add_update_gym_slot(request):
     #print request.POST.dict
     print request.POST.getlist('gym_slot*')
@@ -251,7 +252,7 @@ def add_update_gym_slot(request):
     return HttpResponse(template.render(context, request))
 
 
-@login_required    
+@staff_member_required    
 def edit_player(request, player_id=None):
     template = loader.get_template('team_manager/player_form.html')
     player = Player.objects.get(id = player_id)
@@ -331,7 +332,7 @@ def view_game(request, game_id=None):
     return HttpResponse(template.render(context, request))
 
 
-@login_required
+@staff_member_required
 def edit_game(request, game_id=None):
     template = loader.get_template('team_manager/edit_game.html')
     game = Game.objects.get(id = game_id)
@@ -559,7 +560,7 @@ def players(request):
     return HttpResponse(template.render(context, request))
 
 
-@login_required    
+@staff_member_required    
 def player_stats(request):
     template = loader.get_template('team_manager/player_stats.html')
     players = Player.objects.all().order_by('last_name')
@@ -579,7 +580,7 @@ def player_stats(request):
     context = ({'players': players, 'player_ids': player_ids})
     return HttpResponse(template.render(context, request))
 
-@login_required    
+@staff_member_required    
 def update_player_stats(request):
     ids = request.POST["player_ids"]
     for id in ids.split(","):
@@ -612,9 +613,7 @@ def test_task(request):
     return HttpResponseRedirect('/')
 
 
-
-
-@login_required    
+@staff_member_required    
 def update_game_stats(request):
     PlayerPlayerSummary.update()
     Player.update_player_game_stats()
@@ -636,7 +635,7 @@ def update_game_stats(request):
 
 
 ###  AJAX METHODS  ###
-@login_required    
+@staff_member_required    
 @require_http_methods(["POST"])
 def add_player_to_session(request):
     print request.POST.dict
@@ -648,7 +647,7 @@ def add_player_to_session(request):
 
     return JsonResponse(data)
 
-@login_required    
+@staff_member_required    
 @require_http_methods(["POST"])
 def remove_player_from_session(request):
     print request.POST.dict
@@ -660,7 +659,7 @@ def remove_player_from_session(request):
 
     return JsonResponse(data)
 
-@login_required    
+@staff_member_required    
 @require_http_methods(["POST"])
 def add_player_to_team(request):
     print request.POST.dict
@@ -672,7 +671,7 @@ def add_player_to_team(request):
 
     return JsonResponse(data)
 
-@login_required    
+@staff_member_required    
 @require_http_methods(["POST"])
 def remove_player_from_team(request):
     print request.POST.dict
@@ -684,7 +683,7 @@ def remove_player_from_team(request):
 
     return JsonResponse(data)
 
-@login_required    
+@staff_member_required    
 @require_http_methods(["POST"])
 def add_player_to_gym_slot(request):
     print request.POST.dict
@@ -696,7 +695,7 @@ def add_player_to_gym_slot(request):
 
     return JsonResponse(data)
 
-@login_required    
+@staff_member_required    
 @require_http_methods(["POST"])
 def remove_player_from_gym_slot(request):
     print request.POST.dict
