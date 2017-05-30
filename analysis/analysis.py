@@ -1,6 +1,5 @@
 # https://www.dataquest.io/blog/machine-learning-python/
 # http://nbviewer.jupyter.org/gist/justmarkham/6d5c061ca5aee67c4316471f8c2ae976
-import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
@@ -42,7 +41,9 @@ def score_factors():
 	print("### Print the shapes of both sets.")
 	print("##############################################################")
 	print("train: %s" % (','.join(map(str, X_train.shape))))
+	print("train Y PD: %s" % (','.join(map(str, Y_train.shape))))
 	print("test: %s" % (','.join(map(str, X_test.shape))))
+	print("test Y PD: %s" % (','.join(map(str, Y_test.shape))))
 
 
 
@@ -66,13 +67,13 @@ def score_factors():
 	print("\n\n##############################################################")
 	print("### generate class probabilities")
 	print("##############################################################")
-	#probs = model.predict_proba(test[columns])
+	#probs = model.predict_proba(X_test)
 	#print probs
 
 	print("\n\n##############################################################")
 	print("### generate evaluation metrics")
 	print("##############################################################")
-	#accuracy_score =  metrics.accuracy_score(test[target], predicted)
+	#accuracy_score =  metrics.accuracy_score(Y_test, predicted)
 	#print accuracy_score
 	#print metrics.roc_auc_score(test[target], probs[:, 1])
 	#print("The accuracy is %s percent" % (round(accuracy_score * 100, 0)))
@@ -87,9 +88,9 @@ def score_factors():
 	print("\n\n##############################################################")
 	print("### evaluate the model using 10-fold cross-validation")
 	print("##############################################################")
-	#scores = cross_val_score(LinearRegression(), dataset[columns], dataset[target], scoring='accuracy', cv=10)
-	#print scores
-	#print scores.mean()
+	scores = cross_val_score(LinearRegression(), X_train, Y_train, scoring='neg_mean_squared_error', cv=10)
+	print scores
+	print scores.mean()
 
 
 	print("\n\n##############################################################")

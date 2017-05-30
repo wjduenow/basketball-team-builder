@@ -1,8 +1,6 @@
 # https://www.dataquest.io/blog/machine-learning-python/
 # http://nbviewer.jupyter.org/gist/justmarkham/6d5c061ca5aee67c4316471f8c2ae976
-import pandas as pd
 import numpy as np
-#import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn import metrics
@@ -16,24 +14,22 @@ from collections import OrderedDict
 
 
 def main():
-	dataset = pd.read_csv('full_rolm.csv', index_col = 0)
-	x = dataset.drop('Won', axis=1)
-	y = dataset['Won']
-
-	dataset, validation = train_test_split(dataset, test_size = 0.1)
-	train, test = train_test_split(dataset, test_size = 0.1)
 
 	print("\n\n##############################################################")
 	print("### Load In Data")
 	print("##############################################################")
 	print("Loading Training")
-	X_train = train.drop('Won', axis=1)
-	Y_train_won = y = train['Won']
+	training_data = np.load('train_rolm.npz')
+	X_train = training_data['X']
+	Y_train_won = training_data['Y_WON']
+	c, r = Y_train_won.shape
+	Y_train_won = Y_train_won.reshape(c,)
 	print Y_train_won
 
 	print("Loading Test")
-	X_test = test.drop('Won', axis=1)
-	Y_test_won = test['Won']
+	testing_data = np.load('test_rolm.npz')
+	X_test = testing_data['X']
+	Y_test_won = testing_data['Y_WON']
 	print Y_test_won
 
 	print("Loading Columns")
@@ -41,16 +37,13 @@ def main():
 	with open('columns.json') as data_file:    
 	    model_columns = json.load(data_file)
 
-	# Make a histogram of all the ratings in the average_rating column.
-	#plt.hist(Y_train)
-	# Show the plot.
-	#plt.show()
-
 	print("\n\n##############################################################")
 	print("### Print the shapes of both sets.")
 	print("##############################################################")
 	print("train: %s" % (','.join(map(str, X_train.shape))))
+	print("train Y WON: %s" % (','.join(map(str, Y_train_won.shape))))
 	print("test: %s" % (','.join(map(str, X_test.shape))))
+	print("test Y WON: %s" % (','.join(map(str, Y_test_won.shape))))
 
 	print("\n\n##############################################################")
 	print("### Fit the model to the training data.")

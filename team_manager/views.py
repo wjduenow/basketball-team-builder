@@ -21,7 +21,7 @@ from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats,
 from django.db.models import Count, Avg, Sum, Min, Max
 from operator import itemgetter
 from collections import defaultdict
-#from analysis import analysis2, create_dataset, analysis
+from analysis import analysis2, create_dataset, analysis
 
 #from google.appengine.api.taskqueue import taskqueue
 

@@ -19,6 +19,8 @@ handlers:
 libraries:
 - name: MySQLdb
   version: 1.2.5
+- name: numpy
+  version: 1.6.1
 # [END django_app]
 
 # Google App Engine limits application deployments to 10,000 uploaded files per
