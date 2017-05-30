@@ -348,8 +348,8 @@ class Team(models.Model):
                 player['player_score'] = 2
 
 
-        #Sort by Scoring and Assign to B and then A
-        sl = sorted(players, key=itemgetter('scoring', 'player_score'), reverse=True)
+        #Sort by Scoring and Assign Worst to A and then B
+        sl = sorted(players, key=itemgetter('scoring', 'player_score'), reverse=False)
         team_a.append(sl.pop(0))
         team_b.append(sl.pop(0))
         
