@@ -119,9 +119,11 @@
                                 <i class="fa fa-edit" aria-hidden="true"></i>
                       </a>
                      {% endif %}
-                     <a class="btn btn-primary waves-effect" href="/edit_profile">Edit Profile
-                                <i class="fa fa-edit" aria-hidden="true"></i>
-                      </a>
+                     {% if user.player.id ==  player.id %}
+                       <a class="btn btn-primary waves-effect" href="/edit_profile">Edit Profile
+                                  <i class="fa fa-edit" aria-hidden="true"></i>
+                        </a>
+                      {% endif %}
                     </div>
 
                 </div>
