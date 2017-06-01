@@ -271,12 +271,14 @@
                           <thead>
                             <tr>
                                 <th class="td-name" data-sortable="true">Name</th>
-                                <th class="td-name" data-sortable="true">P</th>
-                                <th class="td-name" data-sortable="true">W</th>
-                                <th class="td-name" data-sortable="true">With %</th>
-                                <th class="td-name" data-sortable="true">Their %</th>
-                                <th class="td-name" data-sortable="true">With +/-</th>
-                                <th class="td-name" data-sortable="true">Their +/-</th>
+                                <th>P</th>
+                                <th>W</th>
+                                <th>With %</th>
+                                <th>Their %</th>
+                                <th>% &Delta;</th>
+                                <th>With +/-</th>
+                                <th>Their +/-</th>
+                                <th>+/- &Delta;</th>
                               </tr>
                             </thead>
                         {% for ps in player.player_player_summary.all|order_by:"-win_loss" %}
@@ -287,8 +289,10 @@
                                 <td>{{ps.won}}</td>
                                 <td>{{ps.win_loss|floatformat:2}}</td>
                                 <td>{{ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
+                                <td>{{ps.win_loss|sub:ps.other_player.ninety_day_win_percentage}}</td>
                                 <td>{{ps.point_differential|floatformat:2}}</td>
                                 <td>{{ps.other_player.ninety_day_plus_minus|floatformat:2}}</td>
+                                <td>{{ps.point_differential|sub:ps.other_player.ninety_day_plus_minus}}</td>
                               </tr>
                             {% endif %}
                         {% endfor %}
@@ -307,11 +311,14 @@
                           <thead>
                             <tr>
                                 <th class="td-name" data-sortable="true">Name</th>
-                                <th class="td-name" data-sortable="true">P</th>
-                                <th class="td-name" data-sortable="true">W</th>
-                                <th class="td-name" data-sortable="true">Against %</th>
-                                <th class="td-name" data-sortable="true">Their %</th>
-                                <th class="td-name" data-sortable="true">Diff</th>
+                                <th>P</th>
+                                <th>W</th>
+                                <th>Against %</th>
+                                <th>Their %</th>
+                                <th>% &Delta;</th>
+                                <th>Against +/-</th>
+                                <th>Their +/-</th>
+                                <th>+/- &Delta;</th>
                               </tr>
                             </thead>
                         {% for ps in player.player_player_summary.all|order_by:"-win_loss" %}
@@ -322,7 +329,10 @@
                                 <td>{{ps.won}}</td>
                                 <td>{{ps.win_loss|floatformat:2}}</td>
                                 <td>{{ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
+                                <td>{{ps.win_loss|sub:ps.other_player.ninety_day_win_percentage}}</td>
                                 <td>{{ps.point_differential|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_plus_minus|floatformat:2}}</td>
+                                <td>{{ps.point_differential|sub:ps.other_player.ninety_day_plus_minus}}</td>
                               </tr>
                             {% endif %}
                         {% endfor %}
