@@ -115,10 +115,13 @@
 
                     <div class="panel-footer">
                     {% if user.is_superuser %}
-                      <a class="btn btn-primary waves-effect" href="/edit_player/{{player.id}}">Edit
+                      <a class="btn btn-primary waves-effect" href="/edit_player/{{player.id}}">Edit Player
                                 <i class="fa fa-edit" aria-hidden="true"></i>
                       </a>
                      {% endif %}
+                     <a class="btn btn-primary waves-effect" href="/edit_profile">Edit Profile
+                                <i class="fa fa-edit" aria-hidden="true"></i>
+                      </a>
                     </div>
 
                 </div>

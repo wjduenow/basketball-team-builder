@@ -498,5 +498,4 @@ def create_user_profile(sender, instance, *args, **kwargs):
         password = make_password('123')
         user = User.objects.create(username=user_name, first_name=instance.first_name, last_name=instance.last_name, password=password)
         instance.user = user
-        #instance.save()
 

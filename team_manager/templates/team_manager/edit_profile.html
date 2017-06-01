@@ -1,0 +1,86 @@
+{% include 'team_manager/partial-user-menu.html' %}
+
+
+ <!-- main content -->
+
+     <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li><a href="/player/{{player.id}}">My Profile</a></li>
+        <li class="active">Edit</li>
+    </ol>
+    
+<div class="container theme-showcase" role="main">
+
+    <div class="page-header">
+        <h4>My Profile: Edit</h4>
+    </div>
+
+    <div class="container">
+
+
+<form action="/edit_profile" method="POST">
+
+{% csrf_token %}
+        <div class="col-sm-12">
+            <div class="list-group" id="list2">
+
+
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                            <h3 class="panel-title">Edit</h3>
+                    </div>
+
+                    <div class="panel-body" id="{{team}}">
+                        <label for="first_name">First Name</label>
+                        <input type="text" name="first_name" value="{{player.first_name}}">
+
+                        <label for="last_name">Last Name</label>
+                        <input type="text" name="last_name" value="{{player.last_name}}">
+
+
+                        <label for="nick_name">Nick Name</label>
+                        <input type="text" name="nick_name" value="{{player.nick_name}}">
+
+                        <label for="email">Email</label>
+                        <input type="email" name="email" value="{{player.user.email}}">
+
+                        <label for="password">Update Password</label>
+                        <input type="password" name="password" value="{{player.password}}">
+                        
+                        <input type="hidden" name="player_id" value="{{player.id}}">
+
+                    </div>
+
+                    <div class="panel-footer">
+                            <button class="btn btn-success" type="submit" name="action">Save
+                                <span class="fa fa-save" aria-hidden="true"></span>
+                            </button>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+
+</div>
+
+
+    <!-- Latest compiled and minified JavaScript -->
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+  </body>
+</html>

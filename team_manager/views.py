@@ -21,6 +21,7 @@ from .models import Player, Group, GymSlot, GymSession, Game, Team, PlayerStats,
 from django.db.models import Count, Avg, Sum, Min, Max
 from operator import itemgetter
 from collections import defaultdict
+from django.contrib.auth.hashers import make_password
 #from analysis import analysis2, create_dataset, analysis
 
 #from google.appengine.api.taskqueue import taskqueue
@@ -195,6 +196,35 @@ def add_update_player(request):
 
     context = ({'player': player, 'form': form})
     return HttpResponse(template.render(context, request))
+
+@login_required    
+def edit_profile(request):
+    #print request.POST.dict
+    player = Player.objects.get(id = request.user.player.id)
+    template = loader.get_template('team_manager/edit_profile.html')
+    
+
+    if request.method == "POST":
+        player.first_name = request.POST['first_name']
+        player.last_name = request.POST['last_name']
+        player.nick_name = request.POST['nick_name']
+
+        player.user.first_name = request.POST['first_name']
+        player.user.last_name = request.POST['last_name']
+        player.user.email = request.POST['email']
+
+        if request.POST['password']:
+            player.user.email = make_password(request.POST['password'])
+
+        player.save()
+        player.user.save()
+
+        messages.success(request, 'Profile Updated')
+
+
+    context = ({'player': player})
+    return HttpResponse(template.render(context, request))
+
 
 @login_required 
 def gym_slots(request):
