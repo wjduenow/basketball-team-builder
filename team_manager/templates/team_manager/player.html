@@ -277,7 +277,6 @@
                                 <th class="td-name" data-sortable="true">Their %</th>
                                 <th class="td-name" data-sortable="true">With +/-</th>
                                 <th class="td-name" data-sortable="true">Their +/-</th>
-                                <th class="td-name" data-sortable="true">MS</th>
                               </tr>
                             </thead>
                         {% for ps in player.player_player_summary.all|order_by:"-win_loss" %}
@@ -290,7 +289,6 @@
                                 <td>{{ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
                                 <td>{{ps.point_differential|floatformat:2}}</td>
                                 <td>{{ps.other_player.ninety_day_plus_minus|floatformat:2}}</td>
-                                <td>{{ps.meta_score|floatformat:2}}</td>
                               </tr>
                             {% endif %}
                         {% endfor %}
@@ -314,7 +312,6 @@
                                 <th class="td-name" data-sortable="true">Against %</th>
                                 <th class="td-name" data-sortable="true">Their %</th>
                                 <th class="td-name" data-sortable="true">Diff</th>
-                                <th class="td-name" data-sortable="true">MS</th>
                               </tr>
                             </thead>
                         {% for ps in player.player_player_summary.all|order_by:"-win_loss" %}
@@ -326,7 +323,6 @@
                                 <td>{{ps.win_loss|floatformat:2}}</td>
                                 <td>{{ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
                                 <td>{{ps.point_differential|floatformat:2}}</td>
-                                <td>{{ps.meta_score|floatformat:2}}</td>
                               </tr>
                             {% endif %}
                         {% endfor %}
