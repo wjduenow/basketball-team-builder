@@ -72,7 +72,8 @@ class Player(models.Model):
     def update_player_game_stats(cls):
         str_sql = """UPDATE team_manager_player INNER JOIN (
                         SELECT p.id, MAX(gt.game_id) game_id, MAX(gs.created_at) as created_at,
-                            COUNT(t.id) as played, SUM(t.won) as won, SUM(t.won)/COUNT(t.id) as win_ratio
+                            COUNT(t.id) as played, SUM(t.won) as won, SUM(t.won)/COUNT(t.id) as win_ratio,
+                            AVG(point_differential) as point_differential
                             FROM team_manager_player p 
                             INNER JOIN team_manager_team_players tp on tp.player_id = p.id 
                             INNER JOIN team_manager_game_teams gt on gt.id = tp.team_id 
@@ -83,6 +84,7 @@ class Player(models.Model):
                         ON tmp_query.id = team_manager_player.id
                         SET 
                             ninety_day_win_percentage = win_ratio,
+                            ninety_day_plus_minus = point_differential,
                             last_game_date = tmp_query.created_at,
                             last_game_id = tmp_query.game_id;"""
 
