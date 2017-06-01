@@ -115,10 +115,15 @@
 
                     <div class="panel-footer">
                     {% if user.is_superuser %}
-                      <a class="btn btn-primary waves-effect" href="/edit_player/{{player.id}}">Edit
+                      <a class="btn btn-primary waves-effect" href="/edit_player/{{player.id}}">Edit Player
                                 <i class="fa fa-edit" aria-hidden="true"></i>
                       </a>
                      {% endif %}
+                     {% if user.player.id ==  player.id %}
+                       <a class="btn btn-primary waves-effect" href="/edit_profile">Edit Profile
+                                  <i class="fa fa-edit" aria-hidden="true"></i>
+                        </a>
+                      {% endif %}
                     </div>
 
                 </div>
@@ -257,22 +262,27 @@
 
     <div class="row">
 
-      <div class="col-sm-6">
+      <div class="col-sm-13">
       <div class="panel panel-primary z-depth-3">
           <div class="panel-heading">
             <h3 class="panel-title g-hed">Players Played With</h3>
           </div>
            <div class="panel-body tablecol">
 
-                      <table class="table table-striped table-condensed table-bordered">
+                      <table data-toggle="table" class="table table-striped table-condensed table-bordered">
                           <thead>
                             <tr>
                                 <th class="td-name" data-sortable="true">Name</th>
-                                <th class="td-name" data-sortable="true">P</th>
-                                <th class="td-name" data-sortable="true">W</th>
-                                <th class="td-name" data-sortable="true">Win %</th>
-                                <th class="td-name" data-sortable="true">Diff</th>
-                                <th class="td-name" data-sortable="true">MS</th>
+                                <th data-sortable="true">P</th>
+                                <th data-sortable="true">W</th>
+                                <th data-sortable="true">With %</th>
+                                <th data-sortable="true">Their %</th>
+                                <th data-sortable="true">% Impact <br />on {{ player.first_name }}</th>
+                                <th data-sortable="true">% Impact <br />on Them </th>
+                                <th data-sortable="true">With +/-</th>
+                                <th data-sortable="true">Their +/-</th>
+                                <th data-sortable="true">+/- Impact <br />on {{ player.first_name }}</th>
+                                <th data-sortable="true">+/- Impact <br />on Them </th>
                               </tr>
                             </thead>
                         {% for ps in player.player_player_summary.all|order_by:"-win_loss" %}
@@ -282,31 +292,43 @@
                                 <td>{{ps.played}}</td>
                                 <td>{{ps.won}}</td>
                                 <td>{{ps.win_loss|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
+                                <td>{{ps.win_loss|sub:ps.player.ninety_day_win_percentage|floatformat:2|floatformat:2}}</td>
+                                <td>{{ps.win_loss|sub:ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
                                 <td>{{ps.point_differential|floatformat:2}}</td>
-                                <td>{{ps.meta_score|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_plus_minus|floatformat:2}}</td>
+                                <td>{{ps.point_differential|sub:ps.player.ninety_day_plus_minus|floatformat:2}}</td>
+                                <td>{{ps.point_differential|sub:ps.other_player.ninety_day_plus_minus|floatformat:2}}</td>
                               </tr>
                             {% endif %}
                         {% endfor %}
                       </table>
           </div>
       </div>
+    </div>
+    <div class="row">
       </div>
-      <div class="col-sm-6">
+      <div class="col-sm-13">
       <div class="panel panel-primary z-depth-3">
         <div class="panel-heading">
             <h3 class="panel-title g-hed">Players Played Against</h3>
           </div>
            <div class="panel-body tablecol">
 
-                      <table class="table table-striped table-condensed table-bordered">
+                      <table data-toggle="table" class="table table-striped table-condensed table-bordered">
                           <thead>
                             <tr>
                                 <th class="td-name" data-sortable="true">Name</th>
-                                <th class="td-name" data-sortable="true">P</th>
-                                <th class="td-name" data-sortable="true">W</th>
-                                <th class="td-name" data-sortable="true">Win %</th>
-                                <th class="td-name" data-sortable="true">Diff</th>
-                                <th class="td-name" data-sortable="true">MS</th>
+                                <th data-sortable="true">P</th>
+                                <th data-sortable="true">W</th>
+                                <th data-sortable="true">Against %</th>
+                                <th data-sortable="true">Their %</th>
+                                <th data-sortable="true">% Impact <br />on {{ player.first_name }}</th>
+                                <th data-sortable="true">% Impact <br />on Them </th>
+                                <th data-sortable="true">Against +/-</th>
+                                <th data-sortable="true">Their +/-</th>
+                                <th data-sortable="true">+/- Impact <br />on {{ player.first_name }}</th>
+                                <th data-sortable="true">+/- Impact <br />on Them </th>
                               </tr>
                             </thead>
                         {% for ps in player.player_player_summary.all|order_by:"-win_loss" %}
@@ -316,8 +338,13 @@
                                 <td>{{ps.played}}</td>
                                 <td>{{ps.won}}</td>
                                 <td>{{ps.win_loss|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
+                                <td>{{ps.win_loss|sub:ps.player.ninety_day_win_percentage|floatformat:2|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_win_percentage|sub:ps.win_loss|floatformat:2}}</td>
                                 <td>{{ps.point_differential|floatformat:2}}</td>
-                                <td>{{ps.meta_score|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_plus_minus|floatformat:2}}</td>
+                                <td>{{ps.point_differential|sub:ps.player.ninety_day_plus_minus|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_plus_minus|sub:ps.point_differential|floatformat:2}}</td>
                               </tr>
                             {% endif %}
                         {% endfor %}

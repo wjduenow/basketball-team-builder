@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^edit_player/([0-9]*)$', views.edit_player, name='edit_player'),
     url(r'^new_player$', views.new_player, name='new_player'),
     url(r'^add_update_player$', views.add_update_player, name='add_update_player'),
+    url(r'^edit_profile$', views.edit_profile, name='edit_profile'),
     url(r'gym_slots$', views.gym_slots, name='gym_slots'),
     url(r'^new_gym_slot$', views.new_gym_slot, name='new_gym_slot'),
     url(r'^edit_gym_slot/([0-9]*)$', views.edit_gym_slot, name='edit_gym_slot'),

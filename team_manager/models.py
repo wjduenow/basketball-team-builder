@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from __future__ import division
 from django.db import models
+from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 from operator import itemgetter
 from collections import defaultdict
@@ -8,6 +9,12 @@ from django.core.signals import request_finished
 from django.dispatch import receiver
 from django.db import connection
 from django.db.models import Count, Avg, Sum, Min, Max
+from django.contrib.auth.hashers import make_password
+
+
+from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -24,6 +31,7 @@ class Group(models.Model):
         return self.name
 
 class Player(models.Model):
+    user = models.OneToOneField(User, blank=True, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200, blank=True, null=True)
     nick_name = models.CharField(max_length=200, blank=True, null=True)
@@ -63,15 +71,20 @@ class Player(models.Model):
     @classmethod
     def update_player_game_stats(cls):
         str_sql = """UPDATE team_manager_player INNER JOIN (
-                        SELECT p.id, MAX(gt.game_id) game_id, MAX(gs.created_at) as created_at 
+                        SELECT p.id, MAX(gt.game_id) game_id, MAX(gs.created_at) as created_at,
+                            COUNT(t.id) as played, SUM(t.won) as won, SUM(t.won)/COUNT(t.id) as win_ratio,
+                            AVG(point_differential) as point_differential
                             FROM team_manager_player p 
                             INNER JOIN team_manager_team_players tp on tp.player_id = p.id 
                             INNER JOIN team_manager_game_teams gt on gt.id = tp.team_id 
+                            INNER JOIN team_manager_team t on t.id = tp.team_id 
                             INNER JOIN team_manager_game g on g.id = gt.game_id 
                             INNER JOIN team_manager_gymsession gs on gs.id = g.gym_session_id 
                             GROUP BY 1) tmp_query 
                         ON tmp_query.id = team_manager_player.id
                         SET 
+                            ninety_day_win_percentage = win_ratio,
+                            ninety_day_plus_minus = point_differential,
                             last_game_date = tmp_query.created_at,
                             last_game_id = tmp_query.game_id;"""
 
@@ -111,7 +124,7 @@ class PlayerSummary(models.Model):
 
 class PlayerPlayerSummary(models.Model):
     player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='player_player_summary')
-    other_player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='+')
+    other_player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='other_player_player_summary')
     played = models.IntegerField(default=2)
     won = models.IntegerField(default=2)
     win_loss = models.FloatField(default=2)
@@ -480,5 +493,11 @@ def sort_team_on_metric_size(teams, metric):
 
     return sorted_team
 
-    #def __str__(self):
-    #    return str(self.gym_slot) + ": " + str(self.player)
+@receiver(pre_save, sender=Player)
+def create_user_profile(sender, instance, *args, **kwargs):
+    if instance._state.adding is True:
+        user_name = "%s_%s" % (instance.first_name, instance.last_name)
+        password = make_password('123')
+        user = User.objects.create(username=user_name, first_name=instance.first_name, last_name=instance.last_name, password=password)
+        instance.user = user
+

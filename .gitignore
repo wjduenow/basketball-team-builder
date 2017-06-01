@@ -3,6 +3,7 @@
 .DS_Store
 polls.back.mysql
 analysis/logdir/
+polls.back.mysql.before_user_player
 
 # Analysis Datasets
 analysis/full_rolm.csv
