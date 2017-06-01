@@ -260,7 +260,7 @@
 
     <div class="row">
 
-      <div class="col-sm-6">
+      <div class="col-sm-13">
       <div class="panel panel-primary z-depth-3">
           <div class="panel-heading">
             <h3 class="panel-title g-hed">Players Played With</h3>
@@ -275,10 +275,12 @@
                                 <th>W</th>
                                 <th>With %</th>
                                 <th>Their %</th>
-                                <th>% &Delta;</th>
+                                <th>% Impact <br />on {{ player.first_name }}</th>
+                                <th>% Impact <br />on Them </th>
                                 <th>With +/-</th>
                                 <th>Their +/-</th>
-                                <th>+/- &Delta;</th>
+                                <th>+/- Impact <br />on {{ player.first_name }}</th>
+                                <th>+/- Impact <br />on Them </th>
                               </tr>
                             </thead>
                         {% for ps in player.player_player_summary.all|order_by:"-win_loss" %}
@@ -289,18 +291,22 @@
                                 <td>{{ps.won}}</td>
                                 <td>{{ps.win_loss|floatformat:2}}</td>
                                 <td>{{ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
-                                <td>{{ps.win_loss|sub:ps.other_player.ninety_day_win_percentage}}</td>
+                                <td>{{ps.win_loss|sub:ps.player.ninety_day_win_percentage|floatformat:2|floatformat:2}}</td>
+                                <td>{{ps.win_loss|sub:ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
                                 <td>{{ps.point_differential|floatformat:2}}</td>
                                 <td>{{ps.other_player.ninety_day_plus_minus|floatformat:2}}</td>
-                                <td>{{ps.point_differential|sub:ps.other_player.ninety_day_plus_minus}}</td>
+                                <td>{{ps.point_differential|sub:ps.player.ninety_day_plus_minus|floatformat:2}}</td>
+                                <td>{{ps.point_differential|sub:ps.other_player.ninety_day_plus_minus|floatformat:2}}</td>
                               </tr>
                             {% endif %}
                         {% endfor %}
                       </table>
           </div>
       </div>
+    </div>
+    <div class="row">
       </div>
-      <div class="col-sm-6">
+      <div class="col-sm-13">
       <div class="panel panel-primary z-depth-3">
         <div class="panel-heading">
             <h3 class="panel-title g-hed">Players Played Against</h3>
@@ -315,10 +321,12 @@
                                 <th>W</th>
                                 <th>Against %</th>
                                 <th>Their %</th>
-                                <th>% &Delta;</th>
+                                <th>% Impact <br />on {{ player.first_name }}</th>
+                                <th>% Impact <br />on Them </th>
                                 <th>Against +/-</th>
                                 <th>Their +/-</th>
-                                <th>+/- &Delta;</th>
+                                <th>+/- Impact <br />on {{ player.first_name }}</th>
+                                <th>+/- Impact <br />on Them </th>
                               </tr>
                             </thead>
                         {% for ps in player.player_player_summary.all|order_by:"-win_loss" %}
@@ -329,10 +337,12 @@
                                 <td>{{ps.won}}</td>
                                 <td>{{ps.win_loss|floatformat:2}}</td>
                                 <td>{{ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
-                                <td>{{ps.win_loss|sub:ps.other_player.ninety_day_win_percentage}}</td>
+                                <td>{{ps.win_loss|sub:ps.player.ninety_day_win_percentage|floatformat:2|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_win_percentage|sub:ps.win_loss|floatformat:2}}</td>
                                 <td>{{ps.point_differential|floatformat:2}}</td>
                                 <td>{{ps.other_player.ninety_day_plus_minus|floatformat:2}}</td>
-                                <td>{{ps.point_differential|sub:ps.other_player.ninety_day_plus_minus}}</td>
+                                <td>{{ps.point_differential|sub:ps.player.ninety_day_plus_minus|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_plus_minus|sub:ps.point_differential|floatformat:2}}</td>
                               </tr>
                             {% endif %}
                         {% endfor %}
