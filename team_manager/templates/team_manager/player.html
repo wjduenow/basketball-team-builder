@@ -267,20 +267,20 @@
           </div>
            <div class="panel-body tablecol">
 
-                      <table class="table table-striped table-condensed table-bordered">
+                      <table data-toggle="table" class="table table-striped table-condensed table-bordered">
                           <thead>
                             <tr>
                                 <th class="td-name" data-sortable="true">Name</th>
-                                <th>P</th>
-                                <th>W</th>
-                                <th>With %</th>
-                                <th>Their %</th>
-                                <th>% Impact <br />on {{ player.first_name }}</th>
-                                <th>% Impact <br />on Them </th>
-                                <th>With +/-</th>
-                                <th>Their +/-</th>
-                                <th>+/- Impact <br />on {{ player.first_name }}</th>
-                                <th>+/- Impact <br />on Them </th>
+                                <th data-sortable="true">P</th>
+                                <th data-sortable="true">W</th>
+                                <th data-sortable="true">With %</th>
+                                <th data-sortable="true">Their %</th>
+                                <th data-sortable="true">% Impact <br />on {{ player.first_name }}</th>
+                                <th data-sortable="true">% Impact <br />on Them </th>
+                                <th data-sortable="true">With +/-</th>
+                                <th data-sortable="true">Their +/-</th>
+                                <th data-sortable="true">+/- Impact <br />on {{ player.first_name }}</th>
+                                <th data-sortable="true">+/- Impact <br />on Them </th>
                               </tr>
                             </thead>
                         {% for ps in player.player_player_summary.all|order_by:"-win_loss" %}
@@ -313,20 +313,20 @@
           </div>
            <div class="panel-body tablecol">
 
-                      <table class="table table-striped table-condensed table-bordered">
+                      <table data-toggle="table" class="table table-striped table-condensed table-bordered">
                           <thead>
                             <tr>
                                 <th class="td-name" data-sortable="true">Name</th>
-                                <th>P</th>
-                                <th>W</th>
-                                <th>Against %</th>
-                                <th>Their %</th>
-                                <th>% Impact <br />on {{ player.first_name }}</th>
-                                <th>% Impact <br />on Them </th>
-                                <th>Against +/-</th>
-                                <th>Their +/-</th>
-                                <th>+/- Impact <br />on {{ player.first_name }}</th>
-                                <th>+/- Impact <br />on Them </th>
+                                <th data-sortable="true">P</th>
+                                <th data-sortable="true">W</th>
+                                <th data-sortable="true">Against %</th>
+                                <th data-sortable="true">Their %</th>
+                                <th data-sortable="true">% Impact <br />on {{ player.first_name }}</th>
+                                <th data-sortable="true">% Impact <br />on Them </th>
+                                <th data-sortable="true">Against +/-</th>
+                                <th data-sortable="true">Their +/-</th>
+                                <th data-sortable="true">+/- Impact <br />on {{ player.first_name }}</th>
+                                <th data-sortable="true">+/- Impact <br />on Them </th>
                               </tr>
                             </thead>
                         {% for ps in player.player_player_summary.all|order_by:"-win_loss" %}
