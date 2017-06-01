@@ -9,9 +9,11 @@ from django.core.signals import request_finished
 from django.dispatch import receiver
 from django.db import connection
 from django.db.models import Count, Avg, Sum, Min, Max
+from django.contrib.auth.hashers import make_password
 
 
 from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 # Create your models here.
@@ -489,9 +491,12 @@ def sort_team_on_metric_size(teams, metric):
 
     return sorted_team
 
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Player.objects.create(user=instance)
+@receiver(pre_save, sender=Player)
+def create_user_profile(sender, instance, *args, **kwargs):
+    if instance._state.adding is True:
+        user_name = "%s_%s" % (instance.first_name, instance.last_name)
+        password = make_password('123')
+        user = User.objects.create(username=user_name, first_name=instance.first_name, last_name=instance.last_name, password=password)
+        instance.user = user
+        #instance.save()
 
