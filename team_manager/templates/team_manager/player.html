@@ -270,7 +270,8 @@
                                 <th class="td-name" data-sortable="true">Name</th>
                                 <th class="td-name" data-sortable="true">P</th>
                                 <th class="td-name" data-sortable="true">W</th>
-                                <th class="td-name" data-sortable="true">Win %</th>
+                                <th class="td-name" data-sortable="true">With %</th>
+                                <th class="td-name" data-sortable="true">Their %</th>
                                 <th class="td-name" data-sortable="true">Diff</th>
                                 <th class="td-name" data-sortable="true">MS</th>
                               </tr>
@@ -282,6 +283,7 @@
                                 <td>{{ps.played}}</td>
                                 <td>{{ps.won}}</td>
                                 <td>{{ps.win_loss|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
                                 <td>{{ps.point_differential|floatformat:2}}</td>
                                 <td>{{ps.meta_score|floatformat:2}}</td>
                               </tr>
@@ -304,7 +306,8 @@
                                 <th class="td-name" data-sortable="true">Name</th>
                                 <th class="td-name" data-sortable="true">P</th>
                                 <th class="td-name" data-sortable="true">W</th>
-                                <th class="td-name" data-sortable="true">Win %</th>
+                                <th class="td-name" data-sortable="true">Against %</th>
+                                <th class="td-name" data-sortable="true">Their %</th>
                                 <th class="td-name" data-sortable="true">Diff</th>
                                 <th class="td-name" data-sortable="true">MS</th>
                               </tr>
@@ -316,6 +319,7 @@
                                 <td>{{ps.played}}</td>
                                 <td>{{ps.won}}</td>
                                 <td>{{ps.win_loss|floatformat:2}}</td>
+                                <td>{{ps.other_player.ninety_day_win_percentage|floatformat:2}}</td>
                                 <td>{{ps.point_differential|floatformat:2}}</td>
                                 <td>{{ps.meta_score|floatformat:2}}</td>
                               </tr>
