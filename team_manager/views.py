@@ -22,6 +22,7 @@ from django.db.models import Count, Avg, Sum, Min, Max
 from operator import itemgetter
 from collections import defaultdict
 from django.contrib.auth.hashers import make_password
+from django.db import connection
 #from analysis import analysis2, create_dataset, analysis
 
 #from google.appengine.api.taskqueue import taskqueue
@@ -96,6 +97,44 @@ def index(request):
     best_opponent_point_differential_bad = PlayerPlayerSummary.objects.filter(relationship='OPP').filter(played__gt=tandem_qualified_games).order_by("point_differential")[:5]
     best_opponent_win_ratio_bad = PlayerPlayerSummary.objects.filter(relationship='OPP').filter(played__gt=tandem_qualified_games).order_by("win_loss")[:5]
 
+    score_lifters = sql_query(""" SELECT p.id as player_id, p.first_name, p.last_name, 
+                            ROUND(AVG(pps.win_loss - op.ninety_day_win_percentage), 4) as Tandem_Lift_Win, 
+                            ROUND(AVG(pps.point_differential - op.ninety_day_plus_minus), 4) as Tandem_Lift_Points
+                            FROM team_manager_player p INNER JOIN player_player_stats pps on pps.player_id = p.id 
+                            INNER JOIN team_manager_player op on op.id = pps.other_player_id WHERE relationship = 'WITH'
+                            AND pps.played >= 5
+                            GROUP BY 1,2,3
+                            ORDER BY 5 DESC LIMIT 5;""")
+
+    score_draggers = sql_query(""" SELECT p.id as player_id, p.first_name, p.last_name, 
+                            ROUND(AVG(pps.win_loss - op.ninety_day_win_percentage), 4) as Tandem_Lift_Win, 
+                            ROUND(AVG(pps.point_differential - op.ninety_day_plus_minus), 4) as Tandem_Lift_Points
+                            FROM team_manager_player p INNER JOIN player_player_stats pps on pps.player_id = p.id 
+                            INNER JOIN team_manager_player op on op.id = pps.other_player_id WHERE relationship = 'WITH'
+                            AND pps.played >= 5
+                            GROUP BY 1,2,3
+                            ORDER BY 5 LIMIT 5;""")
+
+    win_lifters = sql_query(""" SELECT p.id as player_id, p.first_name, p.last_name, 
+                            ROUND(AVG(pps.win_loss - op.ninety_day_win_percentage), 4) as Tandem_Lift_Win, 
+                            ROUND(AVG(pps.point_differential - op.ninety_day_plus_minus), 4) as Tandem_Lift_Points
+                            FROM team_manager_player p INNER JOIN player_player_stats pps on pps.player_id = p.id 
+                            INNER JOIN team_manager_player op on op.id = pps.other_player_id WHERE relationship = 'WITH'
+                            AND pps.played >= 5
+                            GROUP BY 1,2,3
+                            ORDER BY 4 DESC LIMIT 5;""")
+
+    win_draggers = sql_query(""" SELECT p.id as player_id, p.first_name, p.last_name, 
+                            ROUND(AVG(pps.win_loss - op.ninety_day_win_percentage), 4) as Tandem_Lift_Win, 
+                            ROUND(AVG(pps.point_differential - op.ninety_day_plus_minus), 4) as Tandem_Lift_Points
+                            FROM team_manager_player p INNER JOIN player_player_stats pps on pps.player_id = p.id 
+                            INNER JOIN team_manager_player op on op.id = pps.other_player_id WHERE relationship = 'WITH'
+                            AND pps.played >= 5
+                            GROUP BY 1,2,3
+                            ORDER BY 4 LIMIT 5;""")
+
+
+
 
     context = ({'gym_slots_today': gym_slots_today, 'gym_slots_other': gym_slots_other, 'active_games': active_games, 
                 'active_sessions': active_sessions, 'ps_win_ratio': ps_win_ratio, 'ps_point_differential': ps_point_differential, 
@@ -106,7 +145,11 @@ def index(request):
                 'best_opponent_point_differential':best_opponent_point_differential,
                 'best_opponent_win_ratio':best_opponent_win_ratio,
                 'best_opponent_point_differential_bad':best_opponent_point_differential_bad,
-                'best_opponent_win_ratio_bad':best_opponent_win_ratio_bad})
+                'best_opponent_win_ratio_bad':best_opponent_win_ratio_bad,
+                'score_lifters':score_lifters,
+                'score_draggers':score_draggers,
+                'win_lifters':win_lifters,
+                'win_draggers':win_draggers})
 
     return HttpResponse(template.render(context, request))
 
@@ -747,4 +790,20 @@ def date_handler(obj):
         return obj.isoformat()
     else:
         raise TypeError
+
+def dictfetchall(cursor):
+    "Return all rows from a cursor as a dict"
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
+
+def sql_query(stSQL):
+    result = []
+    with connection.cursor() as cursor:
+        cursor.execute(stSQL)
+        result = dictfetchall(cursor) 
+
+    return result
 

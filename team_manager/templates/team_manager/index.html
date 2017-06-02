@@ -187,6 +187,41 @@
       </div>
     </div>
 
+    <div class="col-sm-6">
+      <div class="list-group z-depth-3">
+        <a href="#" class="list-group-item list-group-item-info">
+          <i class="fa fa-arrow-up"></i>
+           <strong>Player:</strong> Best Win Lift
+        </a>
+        {% if win_lifters %}
+          {% for ps in win_lifters %}
+             <a href="/player/{{ps.player_id}}" class="list-group-item list-group-item-action"><span class="fa fa-user" aria-hidden="true"></span> {{ps.first_name}} {{ps.last_name}} ({{ps.Tandem_Lift_Win|floatformat:2}})
+             </a>
+           {% endfor %}
+        {% else %}
+            <a href="" class="list-group-item list-group-item-action">No Active Games</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-sm-6">
+      <div class="list-group z-depth-3">
+        <a href="#" class="list-group-item list-group-item-danger">
+          <i class="fa fa-arrow-up"></i>
+           <strong>Player:</strong> Best Point Lift
+        </a>
+        {% if score_lifters %}
+          {% for ps in score_lifters %}
+             <a href="/player/{{ps.player_id}}" class="list-group-item list-group-item-action"><span class="fa fa-user" aria-hidden="true"></span> {{ps.first_name}} {{ps.last_name}} ({{ps.Tandem_Lift_Points|floatformat:2}})
+             </a>
+           {% endfor %}
+        {% else %}
+            <a href="" class="list-group-item list-group-item-action">No Active Games</a>
+        {% endif %}
+      </div>
+    </div>
+
+
 
 <div class="page-header col-sm-12">
   <h5> <span class="fa-stack fa-lg">
@@ -297,6 +332,46 @@
           {% for ps in best_opponent_point_differential_bad %}
              <a href="/player/{{ps.player_id}}" class="list-group-item list-group-item-action"><span class="fa fa-user" aria-hidden="true"></span> {{ps.player}}/{{ps.other_player}} ({{ps.point_differential|floatformat:2}})
              <i><span class="badge badge-pill badge-primary">{{ps.played}} games</span></i>
+             </a>
+           {% endfor %}
+        {% else %}
+            <a href="" class="list-group-item list-group-item-action">No Active Games</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-sm-6">
+      <div class="list-group z-depth-3">
+        <a href="#" class="list-group-item list-group-item-info">
+        <span class="fa-stack">
+          <i class="fa fa-arrow-up fa-stack-1x"></i>
+          <i class="fa fa-ban fa-stack-2x text-danger"></i>
+        </span>
+           <strong>Player:</strong> Worst Win Lift
+        </a>
+        {% if win_draggers %}
+          {% for ps in win_draggers %}
+             <a href="/player/{{ps.player_id}}" class="list-group-item list-group-item-action"><span class="fa fa-user" aria-hidden="true"></span> {{ps.first_name}} {{ps.last_name}} ({{ps.Tandem_Lift_Win|floatformat:2}})
+             </a>
+           {% endfor %}
+        {% else %}
+            <a href="" class="list-group-item list-group-item-action">No Active Games</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-sm-6">
+      <div class="list-group z-depth-3">
+        <a href="#" class="list-group-item list-group-item-danger">
+        <span class="fa-stack">
+          <i class="fa fa-arrow-up fa-stack-1x"></i>
+          <i class="fa fa-ban fa-stack-2x text-danger"></i>
+        </span>
+           <strong>Player:</strong> Worst Point Lift
+        </a>
+        {% if score_draggers %}
+          {% for ps in score_draggers %}
+             <a href="/player/{{ps.player_id}}" class="list-group-item list-group-item-action"><span class="fa fa-user" aria-hidden="true"></span> {{ps.first_name}} {{ps.last_name}} ({{ps.Tandem_Lift_Points|floatformat:2}})
              </a>
            {% endfor %}
         {% else %}
