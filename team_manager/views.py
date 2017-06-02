@@ -61,11 +61,12 @@ def index(request):
     #return HttpResponse("Hello, world. You're at the team manager index.")
     template = loader.get_template('team_manager/index.html')
     today = (datetime.now() - timedelta(hours=7)).strftime("%A")
+    today_date = (datetime.now() - timedelta(hours=7))
 
     gym_slots_today = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).filter(day_of_week = today).all()
     gym_slots_other = GymSlot.objects.filter(start_date__lte = datetime.now()).filter(end_date__gte = datetime.now()).exclude(day_of_week = today).all()
     active_games = Game.objects.filter(end_time = None)
-    active_sessions = GymSession.objects.filter(created_at__date = datetime.now())
+    active_sessions = GymSession.objects.filter(created_at__date = today_date)
 
 
     total_games = Game.objects.all().aggregate(played=Count('id'))
