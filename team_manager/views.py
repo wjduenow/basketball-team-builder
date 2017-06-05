@@ -580,10 +580,20 @@ def start_gym_slot_session(request, gym_session_id=None):
                      'awareness': request.POST.get("awareness", '1'),
                      'size': request.POST.get("size", '2'),
                      'win_contribution': request.POST.get("win_contribution", False), 
-                     'score_contribution': request.POST.get("score_contribution", False)}
+                     'score_contribution': request.POST.get("score_contribution", False),
+                     'win_ratio': request.POST.get("win_ratio", False), 
+                     'win_ratio_weight': request.POST.get("win_ratio_weight", 0.5)
+                     }
+
+    
 
     if players_group:
         print "Using Team Maker"
+        print model_weights
+        print model_weights
+        print model_weights
+        teams = Team.make_team(players_group, model_weights)
+        print model_weights
         teams = Team.make_team(players_group, model_weights)
         sorted_team = Team.sort_team_on_metric(teams, 'player_score')
         team_score = {'team_a': sorted_team['team_a'], 'team_b': sorted_team['team_b']}

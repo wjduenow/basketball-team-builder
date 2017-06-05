@@ -127,7 +127,7 @@ class PlayerPlayerSummary(models.Model):
     other_player = models.ForeignKey(Player, on_delete=models.DO_NOTHING, related_name='other_player_player_summary')
     played = models.IntegerField(default=2)
     won = models.IntegerField(default=2)
-    win_loss = models.FloatField(default=2)
+    win_loss = models.FloatField(default=0)
     point_differential = models.FloatField(default=2)
     relationship = models.CharField(max_length=200)
 
@@ -299,7 +299,7 @@ class Team(models.Model):
 
 
     @classmethod
-    def make_team(cls, player_ids, model_weights = {}):
+    def make_team(cls, player_ids, model_weights_matrix):
         team_a = []
         team_b = []
         stats_dict = {}
@@ -315,6 +315,14 @@ class Team(models.Model):
         for stat in stats:
             stats_dict[int(stat.player_id)] = stat
 
+
+        ## Collect the Score and Win Contribution Model Weights
+        win_ratio = model_weights_matrix['win_ratio']
+        win_ratio_weight = float(model_weights_matrix['win_ratio_weight'])
+        score_contribution = model_weights_matrix['score_contribution']
+        win_contribution = model_weights_matrix['win_contribution']
+
+
         ### Append Stats to Players
         for player in players:
             if player['id'] in stats_dict:
@@ -327,28 +335,26 @@ class Team(models.Model):
                 player['defend_fast'] = stats_dict[int(player['id'])].defend_fast
                 player['movement'] = stats_dict[int(player['id'])].movement
                 player['awareness'] = stats_dict[int(player['id'])].awareness
+                player['win_ratio'] = player['ninety_day_plus_minus']
                 player['win_contribution'] = player['win_contribution']
                 player['score_contribution'] = player['score_contribution']
                 
 
-                ## Collect the Score and Win Contribution Model Weights
-                score_contribution = model_weights['score_contribution']
-                win_contribution = model_weights['win_contribution']
-                #del ['score_contribution']
-                #del ['win_contribution']
                 
                 #print model_weights
-                for k,v in model_weights.items():
-                    #print v
-                    if 1==1: #v.isnumeric():
-                        #print("%s - %s" % (k,v))
-                        player[k] = float(player[k]) * float(v)
+                for k,v in model_weights_matrix.items():
+                    if k not in ['win_ratio_weight', 'win_ratio', 'score_contribution', 'win_contribution']:
+                        if v.isnumeric():
+                            player[k] = float(player[k]) * float(v)
 
                 player['player_score'] = mean([player['scoring'], player['outside_shooting'], player['passing'], player['rebounding'], player['defend_large'], player['defend_fast'], player['movement'], player['awareness'], player['size']])
 
+                
+                if win_ratio:
+                    player['player_score'] = player['player_score'] * (player['win_ratio'] * win_ratio_weight)
+
                 if win_contribution:
                     player['player_score'] = player['player_score'] * (player['win_contribution'] + 1)
-
 
                 if score_contribution:
                     player['player_score'] = player['player_score'] * player['score_contribution']
