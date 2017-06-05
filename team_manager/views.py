@@ -586,12 +586,10 @@ def start_gym_slot_session(request, gym_session_id=None):
                      }
 
     
+    team_models = request.POST.get("team_models", 'default')
 
     if players_group:
         print "Using Team Maker"
-        print model_weights
-        print model_weights
-        print model_weights
         teams = Team.make_team(players_group, model_weights)
         print model_weights
         teams = Team.make_team(players_group, model_weights)
@@ -610,7 +608,7 @@ def start_gym_slot_session(request, gym_session_id=None):
     gym_session = GymSession.objects.get(id = gym_session_id)
 
     players = Player.objects.filter(pk__in=gym_session.players.values_list('id', flat=True)).exclude(pk__in=selected_players_list).order_by('first_name')    
-    context = ({'rematch_game_id': rematch_game_id, 'players': players, 'gym_session_id': gym_session_id, 'gym_session': gym_session, 'teams_json': json.dumps(teams, default=date_handler), 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights})
+    context = ({'rematch_game_id': rematch_game_id, 'players': players, 'gym_session_id': gym_session_id, 'gym_session': gym_session, 'teams_json': json.dumps(teams, default=date_handler), 'teams': teams, 'players_group': players_group, 'team_score': team_score, 'team_size': team_size, 'model_weights': model_weights, 'team_models': team_models})
     return HttpResponse(template.render(context, request))
 
 @login_required    

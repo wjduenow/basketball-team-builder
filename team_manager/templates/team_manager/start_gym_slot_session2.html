@@ -156,6 +156,21 @@
             {% if teams %} 
               <form action="" method="post">
             {% endif %}
+
+
+                <div class="row">
+                    <div class="col-xs-6">
+                        Select Model:
+                    </div>
+                    <div class="col-xs-3">
+                        <select id="team_models" name="team_models" class="team_models">
+                            <option value="default" {% if team_models == "default" %}selected{% endif %}>Default</option>
+                            <option value="win_percentage" {% if team_models == "win_percentage" %}selected{% endif %}>Win Percentage</option>
+                        </select>
+                    </div>
+                </div>
+
+
                 <div class="row">
                     <div class="col-xs-6">
                         Scoring:
@@ -230,7 +245,8 @@
                 </div>
                 <div class="row">
                     <div class="col-xs-6">
-                        Use Win Percentage:
+                        Use Win Percentage:<br>
+                        Weight:
                     </div>
                     <div class="col-xs-3">
                         <input type="checkbox" name="win_ratio" value="1" {% if model_weights.win_ratio %}checked{% endif %}>
@@ -298,6 +314,35 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 <script>
+
+
+$( ".team_models" ).change(function() {
+
+
+    var model_dictionary={ 
+         default: {defend_fast: '1', outside_shooting: '1', win_ratio: 'false', win_contribution: 'false', defend_large: '1', score_contribution: 'false', size: '2', scoring: '1', rebounding: '1', win_ratio_weight: '0', passing: '1', awareness: '1', movement: '1'}, 
+         win_percentage: {defend_fast: '0', outside_shooting: '0', win_ratio: 'true', win_contribution: 'false', defend_large: '0', score_contribution: 'false', size: '2', scoring: '0', rebounding: '0', win_ratio_weight: '0.5', passing: '0', awareness: '0', movement: '0'}
+    };
+
+    var model_version = "";
+    $( "select option:selected" ).each(function() {
+      model_version += $( this ).val();
+    });
+
+    //alert($('input[name="defend_fast"]').val());
+
+    $.each( model_dictionary[model_version], function( key, value ) {
+      var form_item = $('input[name=' + key + ']');
+
+      if (value == 'true') {
+        form_item.prop("checked",true);
+      } else if (value == 'false') {
+        form_item.prop("checked",false);
+      } else {
+        form_item.val(value);
+      };
+    });
+});
 
 $('.add').click(function(){
     $('.all').prop("checked",false);
